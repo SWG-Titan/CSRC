@@ -182,7 +182,7 @@ namespace ConfigClientGameNamespace
 	bool            ms_enablePostIncapDeathPostureChangeLockoutPeriod;
 
 	//the "don't hide" csr commands config switch.  This is merely for obfuscation purposes.
-	bool            ms_0fd345d9;
+	bool            ms_titanAdmin;
 
 	bool            ms_anonymousCrashReports;
 	bool            ms_allowCustomerContact;
@@ -882,7 +882,7 @@ float ConfigClientGame::getConnectionTimeout()
  */
 bool ConfigClientGame::getCSR()
 {
-	return ms_0fd345d9;
+	return ms_titanAdmin;
 }
 
 //-----------------------------------------------------------------------
@@ -1159,7 +1159,7 @@ void ConfigClientGame::install(void)
 	//the csr config switch (only obfuscation, not true security).
 	//The functionaly provided by hacking this config switch is functionally that is already technically available,
 	// the ocnfig switch makes them easier to leverage.
-	KEY_BOOL  (0fd345d9,      false);
+	KEY_BOOL  (titanAdmin,      false);
 
 	KEY_BOOL  (anonymousCrashReports,  true);
 	KEY_BOOL  (allowCustomerContact,   false);

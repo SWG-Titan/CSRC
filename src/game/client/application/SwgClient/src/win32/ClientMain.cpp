@@ -142,10 +142,11 @@ int ClientMain(
 
 	InstallTimer rootInstallTimer("root");
 
-	char clientWindowName[128] = "Star Wars Galaxies";
+	char clientWindowName[128] = "SWG: Titan";
 
 #if PRODUCTION != 1
-	snprintf(clientWindowName, sizeof(clientWindowName), "SwgClient (%s.%s)", Branch().getBranchName().c_str(), ApplicationVersion::getPublicVersion());
+	const char* customName = "SWG: Titan Development Client v1.0";
+	snprintf(clientWindowName, sizeof(clientWindowName), "%s", customName);
 	clientWindowName[sizeof(clientWindowName) - 1] = '\0';
 #endif
 
