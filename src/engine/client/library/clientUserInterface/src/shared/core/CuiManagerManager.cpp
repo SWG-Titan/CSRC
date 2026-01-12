@@ -24,6 +24,7 @@
 #include "clientUserInterface/CuiCraftManager.h"
 #include "clientUserInterface/CuiDamageManager.h"
 #include "clientUserInterface/CuiDataDrivenPageManager.h"
+#include "clientUserInterface/CuiFurnitureMovementManager.h"
 #include "clientUserInterface/CuiIconManager.h"
 #include "clientUserInterface/CuiInputNames.h"
 #include "clientUserInterface/CuiInstantMessageManager.h"
@@ -123,6 +124,7 @@ void CuiManagerManager::install (UIPage & rootPage)
 	CuiMinigameManager::install          ();
 	CuiPlayerQuestManager::install		 ();
 	CuiRecipeManager::install			 ();
+	CuiFurnitureMovementManager::install ();
 
 	DebugFlags::registerFlag (s_testSkillSystem,        "ClientUserInterface", "testSkillSystem");
 	DebugFlags::registerFlag (s_testSkillSystemVerbose, "ClientUserInterface", "testSkillSystemVerbose");
@@ -135,6 +137,7 @@ void CuiManagerManager::install (UIPage & rootPage)
 
 void CuiManagerManager::remove  ()
 {
+	CuiFurnitureMovementManager::remove ();
 	CuiRecipeManager::remove			();
 	CuiPlayerQuestManager::remove		();
 	CuiMinigameManager::remove          ();

@@ -40,6 +40,7 @@
 #include "clientUserInterface/CuiCombatManager.h"
 #include "clientUserInterface/CuiConsoleHelper.h"
 #include "clientUserInterface/CuiDamageManager.h"
+#include "clientUserInterface/CuiFurnitureMovementManager.h"
 #include "clientUserInterface/CuiIMEManager.h"
 #include "clientUserInterface/CuiIoWin.h"
 #include "clientUserInterface/CuiLayerRenderer.h"
@@ -724,6 +725,11 @@ void CuiManager::update (float elapsedTime)
 		CuiMediator::updateAll (elapsedTime);
 	}
 
+	{
+		PROFILER_AUTO_BLOCK_DEFINE ("CuiFurnitureMovementManager");
+		CuiFurnitureMovementManager::update (elapsedTime);
+	}
+
 	//-----------------------------------------------------------------
 	//-- update the chat bubbles
 
@@ -847,6 +853,8 @@ void CuiManager::render ()
 	if (camera)
 		CuiChatBubbleManager::render (*ms_uiCanvas, *camera);
 
+	ClientRegionManager::drawRegions();
+
 	UITextStyle::SetGlobalDropShadowEnabled(wasDropShadowEnabled);
 
 	UIManager::gUIManager ().Render (*ms_uiCanvas);
@@ -883,8 +891,6 @@ void CuiManager::render ()
 			lastTimes [numLastTimes - 1], totalTime));
 	}
 #endif
-
-	ClientRegionManager::drawRegions();
 
 	//-- restore the player mesh rendering state
 	if (playerSkeletalAppearance)
@@ -1213,7 +1219,7 @@ void CuiManager::setCameraInertia (float f)
 	{
 		ms_cameraInertia = f;
 		if (ms_theIoWin)
-			ms_theIoWin->flashDeadZoneInertia ();
+		 ms_theIoWin->flashDeadZoneInertia ();
 	}
 }
 
@@ -1243,7 +1249,6 @@ bool CuiManager::test (std::string & result)
 	setPointerMotionCapturedByUiX (true);
 	setPointerMotionCapturedByUiY (true);
 
-	update (100.0f);
 	render ();
 
 	setPointerInputActive         (false);
@@ -1272,7 +1277,7 @@ bool CuiManager::test (std::string & result)
 	CuiMediatorFactory::getMediatorNames (names);
 	for (std::vector<std::string>::const_iterator it = names.begin (); it != names.end (); ++it)
 	{
-		CuiMediator * const mediator = CuiMediatorFactory::get ((*it).c_str ());
+		CuiMediator * const mediator = CuiMediatorFactory::get((*it).c_str(), false);
 		NOT_NULL (mediator);
 		mediator->activate ();
 		update (100.0f);
@@ -1546,6 +1551,4 @@ void CuiManager::playUiEffect(std::string const & effect, Object * /*target*/)
 		}
 	}
 }
-
-//-----------------------------------------------------------------
 

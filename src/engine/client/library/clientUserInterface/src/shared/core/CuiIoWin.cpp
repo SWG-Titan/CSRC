@@ -22,6 +22,7 @@
 #include "clientUserInterface/CuiActionManager.h"
 #include "clientUserInterface/CuiActions.h"
 #include "clientUserInterface/CuiConversationManager.h"
+#include "clientUserInterface/CuiFurnitureMovementManager.h"
 #include "clientUserInterface/CuiInputMessage.def"
 #include "clientUserInterface/CuiLoadingManager.h"
 #include "clientUserInterface/CuiManager.h"
@@ -215,6 +216,9 @@ void CuiIoWin::draw () const
 	const GroundScene * const gs = dynamic_cast<const GroundScene *>(Game::getScene ());
 	if (gs)
 		gs->drawOverlays();
+
+	// Render furniture movement gizmos in world space (like GodClient)
+	CuiFurnitureMovementManager::render();
 
 	{
 		PROFILER_AUTO_BLOCK_DEFINE ("CuiManager::render (ui)");
@@ -957,6 +961,16 @@ IoResult CuiIoWin::processEvent (IoEvent * event)
 	case IOET_KeyDown:
 		AwayFromKeyBoardManager::touch();
 		
+		// Check if furniture movement mode wants to consume this input
+		if (CuiFurnitureMovementManager::isActive())
+		{
+			if (CuiFurnitureMovementManager::processKeyDown(event->arg2))
+			{
+				retval = true;
+				break;
+			}
+		}
+
 		if (m_keyboardInputActive)
 		{
 			InputMap * const gameInputMap = Game::getGameInputMap ();
@@ -999,6 +1013,16 @@ IoResult CuiIoWin::processEvent (IoEvent * event)
 		{
 			m_ignoreNextNumPadValue = false;
 
+			// Check if furniture movement mode wants to consume this input
+			if (CuiFurnitureMovementManager::isActive())
+			{
+				if (CuiFurnitureMovementManager::processKeyUp(event->arg2))
+				{
+					retval = true;
+					break;
+				}
+			}
+
 			if (m_keyboardInputActive)
 				retval = true;
 			
@@ -1015,6 +1039,27 @@ IoResult CuiIoWin::processEvent (IoEvent * event)
 		break;
 	case IOET_MouseButtonUp:
 	case IOET_MouseButtonDown:
+		// Check if furniture movement mode wants to consume mouse input
+		if (CuiFurnitureMovementManager::isActive())
+		{
+			bool leftButton = (event->type == IOET_MouseButtonDown && event->arg2 == 0);
+			bool rightButton = (event->type == IOET_MouseButtonDown && event->arg2 == 1);
+			
+			// Also check for button up events
+			if (event->type == IOET_MouseButtonUp)
+			{
+				leftButton = rightButton = false; // Button up means no buttons pressed
+			}
+			
+			if (CuiFurnitureMovementManager::processMouseInput(
+				m_mouseCursor->getX(), 
+				m_mouseCursor->getY(), 
+				leftButton, 
+				rightButton))
+			{
+				retval = true;
+			}
+		}
 		break;
 	case IOET_SetSystemMouseCursorPosition:
 		break;
@@ -1373,7 +1418,7 @@ void CuiIoWin::setDeadZoneSize         (int xy)
 		if (Game::isHudSceneTypeSpace())
 			ms_reticleDeadZoneSizeUsable = std::max(ms_minimumSpaceDeadZone, ms_reticleDeadZoneSize);
 		else
-			ms_reticleDeadZoneSizeUsable = ms_reticleDeadZoneSize;
+		 ms_reticleDeadZoneSizeUsable = ms_reticleDeadZoneSize;
 
 		if (CuiManager::getInstalled ())
 			CuiManager::getIoWin ().resetDeadZone ();

@@ -41,6 +41,7 @@
 #include "clientUserInterface/CuiCombatManager.h"
 #include "clientUserInterface/CuiConversationManager.h"
 #include "clientUserInterface/CuiCraftManager.h"
+#include "clientUserInterface/CuiFurnitureMovementManager.h"
 #include "clientUserInterface/CuiInventoryManager.h"
 #include "clientUserInterface/CuiIoWin.h"
 #include "clientUserInterface/CuiManager.h"
@@ -702,7 +703,7 @@ void CuiRadialMenuManager::update()
 	if (!s_pendingResponses.empty())
 	{
 		if (!player)
-			s_pendingResponses.clear ();
+		 s_pendingResponses.clear ();
 		else
 		{
 			PendingResponseInfo & entry = s_pendingResponses.front();
@@ -797,7 +798,7 @@ bool CuiRadialMenuManager::createMenu (Object & object, const UIPoint & pt, bool
 
 		//-- sending labels to the server has no effect, they will get stripped off anyway		
 		if (!isInPublicContainer)
-			s_helper.purgeLabels ();
+		 s_helper.purgeLabels ();
 
 		if (++s_sequenceGlobal == 0)
 			++s_sequenceGlobal;
@@ -833,7 +834,7 @@ bool CuiRadialMenuManager::createMenu (Object & object, const UIPoint & pt, bool
 			ms_radial->SetProperty (UIRadialMenu::PropertyName::Style, Unicode::narrowToWide (RADIAL_STYLE));
 			UIWidget * const w = safe_cast<UIWidget *>(UIManager::gUIManager ().GetObjectFromPath (RADIAL_CENTER_PROTO, TUIWidget));
 			WARNING (!w, ("No such RADIAL_CENTER_PROTO [%s]", RADIAL_CENTER_PROTO));
-			ms_radial->SetRadialCenterPrototype (w);
+		 ms_radial->SetRadialCenterPrototype (w);
 			
 			UIWidget * const centerWidget = ms_radial->GetRadialCenterWidget ();
 			if (centerWidget)
@@ -943,7 +944,7 @@ CuiMenuInfoHelper * CuiRadialMenuManager::createMenu (Object & object, const UIP
 }
 
 
-//----------------------------------------------------------------------
+ //----------------------------------------------------------------------
 
 namespace
 {
@@ -1306,11 +1307,26 @@ bool CuiRadialMenuManager::populateMenu (CuiMenuInfoHelper & helper, const Objec
 
 			return true;
 		}
-
-		if(got == SharedObjectTemplate::GOT_misc_furniture)
+		//Add move option for furniture not in world or on player
+		if (PlayerObject::isAdmin())
 		{
-			if(!isInWorld && !isOnPlayer)
+			if (got != SharedObjectTemplate::GOT_creature && got != SharedObjectTemplate::GOT_installation && got != SharedObjectTemplate::GOT_data)
+			{
+				//send warning
+				WARNING(!isInWorld && !isOnPlayer, ("Admin moving object that is either in world or on player"));
+				helper.addRootMenu(ITEM_MOVEMENT_MODE, got);
+			}
+		}
+		else if (got == SharedObjectTemplate::GOT_misc_furniture)
+		{
+			if (!isInWorld && !isOnPlayer)
+			{
 				pickupable = true;
+			}
+			if ((isInWorld || (containedByObject && containedByObject->getCellProperty())))
+			{
+				helper.addRootMenu(ITEM_MOVEMENT_MODE, got);
+			}
 		}
 
 		if ((pickupable && !isInWorld) || allowPickups)
@@ -1670,6 +1686,9 @@ bool CuiRadialMenuManager::populateMenu (CuiMenuInfoHelper & helper, const Objec
 			
 			if(!appearanceItem)
 				helper.addRootMenu (ITEM_DESTROY, got);
+
+			if (PlayerObject::isAdmin() && (parentCell == CellProperty::getWorldCellProperty()))
+				helper.addRootMenu(ITEM_DROP, got, true);
 		}
 
 		else if (player)
@@ -2183,7 +2202,7 @@ void CuiRadialMenuManager::OnPopupMenuSelection (UIWidget * context)
 		{
 			if (label.empty ())
 				label = Cui::MenuInfoTypes::getLocalizedLabel (static_cast<Cui::MenuInfoTypes::Type>(type), clientObject->getGameObjectType ());
-			
+
 			Unicode::String result;
 			CuiStringVariablesManager::process (CuiStringIds::radial_out_of_range_prose, 
 				Unicode::emptyString, 
@@ -2479,6 +2498,14 @@ void CuiRadialMenuManager::performMenuAction (int sel, int index, bool serverNot
 			CuiActionManager::performAction  (CuiActions::droidCommand, Unicode::narrowToWide(clientObject->getNetworkId().getValueString()));
 		}
 	}
+	else if(sel == ITEM_MOVEMENT_MODE)
+	{
+		// Enter furniture movement mode for the selected object
+		if(clientObject)
+		{
+			CuiFurnitureMovementManager::enterMovementMode(clientObject->getNetworkId());
+		}
+	}
 }
 
 //----------------------------------------------------------------------
@@ -2497,7 +2524,7 @@ void CuiRadialMenuManager::clear ()
 	if (ms_popup)
 	{
 		UIManager::gUIManager ().PopContextWidgets (ms_radial);
-		setPopup (0);
+	 setPopup (0);
 	}
 }
 
@@ -2675,8 +2702,6 @@ void CuiRadialMenuManager::touchCache  (const NetworkId & id)
 	}
 }
 
-//----------------------------------------------------------------------
-
 void  CuiRadialMenuManager::setObjectMenuDirty (NetworkId const & id)
 {
 	const CacheMap::iterator it = s_cacheMap.find (id);
@@ -2740,19 +2765,19 @@ bool CuiRadialMenuManager::performDefaultDoubleClickAction(Object const & object
 	SharedObjectTemplate::GameObjectType got  = SharedObjectTemplate::GOT_none;
 	if (clientObject)
 		got = static_cast<SharedObjectTemplate::GameObjectType> (clientObject->getGameObjectType ());
-	
+
 	////////////////////////////////////
 	
 	const bool isVendor = (got == SharedObjectTemplate::GOT_vendor || (tangible && tangible->hasCondition (TangibleObject::C_vendor)));
 	bool isAttackable = !isVendor;
 	isAttackable = isAttackable && tangible != 0 && tangible->isAttackable();
-	isAttackable = isAttackable && (!creature || !creature->isDead ());
+	isAttackable = isAttackable && (!creature || !creature->isDead());
 	isAttackable = isAttackable && got != SharedObjectTemplate::GOT_corpse;
-	
+
 	////////////////////////////////////
 
 	bool const isNestedInventory = tangible ? CuiInventoryManager::isNestedInventory(*tangible) : 0;
-	bool const isNestedEquipped = tangible ? CuiInventoryManager::isNestedEquipped(*tangible)  : 0;
+	bool const isNestedEquipped = tangible ? CuiInventoryManager::isNestedEquipped(*tangible) : 0;
 	bool const isOnPlayer = isNestedInventory || isNestedEquipped;
 	bool const isConversable = creature ? creature->hasCondition(TangibleObject::C_conversable) : false;
 	bool const isMount = creature ? creature->hasCondition(TangibleObject::C_mount) : false;
@@ -2762,14 +2787,15 @@ bool CuiRadialMenuManager::performDefaultDoubleClickAction(Object const & object
 	bool const isEnemy = creature ? creature->isEnemy() : false;
 	bool const pickupable = !isOnPlayer && canPickUp(got);
 	bool const isPlayer = creature ? creature->isPlayer() : false;
-	bool const isInWorld = !containedByObject || containedByObject->getCellProperty ();
+	bool const isInWorld = !containedByObject || containedByObject->getCellProperty();
 	bool const isOwner = creature ? creature->getMasterId() == player->getNetworkId() : false;
 	bool const isCraftingStation = got == SharedObjectTemplate::GOT_misc_crafting_station;
 
 	////////////////////////////////////
-	
+
 	uint32 const clientObjectUniqueId = clientObject ? clientObject->getUniqueId() : 0;
-	NetworkId const & networkId = object.getNetworkId();
+	NetworkId const& networkId = object.getNetworkId();
+
 
 	////////////////////////////////////
 
