@@ -14,12 +14,16 @@
 #include "clientGame/ClientCommandQueue.h"
 #include "clientGame/ClientObject.h"
 #include "clientGame/CreatureObject.h"
+#include "clientGame/FreeCamera.h"
 #include "clientGame/Game.h"
+#include "clientGame/GroundScene.h"
 #include "clientGame/PlayerObject.h"
 #include "clientGraphics/Camera.h"
 #include "clientGraphics/DebugPrimitive.h"
 #include "clientGraphics/Graphics.h"
 #include "clientGraphics/ShaderTemplateList.h"
+#include "clientObject/GameCamera.h"
+#include "clientUserInterface/CuiManager.h"
 #include "clientUserInterface/CuiSystemMessageManager.h"
 #include "sharedCollision/BoxExtent.h"
 #include "sharedCollision/Extent.h"
@@ -66,6 +70,17 @@ namespace CuiFurnitureMovementManagerNamespace
 
 	bool s_installed = false;
 	bool s_active = false;
+	bool s_decoratorCameraActive = false;
+	int s_previousCameraMode = -1;
+
+	// Camera control keys (WASD)
+	bool s_cameraKeyW = false;
+	bool s_cameraKeyA = false;
+	bool s_cameraKeyS = false;
+	bool s_cameraKeyD = false;
+	bool s_cameraKeySpace = false;  // Up
+	bool s_cameraKeyCtrl = false;   // Down
+	float s_cameraSpeed = 10.0f;
 
 	CachedNetworkId s_selectedFurniture;
 	Transform s_originalTransform;
@@ -182,13 +197,52 @@ void CuiFurnitureMovementManager::update(float const deltaTimeSecs)
 		return;
 	}
 	
-	// Only apply keyboard movement if not dragging gizmo
+	// Handle WASD camera movement in decorator mode
+	if (s_decoratorCameraActive)
+	{
+		GroundScene * const gs = dynamic_cast<GroundScene *>(Game::getScene());
+		if (gs)
+		{
+			FreeCamera * const freeCamera = dynamic_cast<FreeCamera *>(gs->getCurrentCamera());
+			if (freeCamera)
+			{
+				float const speed = s_fineMode ? s_cameraSpeed * 0.2f : s_cameraSpeed;
+				float const moveAmount = speed * deltaTimeSecs;
+				
+				// Get current camera info
+				FreeCamera::Info info = freeCamera->getInfo();
+				
+				// Calculate movement in camera space
+				Vector forward = freeCamera->getObjectFrameK_w();
+				Vector right = freeCamera->getObjectFrameI_w();
+				Vector movement = Vector::zero;
+				
+				// Forward/Back (W/S)
+				if (s_cameraKeyW) movement += forward * moveAmount;
+				if (s_cameraKeyS) movement -= forward * moveAmount;
+				
+				// Strafe Left/Right (A/D)
+				if (s_cameraKeyA) movement -= right * moveAmount;
+				if (s_cameraKeyD) movement += right * moveAmount;
+				
+				// Up/Down (Space/Ctrl)
+				if (s_cameraKeySpace) movement.y += moveAmount;
+				if (s_cameraKeyCtrl) movement.y -= moveAmount;
+				
+				if (movement != Vector::zero)
+				{
+					info.translate += movement;
+					freeCamera->setInfo(info);
+				}
+			}
+		}
+	}
+	
+	// Update furniture transform if not dragging
 	if (!s_isDragging)
 	{
 		updateFurnitureTransform();
 	}
-	
-	UNREF(deltaTimeSecs);
 }
 
 //----------------------------------------------------------------------
@@ -220,6 +274,10 @@ bool CuiFurnitureMovementManager::enterMovementMode(NetworkId const & furnitureI
 	resetGizmoState();
 	
 	s_active = true;
+	
+	// Enable decorator camera for gizmo interaction
+	enableDecoratorCamera();
+	
 	CuiSystemMessageManager::sendFakeSystemMessage(Unicode::narrowToWide("Furniture Mode: Drag gizmo, R=mode, Enter/Esc"));
 	return true;
 }
@@ -229,6 +287,9 @@ bool CuiFurnitureMovementManager::enterMovementMode(NetworkId const & furnitureI
 void CuiFurnitureMovementManager::exitMovementMode(bool const applyChanges)
 {
 	if (!s_active) return;
+	
+	// Disable decorator camera first
+	disableDecoratorCamera();
 	
 	if (applyChanges)
 	{
@@ -296,20 +357,56 @@ bool CuiFurnitureMovementManager::processKeyDown(int const keystroke)
 	
 	switch (keystroke)
 	{
+	// Gizmo scale controls
+	case DIK_Q:
+		s_gizmoScale = std::max(0.25f, s_gizmoScale - 0.25f);
+		return true;
+	case DIK_E:
+		s_gizmoScale = std::min(4.0f, s_gizmoScale + 0.25f);
+		return true;
+		
+	// Apply and exit
 	case DIK_R:
+		exitMovementMode(true);
+		return true;
+		
+	// Cycle gizmo mode
+	case DIK_TAB:
 		cycleGizmoMode();
 		return true;
+		
+	// Fine mode
 	case DIK_LSHIFT:
 	case DIK_RSHIFT:
 		s_fineMode = true;
 		return true;
-	case DIK_RETURN:
-	case DIK_NUMPADENTER:
-		exitMovementMode(true);
-		return true;
+		
+	// Cancel and exit
 	case DIK_ESCAPE:
 		exitMovementMode(false);
 		return true;
+		
+	// Camera movement (WASD + Space/Ctrl)
+	case DIK_W:
+		s_cameraKeyW = true;
+		return true;
+	case DIK_A:
+		s_cameraKeyA = true;
+		return true;
+	case DIK_S:
+		s_cameraKeyS = true;
+		return true;
+	case DIK_D:
+		s_cameraKeyD = true;
+		return true;
+	case DIK_SPACE:
+		s_cameraKeySpace = true;
+		return true;
+	case DIK_LCONTROL:
+	case DIK_RCONTROL:
+		s_cameraKeyCtrl = true;
+		return true;
+		
 	default:
 		break;
 	}
@@ -328,6 +425,28 @@ bool CuiFurnitureMovementManager::processKeyUp(int const keystroke)
 	case DIK_RSHIFT:
 		s_fineMode = false;
 		return true;
+		
+	// Camera movement release
+	case DIK_W:
+		s_cameraKeyW = false;
+		return true;
+	case DIK_A:
+		s_cameraKeyA = false;
+		return true;
+	case DIK_S:
+		s_cameraKeyS = false;
+		return true;
+	case DIK_D:
+		s_cameraKeyD = false;
+		return true;
+	case DIK_SPACE:
+		s_cameraKeySpace = false;
+		return true;
+	case DIK_LCONTROL:
+	case DIK_RCONTROL:
+		s_cameraKeyCtrl = false;
+		return true;
+		
 	default:
 		break;
 	}
@@ -352,19 +471,6 @@ bool CuiFurnitureMovementManager::processMouseInput(int x, int y, bool leftButto
 {
 	if (!s_active) return false;
 	
-	// Right-click cancels
-	if (rightButton)
-	{
-		if (s_isDragging)
-		{
-			s_isDragging = false;
-			s_activeComponent = GC_None;
-			return true;
-		}
-		exitMovementMode(false);
-		return true;
-	}
-	
 	Object * const obj = getSelectedObject();
 	if (!obj) return false;
 	
@@ -374,7 +480,51 @@ bool CuiFurnitureMovementManager::processMouseInput(int x, int y, bool leftButto
 	Vector const objectPosition = obj->getPosition_w();
 	float const gizmoSize = s_cachedObjectRadius * s_gizmoScale * 2.0f;
 	
-	// Handle dragging
+	// Right-click to pan camera
+	if (rightButton)
+	{
+		// If dragging gizmo, cancel the drag
+		if (s_isDragging)
+		{
+			s_isDragging = false;
+			s_activeComponent = GC_None;
+		}
+		
+		// Pan camera with right-click drag
+		if (s_decoratorCameraActive)
+		{
+			int const deltaX = x - s_lastMouseX;
+			int const deltaY = y - s_lastMouseY;
+			
+			if (deltaX != 0 || deltaY != 0)
+			{
+				GroundScene * const gs = dynamic_cast<GroundScene *>(Game::getScene());
+				if (gs)
+				{
+					FreeCamera * const freeCamera = dynamic_cast<FreeCamera *>(gs->getCurrentCamera());
+					if (freeCamera)
+					{
+						float const panSensitivity = 0.005f;
+						FreeCamera::Info info = freeCamera->getInfo();
+						info.yaw -= static_cast<float>(deltaX) * panSensitivity;
+						info.pitch -= static_cast<float>(deltaY) * panSensitivity;
+						
+						// Clamp pitch
+						if (info.pitch > PI * 0.49f) info.pitch = PI * 0.49f;
+						if (info.pitch < -PI * 0.49f) info.pitch = -PI * 0.49f;
+						
+						freeCamera->setInfo(info);
+					}
+				}
+			}
+		}
+		
+		s_lastMouseX = x;
+		s_lastMouseY = y;
+		return true;
+	}
+	
+	// Handle gizmo dragging with left button
 	if (s_isDragging && leftButton)
 	{
 		int const deltaX = x - s_lastMouseX;
@@ -456,43 +606,72 @@ bool CuiFurnitureMovementManager::processMouseDrag(int x, int y, int deltaX, int
 	
 	if (!s_active || !s_isDragging || s_activeComponent == GC_None) return false;
 	
-	float const sensitivity = s_fineMode ? 0.002f : 0.02f;
+	Camera const * const camera = Game::getCamera();
+	if (!camera) return false;
+	
+	float const sensitivity = s_fineMode ? 0.005f : 0.05f;
+	
+	// Get camera right and up vectors for screen-space movement
+	Vector const cameraRight = camera->getObjectFrameI_w();
+	Vector const cameraUp = camera->getObjectFrameJ_w();
+	Vector const cameraForward = camera->getObjectFrameK_w();
 	
 	switch (s_activeComponent)
 	{
 	case GC_AxisX:
-		moveX(static_cast<float>(deltaX) * sensitivity);
+		{
+			// Project camera right onto X axis to determine drag direction
+			float const dot = cameraRight.x;
+			float const sign = (dot >= 0.0f) ? 1.0f : -1.0f;
+			moveX(static_cast<float>(deltaX) * sensitivity * sign);
+		}
 		break;
 	case GC_AxisY:
+		// Y is always vertical, so use screen Y
 		moveY(static_cast<float>(-deltaY) * sensitivity);
 		break;
 	case GC_AxisZ:
-		moveZ(static_cast<float>(-deltaY) * sensitivity);
+		{
+			// Project camera right onto Z axis to determine drag direction
+			float const dot = cameraRight.z;
+			float const sign = (dot >= 0.0f) ? 1.0f : -1.0f;
+			moveZ(static_cast<float>(deltaX) * sensitivity * sign);
+		}
 		break;
 	case GC_PlaneXY:
 		moveX(static_cast<float>(deltaX) * sensitivity);
 		moveY(static_cast<float>(-deltaY) * sensitivity);
 		break;
 	case GC_PlaneXZ:
-		moveX(static_cast<float>(deltaX) * sensitivity);
-		moveZ(static_cast<float>(-deltaY) * sensitivity);
+		{
+			// Move along XZ plane based on screen movement
+			Vector screenMove = cameraRight * static_cast<float>(deltaX) * sensitivity;
+			screenMove -= cameraForward * static_cast<float>(deltaY) * sensitivity;
+			moveX(screenMove.x);
+			moveZ(screenMove.z);
+		}
 		break;
 	case GC_PlaneYZ:
-		moveY(static_cast<float>(deltaX) * sensitivity);
-		moveZ(static_cast<float>(-deltaY) * sensitivity);
+		moveY(static_cast<float>(-deltaY) * sensitivity);
+		moveZ(static_cast<float>(deltaX) * sensitivity);
 		break;
 	case GC_RotateYaw:
-		rotateYaw(static_cast<float>(deltaX) * sensitivity * 50.0f);
+		rotateYaw(static_cast<float>(deltaX) * sensitivity * 20.0f);
 		break;
 	case GC_RotatePitch:
-		rotatePitch(static_cast<float>(deltaY) * sensitivity * 50.0f);
+		rotatePitch(static_cast<float>(deltaY) * sensitivity * 20.0f);
 		break;
 	case GC_RotateRoll:
-		rotateRoll(static_cast<float>(deltaX) * sensitivity * 50.0f);
+		rotateRoll(static_cast<float>(deltaX) * sensitivity * 20.0f);
 		break;
 	case GC_Sphere:
-		rotateYaw(static_cast<float>(deltaX) * sensitivity * 25.0f);
-		rotatePitch(static_cast<float>(deltaY) * sensitivity * 25.0f);
+		{
+			// Free drag on ground plane (XZ)
+			Vector screenMove = cameraRight * static_cast<float>(deltaX) * sensitivity;
+			screenMove -= cameraForward * static_cast<float>(deltaY) * sensitivity;
+			moveX(screenMove.x);
+			moveZ(screenMove.z);
+		}
 		break;
 	default:
 		return false;
@@ -520,53 +699,92 @@ void CuiFurnitureMovementManager::render()
 	// Get world transform and calculate gizmo size
 	Transform const & objTransform = obj->getTransform_o2w();
 	float const gizmoSize = s_cachedObjectRadius * s_gizmoScale * 2.0f;
+	float const lineThickness = gizmoSize * 0.02f; // For thicker lines
 	
 	// Set up transform for 3D rendering at object location
 	Graphics::setObjectToWorldTransformAndScale(objTransform, obj->getScale());
 	
-	// Draw axis frame using built-in function (RGB lines for XYZ axes)
-	Graphics::drawFrame(gizmoSize);
+	// Helper lambda to draw thicker lines (draw main line plus offset lines)
+	auto drawThickLine = [&](Vector const & start, Vector const & end, VectorArgb const & color) {
+		Graphics::drawLine(start, end, color);
+		// Draw additional offset lines for thickness
+		Vector dir = end - start;
+		dir.normalize();
+		Vector perp1 = dir.cross(Vector::unitY);
+		if (perp1.magnitudeSquared() < 0.01f)
+			perp1 = dir.cross(Vector::unitX);
+		perp1.normalize();
+		Vector perp2 = dir.cross(perp1);
+		perp2.normalize();
+		
+		Graphics::drawLine(start + perp1 * lineThickness, end + perp1 * lineThickness, color);
+		Graphics::drawLine(start - perp1 * lineThickness, end - perp1 * lineThickness, color);
+		Graphics::drawLine(start + perp2 * lineThickness, end + perp2 * lineThickness, color);
+		Graphics::drawLine(start - perp2 * lineThickness, end - perp2 * lineThickness, color);
+	};
 	
-	// Draw additional gizmo elements based on mode
+	// Draw gizmo based on mode
 	if (s_gizmoMode == GM_Translate)
 	{
-		// Draw axis endpoint cubes
+		// Draw axis lines with thickness
 		bool const xH = (s_hoveredComponent == GC_AxisX || s_activeComponent == GC_AxisX);
 		bool const yH = (s_hoveredComponent == GC_AxisY || s_activeComponent == GC_AxisY);
 		bool const zH = (s_hoveredComponent == GC_AxisZ || s_activeComponent == GC_AxisZ);
 		
-		float const cubeSize = gizmoSize * 0.1f;
-		VectorArgb const xColor = xH ? VectorArgb(1.0f, 1.0f, 0.5f, 0.5f) : VectorArgb(1.0f, 1.0f, 0.2f, 0.2f);
-		VectorArgb const yColor = yH ? VectorArgb(1.0f, 0.5f, 1.0f, 0.5f) : VectorArgb(1.0f, 0.2f, 1.0f, 0.2f);
-		VectorArgb const zColor = zH ? VectorArgb(1.0f, 0.5f, 0.5f, 1.0f) : VectorArgb(1.0f, 0.2f, 0.2f, 1.0f);
+		VectorArgb const xColor = xH ? VectorArgb(1.0f, 1.0f, 0.4f, 0.4f) : VectorArgb(1.0f, 0.8f, 0.1f, 0.1f);
+		VectorArgb const yColor = yH ? VectorArgb(1.0f, 0.4f, 1.0f, 0.4f) : VectorArgb(1.0f, 0.1f, 0.8f, 0.1f);
+		VectorArgb const zColor = zH ? VectorArgb(1.0f, 0.4f, 0.4f, 1.0f) : VectorArgb(1.0f, 0.1f, 0.1f, 0.8f);
 		
+		// X axis (Red)
+		drawThickLine(Vector::zero, Vector(gizmoSize, 0.0f, 0.0f), xColor);
+		// Y axis (Green)
+		drawThickLine(Vector::zero, Vector(0.0f, gizmoSize, 0.0f), yColor);
+		// Z axis (Blue)
+		drawThickLine(Vector::zero, Vector(0.0f, 0.0f, gizmoSize), zColor);
+		
+		// Draw axis endpoint cubes
+		float const cubeSize = gizmoSize * 0.12f;
 		Graphics::drawCube(Vector(gizmoSize, 0.0f, 0.0f), cubeSize, xColor);
 		Graphics::drawCube(Vector(0.0f, gizmoSize, 0.0f), cubeSize, yColor);
 		Graphics::drawCube(Vector(0.0f, 0.0f, gizmoSize), cubeSize, zColor);
+		
+		// Draw small center indicator for translate mode
+		bool const centerH = (s_hoveredComponent == GC_Sphere || s_activeComponent == GC_Sphere);
+		VectorArgb const centerColor = centerH ? VectorArgb(1.0f, 1.0f, 1.0f, 1.0f) : VectorArgb(1.0f, 0.9f, 0.9f, 0.5f);
+		Graphics::drawOctahedron(Vector::zero, gizmoSize * 0.1f, centerColor);
 	}
 	else if (s_gizmoMode == GM_Rotate)
 	{
-		// Draw rotation circles
+		// Draw large rotation rings - 3 distinct colored rings
 		bool const yawH = (s_hoveredComponent == GC_RotateYaw || s_activeComponent == GC_RotateYaw);
 		bool const pitchH = (s_hoveredComponent == GC_RotatePitch || s_activeComponent == GC_RotatePitch);
 		bool const rollH = (s_hoveredComponent == GC_RotateRoll || s_activeComponent == GC_RotateRoll);
 		
-		float const radius = gizmoSize * 0.8f;
-		int const segments = 32;
+		// Make rings larger and more visible
+		float const radius = gizmoSize * 1.2f;
+		int const segments = 64;
+		float const ringThickness = gizmoSize * 0.03f;
 		
-		VectorArgb const yawColor = yawH ? VectorArgb(1.0f, 0.5f, 1.0f, 0.5f) : VectorArgb(1.0f, 0.2f, 1.0f, 0.2f);
-		VectorArgb const pitchColor = pitchH ? VectorArgb(1.0f, 1.0f, 0.5f, 0.5f) : VectorArgb(1.0f, 1.0f, 0.2f, 0.2f);
-		VectorArgb const rollColor = rollH ? VectorArgb(1.0f, 0.5f, 0.5f, 1.0f) : VectorArgb(1.0f, 0.2f, 0.2f, 1.0f);
+		// Yaw ring (Green - around Y axis, horizontal)
+		VectorArgb const yawColor = yawH ? VectorArgb(1.0f, 0.5f, 1.0f, 0.5f) : VectorArgb(1.0f, 0.2f, 0.8f, 0.2f);
+		// Pitch ring (Red - around X axis, vertical front-back)
+		VectorArgb const pitchColor = pitchH ? VectorArgb(1.0f, 1.0f, 0.5f, 0.5f) : VectorArgb(1.0f, 0.8f, 0.2f, 0.2f);
+		// Roll ring (Blue - around Z axis, vertical left-right)
+		VectorArgb const rollColor = rollH ? VectorArgb(1.0f, 0.5f, 0.5f, 1.0f) : VectorArgb(1.0f, 0.2f, 0.2f, 0.8f);
 		
-		Graphics::drawCircle(Vector::zero, Vector::unitY, radius, segments, yawColor);
-		Graphics::drawCircle(Vector::zero, Vector::unitX, radius, segments, pitchColor);
-		Graphics::drawCircle(Vector::zero, Vector::unitZ, radius, segments, rollColor);
+		// Draw multiple offset circles for each ring to create thickness
+		for (float offset = -ringThickness; offset <= ringThickness; offset += ringThickness * 0.5f)
+		{
+			// Yaw (Y axis) - green horizontal ring
+			Graphics::drawCircle(Vector(0.0f, offset, 0.0f), Vector::unitY, radius, segments, yawColor);
+			
+			// Pitch (X axis) - red vertical ring (front-back tilt)
+			Graphics::drawCircle(Vector(offset, 0.0f, 0.0f), Vector::unitX, radius * 0.9f, segments, pitchColor);
+			
+			// Roll (Z axis) - blue vertical ring (left-right tilt)
+			Graphics::drawCircle(Vector(0.0f, 0.0f, offset), Vector::unitZ, radius * 0.8f, segments, rollColor);
+		}
 	}
-	
-	// Draw center indicator
-	bool const sphereH = (s_hoveredComponent == GC_Sphere || s_activeComponent == GC_Sphere);
-	VectorArgb const sphereColor = sphereH ? VectorArgb(1.0f, 1.0f, 1.0f, 0.8f) : VectorArgb(1.0f, 1.0f, 1.0f, 0.4f);
-	Graphics::drawOctahedron(Vector::zero, gizmoSize * 0.15f, sphereColor);
 }
 
 //----------------------------------------------------------------------
@@ -809,4 +1027,72 @@ void CuiFurnitureMovementManager::updateFurnitureTransform()
 	obj->setTransform_o2p(newTransform);
 }
 
-//======================================================================
+//----------------------------------------------------------------------
+
+void CuiFurnitureMovementManager::enableDecoratorCamera()
+{
+	if (s_decoratorCameraActive) return;
+	
+	GroundScene * const gs = dynamic_cast<GroundScene *>(Game::getScene());
+	if (!gs) return;
+	
+	// Save current camera mode
+	s_previousCameraMode = gs->getCurrentView();
+	
+	// Switch to free camera mode
+	gs->setView(GroundScene::CI_free);
+	
+	// Enable pointer input so mouse cursor is visible
+	CuiManager::setPointerToggledOn(true);
+	
+	s_decoratorCameraActive = true;
+	
+	CuiSystemMessageManager::sendFakeSystemMessage(Unicode::narrowToWide("Decorator camera enabled. Use mouse to interact with gizmos."));
+}
+
+//----------------------------------------------------------------------
+
+void CuiFurnitureMovementManager::disableDecoratorCamera()
+{
+	if (!s_decoratorCameraActive) return;
+	
+	GroundScene * const gs = dynamic_cast<GroundScene *>(Game::getScene());
+	if (gs && s_previousCameraMode >= 0)
+	{
+		// Restore previous camera mode
+		gs->setView(s_previousCameraMode);
+	}
+	
+	// Disable pointer toggle
+	CuiManager::setPointerToggledOn(false);
+	
+	s_decoratorCameraActive = false;
+	s_previousCameraMode = -1;
+	
+	CuiSystemMessageManager::sendFakeSystemMessage(Unicode::narrowToWide("Decorator camera disabled."));
+}
+
+//----------------------------------------------------------------------
+
+bool CuiFurnitureMovementManager::isDecoratorCameraActive()
+{
+	return s_decoratorCameraActive;
+}
+
+//----------------------------------------------------------------------
+
+void CuiFurnitureMovementManager::sendSetPositionToServer()
+{
+	/*
+	//get location (cell too) and transform/rotation of the furniture 
+	if (!s_selectedFurniture.isValid()) return;
+	Object* const obj = getSelectedObject();
+	if (!obj) return;
+	Transform const& t = obj->getTransform_o2p();
+
+	char buffer[256];
+	
+	*/
+}
+
+//----------------------------------------------------------------------

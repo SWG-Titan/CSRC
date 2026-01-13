@@ -55,6 +55,13 @@ public:
 	static bool enterMovementMode(NetworkId const & furnitureId);
 	static void exitMovementMode(bool applyChanges);
 	static bool isActive();
+	
+	// Decorator camera mode (free camera with mouse cursor visible)
+	static void enableDecoratorCamera();
+	static void disableDecoratorCamera();
+	static bool isDecoratorCameraActive();
+
+	void sendSetPositionToServer();
 
 	// Get selected furniture
 	static NetworkId const & getSelectedFurniture();

@@ -44,6 +44,7 @@
 #include "clientUserInterface/CuiConversationManager.h"
 #include "clientUserInterface/CuiDragInfo.h"
 #include "clientUserInterface/CuiDragManager.h"
+#include "clientUserInterface/CuiFurnitureMovementManager.h"
 #include "clientUserInterface/CuiGameColorManager.h"
 #include "clientUserInterface/CuiIoWin.h"
 #include "clientUserInterface/CuiManager.h"
@@ -1552,6 +1553,17 @@ void SwgCuiHud::manageTargetBoxes (const Object * intendedObject, const Camera &
 	if (player == NULL)
 		return;
 	
+	// Hide target boxes when in decorator/furniture movement mode
+	if (CuiFurnitureMovementManager::isDecoratorCameraActive())
+	{
+		for (int i = 0; i < SBT_numTypes; ++i)
+		{
+			m_selectionBoxPages[i]->SetEnabled(false);
+			m_selectionBoxPages[i]->SetOpacity(0.0f);
+		}
+		return;
+	}
+	
 	const UISize  pageSize (getPage ().GetSize ());
 	const UIPoint pageTargetMargin (16L, 16L);
 	const UIRect  targetClipRect (pageTargetMargin, pageSize - (pageTargetMargin * 2L));
@@ -1566,8 +1578,8 @@ void SwgCuiHud::manageTargetBoxes (const Object * intendedObject, const Camera &
 		m_selectionBoxPages[i]->SetEnabled(false);
 		found[i] = false;
 	}
-	
-	
+
+
 	// Check for critical ships in space.
 	if (Game::isHudSceneTypeSpace())
 	{
@@ -2050,7 +2062,7 @@ void SwgCuiHud::summonRadialMenu(const Unicode::String & params)
 		}
 		else
 		{
-			SwgCuiInventory *inventory = SwgCuiInventory::findSelectedInventoryPage();
+			SwgCuiInventory * inventory = SwgCuiInventory::findSelectedInventoryPage();
 			if(inventory)
 				inventory->openSelectedRadial();
 		}

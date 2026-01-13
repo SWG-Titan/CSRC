@@ -668,7 +668,24 @@ IoResult CuiIoWin::processEvent (IoEvent * event)
 	switch (event->type)
 	{
 	case IOET_MouseMove:
-		{		
+		{
+			// Handle furniture movement gizmo dragging first
+			if (CuiFurnitureMovementManager::isActive())
+			{
+				bool leftButton = (msg.Modifiers.LeftMouseDown != 0);
+				bool rightButton = (msg.Modifiers.RightMouseDown != 0);
+				
+				if (CuiFurnitureMovementManager::processMouseInput(
+					m_mouseCursor->getX(),
+					m_mouseCursor->getY(),
+					leftButton,
+					rightButton))
+				{
+					// Gizmo consumed the input, don't process further
+					return IOR_Block;
+				}
+			}
+			
 			UIPoint newCoords;
 			//Add a movement multiplier
 			newCoords.x = m_mouseCursor->getX ();
@@ -1042,13 +1059,21 @@ IoResult CuiIoWin::processEvent (IoEvent * event)
 		// Check if furniture movement mode wants to consume mouse input
 		if (CuiFurnitureMovementManager::isActive())
 		{
-			bool leftButton = (event->type == IOET_MouseButtonDown && event->arg2 == 0);
-			bool rightButton = (event->type == IOET_MouseButtonDown && event->arg2 == 1);
+			bool leftButton = false;
+			bool rightButton = false;
 			
-			// Also check for button up events
-			if (event->type == IOET_MouseButtonUp)
+			if (event->type == IOET_MouseButtonDown)
 			{
-				leftButton = rightButton = false; // Button up means no buttons pressed
+				leftButton = (event->arg2 == 0);
+				rightButton = (event->arg2 == 1);
+			}
+			// For button up, we still pass the current button states from modifiers
+			// so the manager knows which button was released
+			else if (event->type == IOET_MouseButtonUp)
+			{
+				// Check current modifier state, but note which button was just released
+				leftButton = (msg.Modifiers.LeftMouseDown != 0) && (event->arg2 != 0);
+				rightButton = (msg.Modifiers.RightMouseDown != 0) && (event->arg2 != 1);
 			}
 			
 			if (CuiFurnitureMovementManager::processMouseInput(
@@ -1058,6 +1083,7 @@ IoResult CuiIoWin::processEvent (IoEvent * event)
 				rightButton))
 			{
 				retval = true;
+				break;
 			}
 		}
 		break;
@@ -1504,7 +1530,7 @@ void CuiIoWin::getScreenCenterOffset(UIPoint & screenCenterOffset) const
 }
 
 
-//----------------------------------------------------------------------
+///----------------------------------------------------------------------
 
 void CuiIoWin::setMouseLookState( MouseLookState state )
 {
