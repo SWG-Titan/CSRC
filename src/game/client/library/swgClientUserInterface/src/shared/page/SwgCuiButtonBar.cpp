@@ -29,6 +29,8 @@
 #include "clientUserInterface/CuiManager.h"
 #include "clientUserInterface/CuiMessageBox.h"
 #include "clientUserInterface/CuiMediatorFactory.h"
+#include "clientUserInterface/CuiActionManager.h"
+#include "clientUserInterface/CuiActions.h"
 #include "clientUserInterface/CuiPersistentMessageManager.h"
 #include "clientUserInterface/CuiPreferences.h"
 #include "clientUserInterface/CuiSoundManager.h"
@@ -128,6 +130,7 @@ m_myCollectionsButton(0),
 m_appearanceButton(0),
 m_questBuilderButton(0),
 m_gcwInfoButton(0),
+m_decoratorSpawnButton(0),
 m_effectingExpertise(false),
 m_effectorExpertise(0),
 m_effectingMenu(false),
@@ -163,6 +166,7 @@ m_opacityCallback      (0)
 	getCodeDataObject (TUIButton,     m_appearanceButton,        "buttonAppearance");
 	getCodeDataObject (TUIButton,     m_questBuilderButton,		 "buttonQuestBuilder");
 	getCodeDataObject (TUIButton,     m_gcwInfoButton,           "buttonGCW");
+	getCodeDataObject (TUIButton,     m_decoratorSpawnButton,    "buttonDecoratorSpawn", true);
 
 
 	getCodeDataObject (TUIEffector,   m_effectorNewMail,         "effectorNewMail");
@@ -201,6 +205,8 @@ m_opacityCallback      (0)
 		registerMediatorObject (*m_homePortButton, true);
 	if (m_roadmapButton)
 		registerMediatorObject (*m_roadmapButton, true);
+	if (m_decoratorSpawnButton)
+		registerMediatorObject (*m_decoratorSpawnButton, true);
 
 	getPage ().SetContextCapable (true, true);
 
@@ -638,6 +644,20 @@ void SwgCuiButtonBar::toggleMenu()
 			}
 		}
 
+		// Show decorator spawn button only for admins
+		if(m_decoratorSpawnButton)
+		{
+			if (PlayerObject::isAdmin())
+			{
+				m_decoratorSpawnButton->GetParentWidget()->SetVisible(true);
+				++m_numberButtons;
+			}
+			else
+			{
+				m_decoratorSpawnButton->GetParentWidget()->SetVisible(false);
+			}
+		}
+
 		m_buttonsComposite->Pack();
 		m_buttonsComposite->Pack();
 
@@ -680,6 +700,16 @@ void SwgCuiButtonBar::OnButtonPressed   (UIWidget * context)
 			{
 				CuiMessageBox::createYesNoBox(CuiStringIds::confirm_go_home.localize(), &onConfirmGoHomeClosed);
 			}
+		}
+		else if (context == m_decoratorSpawnButton)
+		{
+			if (PlayerObject::isAdmin())
+			{
+				CuiActionManager::performAction(CuiActions::decoratorSpawn, Unicode::emptyString);
+			}
+			m_mouseoverPage->SetVisible(false);
+			m_buttonsComposite->SetVisible(false);
+			CuiManager::requestPointer(false);
 		}
 		else
 		{

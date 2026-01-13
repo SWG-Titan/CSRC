@@ -1697,7 +1697,10 @@ bool  SwgCuiHudAction::performAction (const std::string & id, const Unicode::Str
 	}
 	else if (id == CuiActions::decoratorSpawn)
 	{
-		CuiMediatorFactory::toggleInWorkspace(CuiMediatorTypes::WS_DecoratorSpawn);
+		if (PlayerObject::isAdmin())
+		{
+			CuiMediatorFactory::toggleInWorkspace(CuiMediatorTypes::WS_DecoratorSpawn);
+		}
 	}
 
 	//unknown action

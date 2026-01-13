@@ -406,14 +406,6 @@ bool CuiFurnitureMovementManager::processKeyDown(int const keystroke)
 		exitMovementMode(false);
 		return true;
 		
-	// Open object spawn UI
-	case DIK_T:
-		if (s_decoratorCameraActive)
-		{
-			openSpawnUI();
-		}
-		return true;
-		
 	// Camera movement (WASD + Space/Ctrl)
 	case DIK_W:
 		s_cameraKeyW = true;
@@ -1157,8 +1149,8 @@ void CuiFurnitureMovementManager::enableDecoratorCamera()
 	s_previousCameraMode = gs->getCurrentView();
 	
 	// Save current HUD opacity and hide UI
-	s_previousHudOpacity = CuiPreferences::getHudOpacity();
-	CuiPreferences::setHudOpacity(0.0f);
+	//s_previousHudOpacity = CuiPreferences::getHudOpacity();
+	//CuiPreferences::setHudOpacity(0.0f);
 	
 	// Switch to free camera mode
 	gs->setView(GroundScene::CI_free);
@@ -1185,7 +1177,8 @@ void CuiFurnitureMovementManager::disableDecoratorCamera()
 	}
 	
 	// Restore HUD opacity
-	CuiPreferences::setHudOpacity(s_previousHudOpacity);
+	//CuiPreferences::setHudOpacity(s_previousHudOpacity);
+
 	
 	// Disable pointer toggle
 	CuiManager::setPointerToggledOn(false);

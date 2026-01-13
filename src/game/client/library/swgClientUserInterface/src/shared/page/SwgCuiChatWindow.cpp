@@ -98,6 +98,7 @@
 #include <algorithm>
 #include <set>
 #include <vector>
+#include "../../../../../../../engine/client/library/clientUserInterface/src/shared/core/CuiFurnitureMovementManager.h"
 
 //#include "DejaLib.h"
 
@@ -715,6 +716,10 @@ void SwgCuiChatWindow::performDeactivate()
 
 void SwgCuiChatWindow::acceptTextInput(bool b, bool setKeyboardInput, bool unfocusMediator)
 {
+	if (CuiFurnitureMovementManager::isDecoratorCameraActive())
+		b = false;
+	else
+
 	if (!isActive() || !getPage().IsVisible())
 		b = false;
 	else if (isMaximized())

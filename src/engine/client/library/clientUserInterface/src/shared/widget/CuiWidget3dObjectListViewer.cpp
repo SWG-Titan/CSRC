@@ -1290,7 +1290,7 @@ void  CuiWidget3dObjectListViewer::Notify( UINotificationServer *, UIBaseObject 
 			const Object * const obj = op.second.getPointer ();
 			if (!obj)
 			{
-				it = m_objectVector->erase (it);
+			 it = m_objectVector->erase (it);
 			}
 			else
 			{
@@ -2378,6 +2378,12 @@ bool CuiWidget3dObjectListViewer::checkAppearancesReady () const
 			if (!const_cast<SkeletalAppearance2 *>(skelApp)->rebuildIfDirtyAndAvailable())
 				return false;
 		}
+		else
+		{
+			const DetailAppearance * const detailApp = app->asDetailAppearance ();
+			if (detailApp && !const_cast<DetailAppearance *>(detailApp)->rebuildIfDirtyAndAvailable())
+				return false;
+		}
 	}
 
 	return true;
@@ -2414,9 +2420,48 @@ void CuiWidget3dObjectListViewer::computeFitPointCloud (stdvector<Vector>::fwd &
 
 		if (appearancesReady)
 		{
-			const SkeletalAppearance2 * const skelApp = app->asSkeletalAppearance2 ();
+			const SkeletalAppearance2 * const skelApp = app ? app->asSkeletalAppearance2 () : 0;
 			if (skelApp)
-				appearancesReady = const_cast<SkeletalAppearance2 *>(skelApp)->rebuildIfDirtyAndAvailable();
+			{
+				bool found = false;
+				int index = 0;
+
+				//-- Force the skeleton and mesh processing to occur if it is needed.
+				// @todo fix this, get a non-const Appearance instance.
+				appearancesReady = const_cast<SkeletalAppearance2 *>(skelApp)->rebuildIfDirtyAndAvailable ();
+
+				Skeleton const * const skeleton = skelApp->getDisplayLodSkeleton ();
+				if (skeleton)
+				{
+					skeleton->findTransformIndex(TemporaryCrcString (m_cameraLookAtBone.c_str (), true), &index, &found);
+
+					if (found && index >= 0)
+					{
+						const Transform & transform = skeleton->getJointToRootTransformArray() [index];
+						m_cameraLookAtTarget = transform.getPosition_p ();
+						if(!m_cameraZoomLookAtBone.empty())
+						{
+							skeleton->findTransformIndex(TemporaryCrcString (m_cameraZoomLookAtBone.c_str (), true), &index, &found);
+							if (found && index >= 0)
+							{
+								const Transform & transform = skeleton->getJointToRootTransformArray() [index];
+								float clampedVal = std::max(std::min(m_zoomBoneInterpFactor, 1.0f), 0.0f);
+								m_cameraLookAtTarget = Vector::linearInterpolate(m_cameraLookAtTarget, transform.getPosition_p (), clampedVal);
+							}
+						}
+					}
+				}
+			}
+
+		}
+		else if (hasFlags (F_cameraLookAtCenter))
+		{
+			if (app)
+			{
+				BoxExtent boxExtent;
+				computeTransformedBoxExtent (*obj, boxExtent, false);
+				m_cameraLookAtTarget = boxExtent.getSphere ().getCenter ();
+			}
 		}
 
 		if (useScale)
@@ -3377,9 +3422,14 @@ void CuiWidget3dObjectListViewer::recomputeNearAndFarPlanes()
 	if (!totalAxialBox.isEmpty() && !m_forceDefaultClippingPlanes)
 	{
 		float const radius = totalAxialBox.getRadius();
+		float const cameraDistance = m_cameraYawPitchZoom.z;
 
-		float nearPlane = clamp(s_nearPlaneMinimum, (m_cameraYawPitchZoom.z - radius) * 0.5f, s_nearPlaneMaximum);
-		float farPlane = clamp(nearPlane + 1.0f, m_cameraYawPitchZoom.z + radius, s_farPlaneMaximum);
+		// Scale the minimum near plane based on camera distance to maintain depth precision
+		// This prevents grey artifacts from depth buffer precision issues when zoomed out
+		float const scaledNearPlaneMinimum = std::max(s_nearPlaneMinimum, cameraDistance * 0.001f);
+
+		float nearPlane = clamp(scaledNearPlaneMinimum, (cameraDistance - radius) * 0.5f, s_nearPlaneMaximum);
+		float farPlane = clamp(nearPlane + 1.0f, cameraDistance + radius, s_farPlaneMaximum);
 		m_camera->setNearPlane (nearPlane);
 		m_camera->setFarPlane  (farPlane);
 	}
