@@ -30,7 +30,7 @@ namespace SplashScreenNamespace
 	Texture const * ms_texture = nullptr;
 	StaticShader * ms_shader = nullptr;
 	
-	char const * const cms_defaultSplashTexture = "texture/ui/loading/large/large_load_watto.dds";
+	char const * const cms_defaultSplashTexture = "texture/loading/large/large_load_watto.dds";
 	char const * const cms_splashShader = "shader/ui_splash.sht";
 	
 	void renderFullscreenQuad();

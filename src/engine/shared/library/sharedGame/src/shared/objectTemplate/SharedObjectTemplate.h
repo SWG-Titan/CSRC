@@ -283,6 +283,9 @@ public:
 		GOT_clothing_wookiee,
 		GOT_clothing_misc,
 		GOT_clothing_skirt,
+		GOT_beastmaster = 0x02000000,
+		GOT_beastmaster_misc,
+		GOT_beastmaster_pet,
 		GOT_ship_component = 0x40000000,		// //add space-specific GOTS at the "end" to make merging easier
 		GOT_ship_component_reactor,
 		GOT_ship_component_engine,

@@ -54,7 +54,6 @@ Usage:
   nuna unpack <input.titanpak> <directory> [options]
   nuna list <input.titanpak> [options]
   nuna validate <input.titanpak> [options]
-  nuna toc create <output.titanlst> <tre1> <tre2> ... [options]
   nuna toc list <input.titanlst> [options]
   nuna toc unpack <input.titanlst> <directory> [options]
   nuna toc validate <input.titanlst>
@@ -64,7 +63,7 @@ Commands:
   unpack     Extract a TitanPak archive to a directory  
   list       List contents of a TitanPak archive
   validate   Validate a TitanPak archive
-  toc        Work with titanlst/TOC files (create, list, unpack, validate)
+  toc        Work with titanlst/TOC files (list, unpack, validate)
 
 Supported Formats:
   .titanpak  - TitanPak format (auto-encrypted with built-in key)
@@ -88,7 +87,6 @@ Examples:
   nuna list assets.titanpak
   nuna pack ./data legacy.tre            (unencrypted .tre)
   nuna list legacy.tre
-  nuna toc create custom.titanlst bottom.tre top.tre
   nuna toc list default.titanlst
   nuna toc unpack default.titanlst ./extracted -s ./tre_files
 
@@ -299,48 +297,13 @@ int main(int argc, char* argv[])
     {
         if (cmd.arg1.empty())
         {
-            std::cerr << "Error: toc requires a subcommand (create, list, unpack, validate)" << std::endl;
+            std::cerr << "Error: toc requires a subcommand (list, unpack, validate)" << std::endl;
             return 1;
         }
         
         std::string subCommand = cmd.arg1;
         
-        if (subCommand == "create" || subCommand == "c")
-        {
-            if (cmd.arg2.empty())
-            {
-                std::cerr << "Error: toc create requires <output.titanlst> <tre1> <tre2> ..." << std::endl;
-                return 1;
-            }
-            
-            std::string outputFile = cmd.arg2;
-            std::vector<std::string> treFiles;
-            
-            // Collect all TRE files from remaining args
-            for (int i = 1; i < argc; ++i)
-            {
-                std::string arg = argv[i];
-                if (arg == cmd.command) continue;
-                if (arg == subCommand) continue;
-                if (arg == outputFile) continue;
-                if (arg[0] == '-') continue;
-                treFiles.push_back(arg);
-            }
-            
-            if (treFiles.empty())
-            {
-                std::cerr << "Error: toc create requires at least one TRE file" << std::endl;
-                return 1;
-            }
-            
-            Nuna::PackOptions options;
-            options.compressToc = !cmd.noTocCompress;
-            options.quiet = cmd.quiet;
-            options.verbose = cmd.verbose;
-            
-            result = Nuna::createTitanlst(outputFile, treFiles, options);
-        }
-        else if (subCommand == "list" || subCommand == "l")
+        if (subCommand == "list" || subCommand == "l")
         {
             if (cmd.arg2.empty())
             {

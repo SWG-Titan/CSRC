@@ -45,11 +45,13 @@ endif()
 
 set(NUNA_SOURCES
     src/Nuna.cpp
+    src/NunaToc.cpp
     src/main.cpp
 )
 
 set(NUNA_HEADERS
     src/Nuna.h
+    src/NunaToc.h
     src/NunaCrc.h
     src/NunaCompression.h
     src/NunaCrypto.h
@@ -90,6 +92,7 @@ install(TARGETS nuna DESTINATION bin)
 
 add_library(nuna_lib STATIC
     src/Nuna.cpp
+    src/NunaToc.cpp
     ${NUNA_HEADERS}
 )
 

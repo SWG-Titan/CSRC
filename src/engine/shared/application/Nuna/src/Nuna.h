@@ -1,13 +1,14 @@
 // ======================================================================
 //
 // Nuna.h
-// TRE Archive Packer/Unpacker Tool
+// TRE/titanlst Archive Packer/Unpacker Tool
 // Copyright (c) Titan Project
 //
-// A standalone TRE archive utility supporting:
+// A standalone archive utility supporting:
 // - Packing directories into TRE archives
 // - Unpacking TRE archives to directories
-// - Listing TRE archive contents
+// - Unpacking titanlst files (extracts from referenced TRE files)
+// - Listing archive contents
 // - Optional encryption for secure TRE files
 //
 // ======================================================================
@@ -28,15 +29,14 @@ namespace Nuna
 // TRE Format Constants
 // ======================================================================
 
-// Tags are stored as big-endian (characters in reading order)
-// 'TREE' in file = bytes 0x54 0x52 0x45 0x45 = "TREE"
-// When read as uint32_t on little-endian: 0x45455254
-constexpr uint32_t TAG_TREE = 'E' | ('E' << 8) | ('R' << 16) | ('T' << 24);  // "TREE" as read from file
-constexpr uint32_t TAG_0005 = '5' | ('0' << 8) | ('0' << 16) | ('0' << 24);  // "0005" as read from file
-constexpr uint32_t TAG_0004 = '4' | ('0' << 8) | ('0' << 16) | ('0' << 24);  // "0004" as read from file
+constexpr uint32_t TAG_TREE = 'E' | ('E' << 8) | ('R' << 16) | ('T' << 24);  // "TREE"
+constexpr uint32_t TAG_0005 = '5' | ('0' << 8) | ('0' << 16) | ('0' << 24);  // "0005"
+constexpr uint32_t TAG_0004 = '4' | ('0' << 8) | ('0' << 16) | ('0' << 24);  // "0004"
+constexpr uint32_t TAG_NUNA = 'A' | ('N' << 8) | ('U' << 16) | ('N' << 24);  // "NUNA" (encrypted)
 
-// Encrypted TRE magic (NUNA)
-constexpr uint32_t TAG_NUNA = 'A' | ('N' << 8) | ('U' << 16) | ('N' << 24);  // "NUNA" as read from file
+// TOC Format Constants
+constexpr uint32_t TAG_TOC  = 'C' | ('O' << 8) | ('T' << 16) | (' ' << 24);  // "TOC "
+constexpr uint32_t TAG_0001 = '1' | ('0' << 8) | ('0' << 16) | ('0' << 24);  // "0001"
 
 // ======================================================================
 // Compression Types
@@ -56,41 +56,73 @@ enum class CompressionType : uint32_t
 #pragma pack(push, 1)
 struct TreHeader
 {
-    uint32_t token;                    // 'TREE' or 'NUNA' for encrypted
-    uint32_t version;                  // '0005' or '0004'
-    uint32_t numberOfFiles;            // Number of files in archive
-    uint32_t tocOffset;                // Offset to table of contents
-    uint32_t tocCompressor;            // Compressor used for TOC
-    uint32_t sizeOfTOC;                // Size of compressed TOC
-    uint32_t blockCompressor;          // Compressor used for name block
-    uint32_t sizeOfNameBlock;          // Size of compressed name block
-    uint32_t uncompSizeOfNameBlock;    // Uncompressed size of name block
+    uint32_t token;
+    uint32_t version;
+    uint32_t numberOfFiles;
+    uint32_t tocOffset;
+    uint32_t tocCompressor;
+    uint32_t sizeOfTOC;
+    uint32_t blockCompressor;
+    uint32_t sizeOfNameBlock;
+    uint32_t uncompSizeOfNameBlock;
 };
 
 // ======================================================================
-// Table of Contents Entry (24 bytes)
+// TRE Table of Contents Entry (24 bytes)
 // ======================================================================
 
 struct TocEntry
 {
-    uint32_t crc;                      // CRC32 of filename (for fast lookup)
-    int32_t  length;                   // Uncompressed file length
-    int32_t  offset;                   // Offset in archive
-    int32_t  compressor;               // Compression type used
-    int32_t  compressedLength;         // Compressed length (0 if uncompressed)
-    int32_t  fileNameOffset;           // Offset into name block
+    uint32_t crc;
+    int32_t  length;
+    int32_t  offset;
+    int32_t  compressor;
+    int32_t  compressedLength;
+    int32_t  fileNameOffset;
 };
 
 // ======================================================================
-// Encrypted TRE Header Extension (follows standard header)
+// TOC File Header (32 bytes)
 // ======================================================================
+
+struct TocFileHeader
+{
+    uint32_t token;                    // 'TOC '
+    uint32_t version;                  // '0001'
+    uint8_t  tocCompressor;
+    uint8_t  fileNameBlockCompressor;
+    uint8_t  unused1;
+    uint8_t  unused2;
+    uint32_t numberOfFiles;
+    uint32_t sizeOfTOC;
+    uint32_t sizeOfNameBlock;
+    uint32_t uncompSizeOfNameBlock;
+    uint32_t numberOfTreeFiles;
+    uint32_t sizeOfTreeFileNameBlock;
+};
+
+// ======================================================================
+// TOC Table of Contents Entry (20 bytes)
+// ======================================================================
+
+struct TocFileEntry
+{
+    uint8_t  compressor;
+    uint8_t  unused;
+    uint16_t treeFileIndex;
+    uint32_t crc;
+    uint32_t fileNameOffset;
+    uint32_t offset;
+    uint32_t length;
+    uint32_t compressedLength;
+};
 
 struct EncryptionHeader
 {
-    uint32_t encryptionVersion;        // Encryption version (1 = XOR, 2 = future AES)
-    uint8_t  salt[16];                 // Salt for key derivation
-    uint8_t  iv[16];                   // Initialization vector
-    uint32_t flags;                    // Encryption flags
+    uint32_t encryptionVersion;
+    uint8_t  salt[16];
+    uint8_t  iv[16];
+    uint32_t flags;
 };
 #pragma pack(pop)
 
@@ -100,8 +132,8 @@ struct EncryptionHeader
 
 struct FileEntry
 {
-    std::string diskPath;              // Path on disk
-    std::string archivePath;           // Path in archive
+    std::string diskPath;
+    std::string archivePath;
     int32_t     offset = 0;
     int32_t     length = 0;
     int32_t     compressor = 0;
@@ -112,7 +144,7 @@ struct FileEntry
 };
 
 // ======================================================================
-// TRE Archive Statistics
+// Archive Statistics
 // ======================================================================
 
 struct ArchiveStats
@@ -125,19 +157,15 @@ struct ArchiveStats
 };
 
 // ======================================================================
-// Encryption Options
+// Options Structures
 // ======================================================================
 
 struct EncryptionOptions
 {
     bool        enabled = false;
     std::string password;
-    uint32_t    version = 1;           // 1 = XOR-based, 2 = reserved for AES
+    uint32_t    version = 1;
 };
-
-// ======================================================================
-// Pack Options
-// ======================================================================
 
 struct PackOptions
 {
@@ -149,29 +177,22 @@ struct PackOptions
     EncryptionOptions  encryption;
 };
 
-// ======================================================================
-// Unpack Options
-// ======================================================================
-
 struct UnpackOptions
 {
     bool               overwrite = false;
     bool               quiet = false;
     bool               verbose = false;
-    std::string        filter;          // Optional filename filter
+    std::string        filter;
+    std::string        treSearchPath;   // For TOC: path to search for TRE files
     EncryptionOptions  encryption;
 };
-
-// ======================================================================
-// List Options
-// ======================================================================
 
 struct ListOptions
 {
     bool               showSize = true;
     bool               showCompressed = true;
     bool               showOffset = false;
-    std::string        filter;           // Optional filename filter
+    std::string        filter;
     EncryptionOptions  encryption;
 };
 
@@ -191,7 +212,8 @@ enum class ResultCode
     DecryptionError,
     InvalidPassword,
     InvalidArguments,
-    OutOfMemory
+    OutOfMemory,
+    TreFileNotFound
 };
 
 struct Result
@@ -204,33 +226,42 @@ struct Result
 };
 
 // ======================================================================
-// Main API Functions
+// TRE API Functions
 // ======================================================================
 
-// Pack a directory into a TRE archive
 Result pack(const std::string& sourceDir, 
             const std::string& outputTre, 
             const PackOptions& options = PackOptions());
 
-// Unpack a TRE archive to a directory
 Result unpack(const std::string& inputTre, 
               const std::string& outputDir, 
               const UnpackOptions& options = UnpackOptions());
 
-// List contents of a TRE archive
 Result list(const std::string& inputTre, 
             const ListOptions& options = ListOptions(),
             std::vector<std::pair<std::string, TocEntry>>* entries = nullptr);
 
-// Validate a TRE archive
 Result validate(const std::string& inputTre,
                 const EncryptionOptions& encryption = EncryptionOptions());
 
-// Get archive statistics
 Result getStats(const std::string& inputTre,
                 ArchiveStats& stats,
                 const EncryptionOptions& encryption = EncryptionOptions());
 
+// ======================================================================
+// TOC API Functions
+// ======================================================================
+
+Result unpackToc(const std::string& inputToc,
+                 const std::string& outputDir,
+                 const UnpackOptions& options = UnpackOptions());
+
+Result listToc(const std::string& inputToc,
+               const ListOptions& options = ListOptions());
+
+Result validateToc(const std::string& inputToc);
+
 } // namespace Nuna
 
 #endif // NUNA_H
+
