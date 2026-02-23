@@ -28,6 +28,7 @@ public:
 	//lint -save
 	//lint -e1925 // public data member
 	ActionHack*             m_snapToGrid;
+	ActionHack*             m_stackObject;
 	ActionHack*             m_saveAsBrush;
 	ActionHack*             m_createBrush;
 	ActionHack*             m_deleteBrush;
@@ -45,6 +46,7 @@ public:
 
 private slots:
 	void onSnapToGrid             () const;
+	void onStackObject            () const;
 	void onSaveAsBrush            () const;
 	void onCreateBrush            () const;
 	void onDeleteBrush            () const;

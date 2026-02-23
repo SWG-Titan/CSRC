@@ -103,7 +103,6 @@ public:
 	static void                setFreeCameraSpeedFast (float f);
 
 	static bool                getUseCustomInputMaps ();
-	static bool                getDisableWorldSnapshot ();
 	static bool                getWorldSnapshotIgnorePobChanges();
 	static float               getWorldSnapshotDetailLevelBias ();
 

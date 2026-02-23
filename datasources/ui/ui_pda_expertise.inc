@@ -320,11 +320,11 @@
 								MouseOverSound='ui_rollover'
 								MouseOverTextColor='#18393D'
 								MouseOverTextMargin='9,0,9,0'
-								MouseOverTextStyle='starwars_20'
+								MouseOverTextStyle='starwars_18'
 								Name='style'
 								NormalTextColor='#2FF4FF'
 								NormalTextMargin='9,0,9,0'
-								NormalTextStyle='starwars_20'
+								NormalTextStyle='starwars_18'
 								PalActivatedText='textactivated'
 								PalDisabledText='textdisabled'
 								PalHoverText='texthover'
@@ -1053,7 +1053,7 @@
 								>
 									<Text
 										Color='#E4C86B'
-										Font='starwars_24'
+										Font='starwars_21'
 										LocalText='Expertise Name'
 										Name='Text'
 										ScrollExtent='231,45'
@@ -1128,7 +1128,7 @@
 										Size='269,28'
 									>
 										<Text
-											Font='bold_19'
+											Font='bold_18'
 											LocalText='Rank: 0/1'
 											Location='7,6'
 											Name='Text'
@@ -1212,7 +1212,7 @@
 												/>
 											</Page>
 											<Text
-												Font='starwars_24'
+												Font='starwars_21'
 												LocalText='Vital Strike'
 												Location='69,26'
 												Name='CommandName'
@@ -1301,7 +1301,7 @@
 												/>
 											</Page>
 											<Text
-												Font='starwars_24'
+												Font='starwars_21'
 												LocalText='Recon Armor'
 												Location='69,26'
 												Name='SchematicName'
@@ -1340,7 +1340,7 @@
 												Size='261,93'
 											>
 												<Text
-													Font='starwars_20'
+													Font='starwars_18'
 													LocalText='Improved Accuracy'
 													Name='SkillModName'
 													ScrollExtent='261,40'
@@ -1395,7 +1395,7 @@
 														SourceResource='ui_expertise_parts'
 													/>
 													<Text
-														Font='bold_19'
+														Font='bold_18'
 														GetsInput='true'
 														LocalText='2'
 														Location='1,4'
@@ -1406,7 +1406,7 @@
 														TextAlignmentVertical='Center'
 													>2</Text>
 													<Text
-														Font='bold_19'
+														Font='bold_18'
 														GetsInput='true'
 														LocalText='4'
 														Location='52,4'
@@ -1417,7 +1417,7 @@
 														TextAlignmentVertical='Center'
 													>4</Text>
 													<Text
-														Font='bold_19'
+														Font='bold_18'
 														GetsInput='true'
 														LocalText='-6'
 														Location='103,4'
@@ -1429,7 +1429,7 @@
 														TextColor='#000000'
 													>-6</Text>
 													<Text
-														Font='bold_19'
+														Font='bold_18'
 														GetsInput='true'
 														LocalText='8'
 														Location='154,4'
@@ -1481,7 +1481,7 @@
 												Size='261,93'
 											>
 												<Text
-													Font='starwars_20'
+													Font='starwars_18'
 													LocalText='Improved Vision'
 													Name='SkillModName'
 													ScrollExtent='261,40'
@@ -1536,7 +1536,7 @@
 														SourceResource='ui_expertise_parts'
 													/>
 													<Text
-														Font='bold_19'
+														Font='bold_18'
 														GetsInput='true'
 														LocalText='2'
 														Location='1,4'
@@ -1547,7 +1547,7 @@
 														TextAlignmentVertical='Center'
 													>2</Text>
 													<Text
-														Font='bold_19'
+														Font='bold_18'
 														GetsInput='true'
 														LocalText='4'
 														Location='52,4'
@@ -1558,7 +1558,7 @@
 														TextAlignmentVertical='Center'
 													>4</Text>
 													<Text
-														Font='bold_19'
+														Font='bold_18'
 														GetsInput='true'
 														LocalText='-6'
 														Location='103,4'
@@ -1570,7 +1570,7 @@
 														TextColor='#000000'
 													>-6</Text>
 													<Text
-														Font='bold_19'
+														Font='bold_18'
 														GetsInput='true'
 														LocalText='8'
 														Location='154,4'
@@ -1622,7 +1622,7 @@
 												Size='261,93'
 											>
 												<Text
-													Font='starwars_20'
+													Font='starwars_18'
 													LocalText='Blast Radius'
 													Name='SkillModName'
 													ScrollExtent='261,40'
@@ -1677,7 +1677,7 @@
 														SourceResource='ui_expertise_parts'
 													/>
 													<Text
-														Font='bold_19'
+														Font='bold_18'
 														GetsInput='true'
 														LocalText='2'
 														Location='1,4'
@@ -1688,7 +1688,7 @@
 														TextAlignmentVertical='Center'
 													>2</Text>
 													<Text
-														Font='bold_19'
+														Font='bold_18'
 														GetsInput='true'
 														LocalText='4'
 														Location='52,4'
@@ -1699,7 +1699,7 @@
 														TextAlignmentVertical='Center'
 													>4</Text>
 													<Text
-														Font='bold_19'
+														Font='bold_18'
 														GetsInput='true'
 														LocalText='-6'
 														Location='103,4'
@@ -1711,7 +1711,7 @@
 														TextColor='#000000'
 													>-6</Text>
 													<Text
-														Font='bold_19'
+														Font='bold_18'
 														GetsInput='true'
 														LocalText='8'
 														Location='154,4'
@@ -1763,7 +1763,7 @@
 												Size='261,93'
 											>
 												<Text
-													Font='starwars_20'
+													Font='starwars_18'
 													LocalText='Blast Radius'
 													Name='SkillModName'
 													ScrollExtent='261,40'
@@ -1818,7 +1818,7 @@
 														SourceResource='ui_expertise_parts'
 													/>
 													<Text
-														Font='bold_19'
+														Font='bold_18'
 														GetsInput='true'
 														LocalText='2'
 														Location='1,4'
@@ -1829,7 +1829,7 @@
 														TextAlignmentVertical='Center'
 													>2</Text>
 													<Text
-														Font='bold_19'
+														Font='bold_18'
 														GetsInput='true'
 														LocalText='4'
 														Location='52,4'
@@ -1840,7 +1840,7 @@
 														TextAlignmentVertical='Center'
 													>4</Text>
 													<Text
-														Font='bold_19'
+														Font='bold_18'
 														GetsInput='true'
 														LocalText='-6'
 														Location='103,4'
@@ -1852,7 +1852,7 @@
 														TextColor='#000000'
 													>-6</Text>
 													<Text
-														Font='bold_19'
+														Font='bold_18'
 														GetsInput='true'
 														LocalText='8'
 														Location='154,4'

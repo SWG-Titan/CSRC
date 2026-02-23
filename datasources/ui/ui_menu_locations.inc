@@ -61,7 +61,7 @@
 				Size='312,314'
 			>
 				<Text
-					Font='bold_12'
+					Font='bold_11'
 					LocalText='Planets'
 					Location='7,25'
 					MinimumSize='79,24'
@@ -169,7 +169,7 @@
 					</Page>
 					<Text
 						BackgroundTint='#FF8000'
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='[@loc_planets]'
 						MinimumSize='0,19'
 						Name='Label'
@@ -277,7 +277,7 @@
 						/>
 					</Page>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='[@loc_locations]'
 						MinimumSize='0,19'
 						Name='Label'

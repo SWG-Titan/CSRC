@@ -644,10 +644,10 @@ void SwgCuiButtonBar::toggleMenu()
 			}
 		}
 
-		// Show decorator spawn button only for admins
+		// Show decorator spawn button only for CSR (titanAdmin)
 		if(m_decoratorSpawnButton)
 		{
-			if (PlayerObject::isAdmin())
+			if (ConfigClientGame::getCSR())
 			{
 				m_decoratorSpawnButton->GetParentWidget()->SetVisible(true);
 				++m_numberButtons;
@@ -703,7 +703,7 @@ void SwgCuiButtonBar::OnButtonPressed   (UIWidget * context)
 		}
 		else if (context == m_decoratorSpawnButton)
 		{
-			if (PlayerObject::isAdmin())
+			if (ConfigClientGame::getCSR())
 			{
 				CuiActionManager::performAction(CuiActions::decoratorSpawn, Unicode::emptyString);
 			}

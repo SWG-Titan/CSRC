@@ -23,7 +23,7 @@
 				textPing='pingtext'
 			/>
 			<Text
-				Font='bold_12'
+				Font='bold_11'
 				LocalText='ping (ms):'
 				MaxLines='1'
 				Name='pinglabel'
@@ -50,7 +50,7 @@
 				TextColor='#96F4FC'
 			>35000</Text>
 			<Text
-				Font='bold_12'
+				Font='bold_11'
 				LocalText='packet loss:'
 				Location='0,16'
 				MaxLines='1'
@@ -78,7 +78,7 @@
 				TextColor='#96F4FC'
 			>88%</Text>
 			<Text
-				Font='bold_12'
+				Font='bold_11'
 				LocalText='bandwidth in:'
 				Location='0,32'
 				MaxLines='1'
@@ -106,7 +106,7 @@
 				TextColor='#96F4FC'
 			>0.0/0.0</Text>
 			<Text
-				Font='bold_12'
+				Font='bold_11'
 				LocalText='fps:'
 				Location='0,48'
 				MaxLines='1'
@@ -134,7 +134,7 @@
 				TextColor='#96F4FC'
 			>500</Text>
 			<Text
-				Font='bold_12'
+				Font='bold_11'
 				LocalText='area activity:'
 				Location='0,64'
 				MaxLines='1'

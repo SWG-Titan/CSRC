@@ -390,7 +390,7 @@
 			>
 				<Text
 					DropShadowDepth='1,1'
-					Font='bold_12'
+					Font='bold_11'
 					LocalText='XXX NAME'
 					Location='0,2'
 					MaxLines='1'
@@ -543,7 +543,7 @@
 					>
 						<Text
 							DropShadowDepth='1,1'
-							Font='bold_12'
+							Font='bold_11'
 							LocalText='XXX NAME'
 							Location='0,2'
 							MaxLines='1'
@@ -672,7 +672,7 @@
 					>
 						<Text
 							DropShadowDepth='1,1'
-							Font='bold_12'
+							Font='bold_11'
 							LocalText='XXX NAME'
 							Location='0,2'
 							MaxLines='1'
@@ -801,7 +801,7 @@
 					>
 						<Text
 							DropShadowDepth='1,1'
-							Font='bold_12'
+							Font='bold_11'
 							LocalText='XXX NAME'
 							Location='0,2'
 							MaxLines='1'
@@ -930,7 +930,7 @@
 					>
 						<Text
 							DropShadowDepth='1,1'
-							Font='bold_12'
+							Font='bold_11'
 							LocalText='XXX NAME'
 							Location='0,2'
 							MaxLines='1'
@@ -1122,7 +1122,7 @@
 				>
 					<Text
 						Enabled='false'
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='XXX GROUP TITLE'
 						Margin='6,-2,0,0'
 						MaxLines='1'
@@ -1373,7 +1373,7 @@
 					>
 						<Text
 							Enabled='false'
-							Font='bold_12'
+							Font='bold_11'
 							LocalText='Description of commands and chips'
 							Location='7,3'
 							Name='text'
@@ -1405,7 +1405,7 @@
 					>
 						<Text
 							Enabled='false'
-							Font='bold_12'
+							Font='bold_11'
 							LocalText='[@ui_droid:available_commands]'
 							Location='5,13'
 							Margin='2,2,2,2'
@@ -1584,7 +1584,7 @@
 					>
 						<Text
 							Enabled='false'
-							Font='bold_12'
+							Font='bold_11'
 							LocalText='Description of commands and chips'
 							Location='5,3'
 							Name='text'
@@ -1642,7 +1642,7 @@
 						>
 							<Text
 								Enabled='false'
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='[@ui_droid:loaded_commands]'
 								Location='5,7'
 								Margin='2,2,2,2'
@@ -2615,7 +2615,7 @@
 			>
 				<Text
 					Enabled='false'
-					Font='bold_12'
+					Font='bold_11'
 					LocalText='[@UI_DROID:CAPTION]'
 					Margin='6,0,0,0'
 					MinimumSize='0,19'
@@ -3065,7 +3065,7 @@
 					>
 						<Text
 							DropShadowDepth='1,1'
-							Font='bold_12'
+							Font='bold_11'
 							LocalText='XXX NAME'
 							MaxLines='1'
 							Name='name'
@@ -3178,7 +3178,7 @@
 						>
 							<Text
 								DropShadowDepth='1,1'
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='XXX NAME'
 								MaxLines='1'
 								Name='name'
@@ -3282,7 +3282,7 @@
 						>
 							<Text
 								DropShadowDepth='1,1'
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='XXX NAME'
 								MaxLines='1'
 								Name='name'
@@ -3386,7 +3386,7 @@
 						>
 							<Text
 								DropShadowDepth='1,1'
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='XXX NAME'
 								MaxLines='1'
 								Name='name'
@@ -3490,7 +3490,7 @@
 						>
 							<Text
 								DropShadowDepth='1,1'
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='XXX NAME'
 								MaxLines='1'
 								Name='name'
@@ -3594,7 +3594,7 @@
 						>
 							<Text
 								DropShadowDepth='1,1'
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='XXX NAME'
 								MaxLines='1'
 								Name='name'
@@ -4163,7 +4163,7 @@
 				BackgroundColor='#FFFFFF'
 				ColorCarat='#FFFFFF'
 				ColorSelection='#FFFFFF'
-				Font='bold_12'
+				Font='bold_11'
 				LocalText='xxx radar range'
 				Location='2,90'
 				Name='Range'
@@ -4362,7 +4362,7 @@
 				>
 					<Text
 						DropShadowDepth='1,1'
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='xxx,xxx\"'
 						Name='text'
 						PackLocation='nfn,cfc'
@@ -4390,7 +4390,7 @@
 				>
 					<Text
 						DropShadowDepth='1,1'
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='xxx,xxx\"'
 						Name='text'
 						PackLocation='nfn,cfc'
@@ -4418,7 +4418,7 @@
 				>
 					<Text
 						DropShadowDepth='1,1'
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='xxx,xxx\"'
 						Name='text'
 						PackLocation='nfn,cfc'
@@ -4542,7 +4542,7 @@
 									<Text
 										AbsorbsInput='false'
 										DropShadowDepth='1,1'
-										Font='bold_12'
+										Font='bold_11'
 										Location='2,156'
 										Name='text'
 										ScrollExtent='39,15'
@@ -4630,7 +4630,7 @@
 									<Text
 										AbsorbsInput='false'
 										DropShadowDepth='1,1'
-										Font='bold_12'
+										Font='bold_11'
 										Location='72,158'
 										Name='text'
 										ScrollExtent='39,15'
@@ -4715,7 +4715,7 @@
 										AbsorbsInput='false'
 										DropShadowDepth='1,1'
 										DropShadowsEnabled='true'
-										Font='bold_12'
+										Font='bold_11'
 										Location='132,22'
 										Name='text'
 										ScrollExtent='39,15'
@@ -6567,7 +6567,7 @@
 							<Text
 								AbsorbsInput='false'
 								DropShadowDepth='1,1'
-								Font='bold_12'
+								Font='bold_11'
 								Location='2,156'
 								Name='text'
 								ScrollExtent='39,15'
@@ -6655,7 +6655,7 @@
 							<Text
 								AbsorbsInput='false'
 								DropShadowDepth='1,1'
-								Font='bold_12'
+								Font='bold_11'
 								Location='72,158'
 								Name='text'
 								ScrollExtent='39,15'
@@ -6740,7 +6740,7 @@
 								AbsorbsInput='false'
 								DropShadowDepth='1,1'
 								DropShadowsEnabled='true'
-								Font='bold_12'
+								Font='bold_11'
 								Location='132,22'
 								Name='text'
 								ScrollExtent='39,15'
@@ -7740,7 +7740,7 @@
 					ColorCarat='#FFFFFF'
 					ColorSelection='#FFFFFF'
 					Enabled='false'
-					Font='bold_12'
+					Font='bold_11'
 					LocalText='XXX SCREENSHOT NAME'
 					Location='5,0'
 					Name='screenshotName'
@@ -7756,7 +7756,7 @@
 				<Text
 					ColorCarat='#FFFFFF'
 					Enabled='false'
-					Font='bold_12'
+					Font='bold_11'
 					LocalText='Description of this attribute'
 					Location='5,22'
 					Name='text'
@@ -7771,6 +7771,7 @@
 				<Scrollbar
 					BackgroundColor='#FFFFFF'
 					Control='text'
+					Enabled='false'
 					Location='407,22'
 					Name='scroll'
 					OpacityRelativeMin='0.50'
@@ -7980,7 +7981,7 @@
 						Size='111,36'
 					>
 						<Text
-							Font='bold_12'
+							Font='bold_11'
 							LocalText='TOTAL CREDITS:'
 							MaxLines='1'
 							Name='label'
@@ -7994,7 +7995,7 @@
 							TextColor='#96F4FC'
 						>Total Credits:</Text>
 						<Text
-							Font='bold_12'
+							Font='bold_11'
 							LocalText='XXX AMOUNT'
 							Location='0,18'
 							MaxLines='1'
@@ -8018,7 +8019,7 @@
 						Size='111,36'
 					>
 						<Text
-							Font='bold_12'
+							Font='bold_11'
 							LocalText='CASH BACK:'
 							MaxLines='1'
 							Name='label'
@@ -8032,7 +8033,7 @@
 							TextColor='#96F4FC'
 						>cash back:</Text>
 						<Text
-							Font='bold_12'
+							Font='bold_11'
 							LocalText='XXX AMOUNT'
 							Location='0,18'
 							MaxLines='1'
@@ -8056,7 +8057,7 @@
 						Size='100,36'
 					>
 						<Text
-							Font='bold_12'
+							Font='bold_11'
 							LocalText='MAX BET:'
 							MaxLines='1'
 							Name='label'
@@ -8070,7 +8071,7 @@
 							TextColor='#96F4FC'
 						>Max bet:</Text>
 						<Text
-							Font='bold_12'
+							Font='bold_11'
 							LocalText='XXX AMOUNT'
 							Location='0,18'
 							MaxLines='1'
@@ -8094,7 +8095,7 @@
 						Size='111,36'
 					>
 						<Text
-							Font='bold_12'
+							Font='bold_11'
 							LocalText='CURRENT BET:'
 							MaxLines='1'
 							Name='label'
@@ -8108,7 +8109,7 @@
 							TextColor='#96F4FC'
 						>current bet:</Text>
 						<Text
-							Font='bold_12'
+							Font='bold_11'
 							LocalText='XXX AMOUNT'
 							Location='0,18'
 							MaxLines='1'
@@ -8157,7 +8158,7 @@
 						Style='/Styles.textbox.default.Style_bet2'
 					>1000000</Textbox>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='YOUR BET:'
 						Location='3,20'
 						MaxLines='1'
@@ -9128,7 +9129,7 @@
 					Size='158,36'
 				>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='Available Credits'
 						MaxLines='1'
 						MinimumSize='64,0'
@@ -9142,7 +9143,7 @@
 						TextColor='#96F4FC'
 					>Available Credits</Text>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='XXX CREDITS'
 						Location='0,17'
 						MaxLines='1'
@@ -9614,7 +9615,7 @@
 						/>
 					</Page>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='XXX ALL BETS'
 						Location='24,136'
 						MaxLines='1'
@@ -9629,7 +9630,7 @@
 						TextColor='#FF6600'
 					>xxx all bets</Text>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='SAARLAC PIT'
 						Location='24,23'
 						MaxLines='1'
@@ -9691,7 +9692,7 @@
 					Size='202,74'
 				>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='ARCH MESA'
 						Location='40,18'
 						MaxLines='1'
@@ -9707,7 +9708,7 @@
 						TextColor='#96F4FC'
 					>arch mesa</Text>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='XXX ALL BETS'
 						Location='40,32'
 						MaxLines='1'
@@ -9756,7 +9757,7 @@
 					Size='202,74'
 				>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='GRAND ARENA FLATS'
 						Location='21,18'
 						MaxLines='1'
@@ -9772,7 +9773,7 @@
 						TextColor='#96F4FC'
 					>grand arena flats</Text>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='XXX ALL BETS'
 						Location='40,32'
 						MaxLines='1'
@@ -9821,7 +9822,7 @@
 					Size='202,74'
 				>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='DUNE SEA'
 						Location='40,18'
 						MaxLines='1'
@@ -9837,7 +9838,7 @@
 						TextColor='#96F4FC'
 					>dune sea</Text>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='XXX ALL BETS'
 						Location='40,32'
 						MaxLines='1'
@@ -9886,7 +9887,7 @@
 					Size='202,74'
 				>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='BESTINE'
 						Location='40,27'
 						MaxLines='1'
@@ -9902,7 +9903,7 @@
 						TextColor='#96F4FC'
 					>bestine</Text>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='XXX ALL BETS'
 						Location='40,42'
 						MaxLines='1'
@@ -9953,7 +9954,7 @@
 					Size='202,74'
 				>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='ANCHORHEAD'
 						Location='40,27'
 						MaxLines='1'
@@ -9969,7 +9970,7 @@
 						TextColor='#96F4FC'
 					>anchorhead</Text>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='XXX ALL BETS'
 						Location='40,42'
 						MaxLines='1'
@@ -10020,7 +10021,7 @@
 					Size='202,74'
 				>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='MOS EISLEY'
 						Location='40,27'
 						MaxLines='1'
@@ -10036,7 +10037,7 @@
 						TextColor='#96F4FC'
 					>mos eisley</Text>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='XXX ALL BETS'
 						Location='40,42'
 						MaxLines='1'
@@ -10087,7 +10088,7 @@
 					Size='202,74'
 				>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='JACKPOT'
 						Location='68,25'
 						MaxLines='1'
@@ -10102,7 +10103,7 @@
 						TextColor='#FFEC00'
 					>jackpot</Text>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='OASIS'
 						Location='68,8'
 						MaxLines='1'
@@ -10118,7 +10119,7 @@
 						TextColor='#96F4FC'
 					>oasis</Text>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='XXX ALL BETS'
 						Location='68,45'
 						MaxLines='1'
@@ -10169,7 +10170,7 @@
 					Size='202,74'
 				>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='JACKPOT'
 						Location='11,25'
 						MaxLines='1'
@@ -10184,7 +10185,7 @@
 						TextColor='#FFEC00'
 					>jackpot</Text>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='JABBA\'S PALACE'
 						Location='11,8'
 						MaxLines='1'
@@ -10200,7 +10201,7 @@
 						TextColor='#96F4FC'
 					>jabba\'s palace</Text>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='XXX ALL BETS'
 						Location='11,45'
 						MaxLines='1'
@@ -10249,7 +10250,7 @@
 					Size='215,50'
 				>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='MINES'
 						Location='34,10'
 						MaxLines='1'
@@ -10265,7 +10266,7 @@
 						TextColor='#96F4FC'
 					>mines</Text>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='XXX ALL BETS'
 						Location='32,25'
 						MaxLines='1'
@@ -10318,7 +10319,7 @@
 					VisualEditLock='true'
 				>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='FORT TUSKEN'
 						Location='45,9'
 						MaxLines='1'
@@ -10334,7 +10335,7 @@
 						TextColor='#96F4FC'
 					>fort tusken</Text>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='XXX ALL BETS'
 						Location='43,24'
 						MaxLines='1'
@@ -10384,7 +10385,7 @@
 					Size='215,47'
 				>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='JAWA STRONGHOLD'
 						Location='43,7'
 						MaxLines='1'
@@ -10400,7 +10401,7 @@
 						TextColor='#96F4FC'
 					>Jawa Stronghold</Text>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='XXX ALL BETS'
 						Location='45,24'
 						MaxLines='1'
@@ -10452,7 +10453,7 @@
 					VisualEditLock='true'
 				>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='SPICE FIELDS'
 						Location='38,9'
 						MaxLines='1'
@@ -10468,7 +10469,7 @@
 						TextColor='#96F4FC'
 					>spice fields</Text>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='XXX ALL BETS'
 						Location='36,24'
 						MaxLines='1'
@@ -10521,7 +10522,7 @@
 					Size='125,122'
 				>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='KRAYT'
 						Location='17,19'
 						MaxLines='1'
@@ -10586,7 +10587,7 @@
 					Size='125,122'
 				>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='KRAYT'
 						Location='19,20'
 						MaxLines='1'
@@ -10854,7 +10855,7 @@
 						TextColor='#96F4FC'
 					>All Bets</Text>
 					<Text
-						Font='bold_24'
+						Font='bold_25'
 						LocalText='OPEN'
 						Location='0,18'
 						MaxLines='1'
@@ -10872,7 +10873,7 @@
 						Visible='false'
 					>open</Text>
 					<Text
-						Font='bold_24'
+						Font='bold_25'
 						LocalText='CLOSED'
 						Location='0,18'
 						MaxLines='1'
@@ -12418,7 +12419,7 @@
 							Size='111,36'
 						>
 							<Text
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='TOTAL CREDITS:'
 								MaxLines='1'
 								Name='label'
@@ -12432,7 +12433,7 @@
 								TextColor='#96F4FC'
 							>Total Credits:</Text>
 							<Text
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='XXX AMOUNT'
 								Location='0,18'
 								MaxLines='1'
@@ -12456,7 +12457,7 @@
 							Size='111,36'
 						>
 							<Text
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='CASH BACK:'
 								MaxLines='1'
 								Name='label'
@@ -12470,7 +12471,7 @@
 								TextColor='#96F4FC'
 							>cash back:</Text>
 							<Text
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='XXX AMOUNT'
 								Location='0,18'
 								MaxLines='1'
@@ -12494,7 +12495,7 @@
 							Size='111,36'
 						>
 							<Text
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='MAX BET:'
 								MaxLines='1'
 								Name='label'
@@ -12508,7 +12509,7 @@
 								TextColor='#96F4FC'
 							>Max bet:</Text>
 							<Text
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='XXX AMOUNT'
 								Location='0,18'
 								MaxLines='1'
@@ -12532,7 +12533,7 @@
 							Size='111,36'
 						>
 							<Text
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='CURRENT BET:'
 								MaxLines='1'
 								Name='label'
@@ -12546,7 +12547,7 @@
 								TextColor='#96F4FC'
 							>current bet:</Text>
 							<Text
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='XXX AMOUNT'
 								Location='0,18'
 								MaxLines='1'
@@ -12584,7 +12585,7 @@
 							Style='/Styles.textbox.default.Style_bet2'
 						>1000000</Textbox>
 						<Text
-							Font='bold_12'
+							Font='bold_11'
 							LocalText='YOUR BET:'
 							Location='-4,3'
 							MaxLines='1'

@@ -665,17 +665,17 @@ void ObjectEditor::onAttributeRenamed(QListViewItem* item, int col, const QStrin
 
 	else if(item == m_pmi.client.transform.scaleX)
 	{
-		//we don't have scaling in right now, so don't set it
+		GodClientData::getInstance().setSelectionScaleX(floatValue);
 	}
 
 	else if(item == m_pmi.client.transform.scaleY)
 	{
-		//we don't have scaling in right now, so don't set it
+		GodClientData::getInstance().setSelectionScaleY(floatValue);
 	}
 
 	else if(item == m_pmi.client.transform.scaleZ)
 	{
-		//we don't have scaling in right now, so don't set it
+		GodClientData::getInstance().setSelectionScaleZ(floatValue);
 	}
 }
 

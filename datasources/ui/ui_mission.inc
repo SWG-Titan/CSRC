@@ -137,7 +137,7 @@
 			<TabbedPane
 				BackgroundColor='#009977'
 				Location='14,30'
-				MinimumScrollExtent='164,0'
+				MinimumScrollExtent='358,0'
 				MinimumSize='0,19'
 				Name='tabs'
 				PackSize='a,f'
@@ -180,7 +180,7 @@
 						GridColorHorizontal='#1CFFFF'
 						GridColorVertical='#1CFFFF'
 						Location='0,26'
-						MinimumScrollExtent='409,80'
+						MinimumScrollExtent='409,100'
 						Name='table'
 						PackLocation='nfn,nfn'
 						PackSize='a,a'

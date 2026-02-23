@@ -272,7 +272,7 @@
 						>
 							<Text
 								ColorCarat='#FFFFFF'
-								Font='bold_24'
+								Font='bold_25'
 								LocalText='81%'
 								Margin='2,2,2,2'
 								Name='text'
@@ -392,7 +392,7 @@
 							Size='281,304'
 						>
 							<Text
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='[@res_survey_resnames]'
 								Location='0,5'
 								MaxLines='1'

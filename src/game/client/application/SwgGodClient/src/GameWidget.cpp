@@ -609,6 +609,17 @@ void GameWidget::keyPressEvent(QKeyEvent*keyEvent)
 
 	if(!m_gameHasFocus)
 	{
+		// CTRL+T and Space apply transform - handle before transform keys consume T
+		if ((keyEvent->key() == s_translateKey && hasState(keyEvent, Qt::ControlButton)) ||
+			keyEvent->key() == static_cast<int>(Key_Space))
+		{
+			if (!keyEvent->isAutoRepeat())
+			{
+				ActionsEdit::getInstance().applyTransform->doActivate();
+			}
+			return;
+		}
+
 		const float PI = 3.14159265359;
 		if (keyEvent->key() == s_avatarKey)// && Game::getSinglePlayer())
 		{
@@ -753,6 +764,16 @@ void GameWidget::keyPressEvent(QKeyEvent*keyEvent)
 		(keyEvent->key() == static_cast<int>(Key_F8) && hasState(keyEvent, Qt::ControlButton)))
 	{
 		ActionsGame::getInstance().gameFocusAllowed->doActivate();
+		return;
+	}
+	// CTRL+T and Space apply transform - also when game has focus
+	else if ((keyEvent->key() == s_translateKey && hasState(keyEvent, Qt::ControlButton)) ||
+		keyEvent->key() == static_cast<int>(Key_Space))
+	{
+		if (!keyEvent->isAutoRepeat())
+		{
+			ActionsEdit::getInstance().applyTransform->doActivate();
+		}
 		return;
 	}
 

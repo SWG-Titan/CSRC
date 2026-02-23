@@ -689,6 +689,8 @@ bool  SwgCuiHudAction::performAction (const std::string & id, const Unicode::Str
 	}
 	else if (id == CuiActions::debugPrint)
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		CuiMediatorFactory::toggle (CuiMediatorTypes::DebugInfoPage);
 	}
 
@@ -845,7 +847,7 @@ bool  SwgCuiHudAction::performAction (const std::string & id, const Unicode::Str
 
 	else if(id == CuiActions::clientExamine)
 	{	
-		if(PlayerObject::isAdmin())
+		if(ConfigClientGame::getCSR())
 		{		
 			CreatureObject * const playerCreature = Game::getPlayerCreature();
 			SwgCuiHud const * const hud = SwgCuiHudFactory::findMediatorForCurrentHud();
@@ -1511,7 +1513,7 @@ bool  SwgCuiHudAction::performAction (const std::string & id, const Unicode::Str
 	}
 	else if (id == CuiActions::blueGlowieOn)
 	{
-		if(PlayerObject::isAdmin() || Game::getSinglePlayer())
+		if(ConfigClientGame::getCSR() || Game::getSinglePlayer())
 		{		
 			Object *obj = Game::getPlayer();
 			Appearance *app = obj->getAppearance();
@@ -1522,7 +1524,7 @@ bool  SwgCuiHudAction::performAction (const std::string & id, const Unicode::Str
 	}
 	else if (id == CuiActions::blueGlowieOff)
 	{
-		if(PlayerObject::isAdmin() || Game::getSinglePlayer())
+		if(ConfigClientGame::getCSR() || Game::getSinglePlayer())
 		{
 			Object *obj = Game::getPlayer();
 			Appearance *app = obj->getAppearance();
@@ -1533,7 +1535,7 @@ bool  SwgCuiHudAction::performAction (const std::string & id, const Unicode::Str
 	}
 	else if (id == CuiActions::holonetOn)
 	{
-		if(PlayerObject::isAdmin() || Game::getSinglePlayer())
+		if(ConfigClientGame::getCSR() || Game::getSinglePlayer())
 		{		
 			Object *obj = Game::getPlayer();
 			Appearance *app = obj->getAppearance();
@@ -1544,7 +1546,7 @@ bool  SwgCuiHudAction::performAction (const std::string & id, const Unicode::Str
 	}
 	else if (id == CuiActions::holonetOff)
 	{
-		if(PlayerObject::isAdmin() || Game::getSinglePlayer())
+		if(ConfigClientGame::getCSR() || Game::getSinglePlayer())
 		{
 			Object *obj = Game::getPlayer();
 			Appearance *app = obj->getAppearance();
@@ -1697,7 +1699,7 @@ bool  SwgCuiHudAction::performAction (const std::string & id, const Unicode::Str
 	}
 	else if (id == CuiActions::decoratorSpawn)
 	{
-		if (PlayerObject::isAdmin())
+		if (ConfigClientGame::getCSR())
 		{
 			CuiMediatorFactory::toggleInWorkspace(CuiMediatorTypes::WS_DecoratorSpawn);
 		}

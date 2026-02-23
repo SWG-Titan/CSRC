@@ -19,7 +19,7 @@
 			/>
 			<Text
 				ColorSelection='#FFFFFF'
-				Font='bold_12'
+				Font='bold_11'
 				LocalText='xxx incapacitation time: 666'
 				MinimumSize='0,19'
 				Name='text'

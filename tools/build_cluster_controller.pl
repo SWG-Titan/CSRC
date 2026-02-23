@@ -474,7 +474,14 @@ sub snapshot
 		}
 	}
 
-	# If we get here, we have decided to submit
+	# World snapshot deprecated - no .ws files generated; use buildouts for full server authority
+	if (scalar(@worldSnapshots) == 0)
+	{
+		print STDERR "World snapshot deprecated. No .ws files to submit. Use buildouts for full server authority.\n";
+		return 1;
+	}
+
+	# If we get here, we have decided to submit (legacy path - should not be reached after deprecation)
 	print STDERR "Proceeding with $p4operation\n";
 	
 	# Get a hash of the current world snapshots in perforce

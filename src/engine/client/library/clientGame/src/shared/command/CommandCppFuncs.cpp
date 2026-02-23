@@ -1836,7 +1836,7 @@ void CommandCppFuncsNamespace::commandFuncDraw (Command const & , NetworkId cons
 
 void CommandCppFuncsNamespace::commandFuncUiDebugExamine (Command const & , NetworkId const & , NetworkId const & , Unicode::String const & params)
 {
-	if(Game::getPlayerObject()->isAdmin())
+	if (ConfigClientGame::getCSR())
 	{
 		const std::string debugExamineCommand = "/ui debugexamine ";
 		std::string command = debugExamineCommand + Unicode::wideToUTF8(params);

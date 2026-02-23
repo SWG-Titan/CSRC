@@ -1,6 +1,6 @@
 		<Page
-			Location='149,175'
-			MinimumSize='265,236'
+			Location='88,259'
+			MinimumSize='465,236'
 			minimumsizeitem='200,244'
 			Name='Inventory'
 			OnSetLightsaber='bg.back.PalBgTint=disabledObject
@@ -20,7 +20,7 @@ comp.Container.info.Visible=true
 comp.Container.buttonView.Visible=true
 comp.Container.icons.Lightsaber.Visible=true
 bg.caption.text.Text=@inventory_lightsaber_title
-examineButton.PalColor=disabledObject
+bg.examineButton.PalColor=disabledObject
 comp.Container.bg.outline.PalBgTint=disabledObject
 comp.Container.bg.box.PalBgTint=disabledObject
 comp.Container.buttonView.PalBgTint=disabledObject
@@ -45,7 +45,7 @@ comp.Container.buttonView.Visible=false
 comp.Container.icons.Lightsaber.Visible=false
 comp.Container.icons.SizeY=comp.Container.SizeY - 25
 bg.caption.text.Text=@inventory_loot_title
-examineButton.PalColor=contrast1
+bg.examineButton.PalColor=contrast1
 comp.Container.bg.outline.PalBgTint=contrast1
 comp.Container.bg.box.PalBgTint=contrast1
 comp.Container.buttonView.PalBgTint=contrast1
@@ -69,7 +69,7 @@ comp.Container.info.Visible=true
 comp.Container.buttonView.Visible=true
 comp.Container.icons.Lightsaber.Visible=false
 bg.caption.text.Text=@inventory_normal_title
-examineButton.PalColor=default
+bg.examineButton.PalColor=default
 comp.Container.bg.outline.PalBgTint=line2
 comp.Container.bg.box.PalBgTint=back4
 comp.Container.buttonView.PalBgTint=default
@@ -92,14 +92,14 @@ comp.Container.info.Visible=false
 comp.Container.buttonView.Visible=false
 comp.Container.icons.Lightsaber.Visible=false
 bg.caption.text.Text=@inventory_normal_title
-examineButton.PalColor=default
+bg.examineButton.PalColor=default
 comp.Container.bg.outline.PalBgTint=line2
 comp.Container.bg.box.PalBgTint=back4
 comp.Container.buttonView.PalBgTint=default
 comp.Container.defaultButton.Visible=true
 comp.Container.lootAll.Visible=false'
-			ScrollExtent='682,337'
-			Size='682,337'
+			ScrollExtent='852,462'
+			Size='852,462'
 			UserMovable='true'
 			UserResizable='true'
 		>
@@ -110,42 +110,9 @@ comp.Container.lootAll.Visible=false'
 				info='comp.Exam'
 				Name='CodeData'
 				StartSize='346,516'
-				toggleexaminebutton='examineButton'
-				togglepaperdollbutton='eqbutton'
+				toggleexaminebutton='bg.examineButton'
+				togglepaperdollbutton='bg.eqButton'
 			/>
-			<Button
-				Color='#2DAAC6'
-				Location='10,27'
-				MaximumSize='48,48'
-				Name='examineButton'
-				oldExamVisible='false'
-				oldExamVisibleTmp='false'
-				OnPress='oldExamVisibleTmp=parent.comp.exam.visible
-parent.comp.exam.visible=oldExamVisible
-oldExamVisible=oldExamVisibleTmp'
-				OpacityRelativeMin='1.00'
-				PalColor='default'
-				ScrollExtent='28,8'
-				Size='28,8'
-				Style='pane_arrow.style'
-				TextColor='#000000'
-			></Button>
-			<Button
-				Location='646,27'
-				MaximumSize='48,48'
-				Name='eqButton'
-				oldEqVisible='false'
-				oldEqVisibleTmp='false'
-				OnPress='oldEqVisibleTmp=parent.comp.eq.visible
-parent.comp.eq.visible=oldEqVisible
-oldEqVisible=oldEqVisibleTmp'
-				OpacityRelativeMin='1.00'
-				PackLocation='fff,nfn'
-				ScrollExtent='28,8'
-				Size='28,8'
-				Style='/Styles.New.buttons.pane_arrow.style'
-				TextColor='#000000'
-			></Button>
 			<Namespace
 				Name='pane_arrow'
 				Size='128,64'
@@ -263,22 +230,24 @@ oldEqVisible=oldEqVisibleTmp'
 				Location='8,39'
 				Name='comp'
 				Orientation='Horizontal'
+				PackLocation='nfn,nfn'
 				PackSize='a,a'
-				ScrollExtent='667,290'
-				Size='667,290'
+				ScrollExtent='837,415'
+				Size='837,415'
 				Spacing='1'
 				SpacingType='Fill'
 			>
 				<Page
+					BackgroundOpacity='1.00'
 					MaximumSize='267,16384'
 					Name='Exam'
 					OnHide='parent.pack=t'
 					OnShow='parent.pack=t'
 					PackSize='f,a'
 					RStyleDefault='/Styles.New.whiteOutline.rs_default'
-					ScrollExtent='221,290'
+					ScrollExtent='267,415'
 					Selectable='true'
-					Size='221,290'
+					Size='267,415'
 				>
 					<Data
 						content='comp.page.details.content'
@@ -294,36 +263,36 @@ oldEqVisible=oldEqVisibleTmp'
 						Name='comp'
 						Orientation='Horizontal'
 						PackSize='a,a'
-						ScrollExtent='221,290'
+						ScrollExtent='267,415'
 						Selectable='true'
-						Size='221,290'
+						Size='267,415'
 						SpacingType='Fill'
 					>
 						<Page
 							DragAccepts='GameObject'
+							Location='0,6'
 							Name='page'
 							OnHide='parent.pack=t'
 							OnShow='parent.pack=t'
 							PackLocation='nfn,nfn'
 							PackSize='a,a'
 							RStyleDefault='rs'
-							ScrollExtent='221,289'
-							Size='221,289'
+							ScrollExtent='267,408'
+							Size='267,408'
 						>
 							<Scrollbar
 								Activated='true'
 								BackgroundTint='#01B5C9'
 								Color='#01B5C9'
 								Control='details.content'
-								Enabled='false'
-								Location='204,5'
+								Location='250,5'
 								Name='Scroll'
 								Opacity='0.90'
 								PackLocation='fff,nfn'
 								PackSize='f,a'
 								PalColor='scrollDefault'
-								ScrollExtent='11,279'
-								Size='11,279'
+								ScrollExtent='11,398'
+								Size='11,398'
 								Style='/Styles.scrollbar.default.vHud4.style'
 								ValueUpdateContinuous='false'
 							>
@@ -335,81 +304,79 @@ oldEqVisible=oldEqVisibleTmp'
 								PackLocation='nfn,nfn'
 								PackSize='a,a'
 								RStyleDefault='rs'
-								ScrollExtent='222,289'
-								Size='222,289'
+								ScrollExtent='268,408'
+								Size='268,408'
 							>
 								<Composite
 									DragAccepts='GameObject'
-									Location='4,4'
+									Location='4,20'
 									MaximumSize='293,16384'
 									Name='content'
 									OnDisableEffector='/effectors.opacity.fast.fadeout'
 									OnEnableEffector='/effectors.opacity.fast.fadefull'
 									PackLocation='nfn,nfn'
 									PackSize='a,a'
-									ScrollExtent='199,275'
-									Size='199,275'
+									ScrollExtent='245,563'
+									Size='245,378'
 									Spacing='10'
 									SpacingType='Constant'
 									UserDragScrollable='true'
 								>
 									<Page
 										GetsInput='false'
-										MaximumSize='16384,16'
-										MinimumSize='0,16'
 										Name='restrictions'
 										PackLocation='nfn,nfn'
-										PackSize='a,a'
-										ScrollExtent='199,16'
-										Size='199,16'
+										PackSize='a,f'
+										ScrollExtent='245,72'
+										Size='245,72'
 									>
 										<Composite
-											MaximumSize='16384,16'
 											Name='comp'
-											Orientation='Horizontal'
 											PackSize='a,f'
-											ScrollExtent='326,16'
-											Size='199,16'
+											ScrollExtent='245,72'
+											Size='245,72'
+											Spacing='2'
+											SpacingType='Constant'
 										>
 											<Text
 												Font='bold_11'
-												LocalText='Manufactured'
-												MaximumSize='125,16384'
+												LocalText='[@object_usability:tier_unknown]'
 												MaxLines='1'
-												MinimumSize='76,0'
+												MinimumSize='0,18'
 												Name='Tier'
 												OpacityRelativeMin='0.20'
-												PackSize='a,a'
-												ScrollExtent='76,16'
-												Size='76,16'
-											>Manufactured</Text>
+												PackSize='a,f'
+												ScrollExtent='245,18'
+												Size='245,18'
+												TextAlignment='Right'
+											>@object_usability:tier_unknown</Text>
 											<Text
 												Font='bold_11'
 												LocalText='[@object_usability:unique]'
-												Location='76,0'
-												MaximumSize='125,16384'
+												Location='0,20'
 												MaxLines='1'
-												MinimumSize='45,0'
+												MinimumSize='0,18'
 												Name='unique'
 												OpacityRelativeMin='0.20'
-												PackSize='a,a'
-												ScrollExtent='45,16'
-												Size='45,16'
+												PackSize='a,f'
+												ScrollExtent='245,18'
+												Size='245,18'
+												TextAlignment='Right'
 												TextColor='#FF0000'
 											>@object_usability:unique</Text>
 											<Text
 												ColorSelection='#FF0000'
 												Font='bold_11'
 												LocalText='[@object_usability:no_trade]'
-												Location='201,0'
-												MaximumSize='125,16384'
+												Location='0,40'
 												MaxLines='1'
-												MinimumSize='102,0'
+												MinimumSize='0,18'
 												Name='noTrade'
 												OpacityRelativeMin='0.20'
-												PackSize='a,a'
-												ScrollExtent='102,16'
-												Size='102,16'
+												PackSize='a,f'
+												ScrollExtent='245,18'
+												Size='245,18'
+												TextAlignment='Right'
 												TextColor='#FF0000'
 											>@object_usability:no_trade</Text>
 										</Composite>
@@ -417,37 +384,85 @@ oldEqVisible=oldEqVisibleTmp'
 									<Text
 										Font='bold_11'
 										LocalText='xxx attrib 1:    info here
+
+
+
 xxx attrib 2:    info here
+
+
+
 xxx attrib 3:    info here
+
+
+
 xxx attrib 4:    info here
+
+
+
 xxx attrib 5:    info here
+
+
+
 xxx attrib 6:    info here
+
+
+
 xxx attrib 7:    info here
+
+
+
 xxx attrib 8:    info here
+
+
+
 '
-										Location='0,26'
+										Location='0,82'
 										Margin='4,4,4,4'
 										Name='textAttribs'
 										OpacityRelativeMin='0.50'
 										PackSize='a,f'
 										PalText='text1'
 										RStyleDefault='/Styles.New.whitebox.rs_default'
-										ScrollExtent='199,125'
-										Size='199,125'
+										ScrollExtent='245,437'
+										Size='245,437'
 										TextColor='#96F4FC'
-									>xxx attrib 1:    info here
-xxx attrib 2:    info here
-xxx attrib 3:    info here
-xxx attrib 4:    info here
-xxx attrib 5:    info here
-xxx attrib 6:    info here
-xxx attrib 7:    info here
-xxx attrib 8:    info here
+									>xxx attrib 1:    info here
+
+
+
+xxx attrib 2:    info here
+
+
+
+xxx attrib 3:    info here
+
+
+
+xxx attrib 4:    info here
+
+
+
+xxx attrib 5:    info here
+
+
+
+xxx attrib 6:    info here
+
+
+
+xxx attrib 7:    info here
+
+
+
+xxx attrib 8:    info here
+
+
+
 </Text>
 									<Text
 										Font='bold_11'
 										LocalText='xxx Description goes into this field with all the other text ok you can stop now.'
-										Location='0,161'
+										Location='0,529'
 										Margin='4,4,4,4'
 										Name='textDesc'
 										OpacityRelativeMin='0.50'
@@ -455,8 +470,8 @@ xxx attrib 8:    info here
 										PackSize='a,f'
 										PalText='text1'
 										RStyleDefault='/Styles.New.whitebox.rs_default'
-										ScrollExtent='199,47'
-										Size='199,47'
+										ScrollExtent='245,34'
+										Size='245,34'
 										TextColor='#96F4FC'
 									>xxx Description goes into this field with all the other text ok you can stop now.</Text>
 								</Composite>
@@ -467,24 +482,23 @@ xxx attrib 8:    info here
 									PackLocation='nfn,nfn'
 									PackSize='a,a'
 									PalBgTint='line1'
-									ScrollExtent='220,289'
+									RStyleDefault='/Styles.New.thin_in.rs_default'
+									ScrollExtent='266,408'
 									Selectable='true'
-									Size='220,289'
+									Size='266,408'
 								>
 									<Page
-										BackgroundColor='#FFFFFF'
-										BackgroundOpacity='0.80'
+										BackgroundOpacity='1.00'
 										BackgroundTint='#1CFFFF'
 										Name='outline'
 										PackLocation='nfn,nfn'
 										PackSize='a,a'
 										PalBgTint='line1'
-										RStyleDefault='/Styles.New.whiteOutline_palW.rs_default'
-										ScrollExtent='220,289'
-										Size='220,289'
+										RStyleDefault='/Styles.New.thin_in.rs_default'
+										ScrollExtent='266,408'
+										Size='266,408'
 									/>
 									<Page
-										BackgroundColor='#FFFFFF'
 										BackgroundOpacity='0.30'
 										BackgroundTint='#00D6FB'
 										Location='4,6'
@@ -492,21 +506,20 @@ xxx attrib 8:    info here
 										PackLocation='nfn,nfn'
 										PackSize='a,a'
 										PalBgTint='back1'
-										RStyleDefault='/Styles.New.whitebox_palW.rs_default'
-										ScrollExtent='200,279'
-										Size='200,279'
+										RStyleDefault='/Styles.New.thin_in.rs_default'
+										ScrollExtent='246,398'
+										Size='246,398'
 									/>
 									<Page
-										BackgroundColor='#FFFFFF'
 										BackgroundOpacity='0.60'
 										BackgroundTint='#00D6FB'
 										Name='inFrame'
 										PackLocation='nfn,nfn'
 										PackSize='a,a'
 										PalBgTint='back1'
-										RStyleDefault='/Styles.New.fatFrameInside_palW.rs_default'
-										ScrollExtent='218,289'
-										Size='218,289'
+										RStyleDefault='/Styles.New.thin_in.rs_default'
+										ScrollExtent='264,408'
+										Size='264,408'
 									/>
 								</Page>
 							</Page>
@@ -516,14 +529,37 @@ xxx attrib 8:    info here
 				<Page
 					details.visible='false'
 					iconpage.visible='false'
-					Location='222,0'
+					Location='268,0'
 					Name='Container'
 					PackLocation='fff'
 					PackSize='f,a'
 					RStyleDefault='rs_default'
-					ScrollExtent='221,290'
-					Size='221,290'
+					ScrollExtent='336,415'
+					Size='336,415'
 				>
+					<Page
+						Location='0,0'
+						Name='searchBar'
+						PackLocation='nfn,nfn'
+						PackSize='a,f'
+						ScrollExtent='336,24'
+						Size='336,24'
+					>
+						<Textbox
+							BackgroundOpacity='0.95'
+							BackgroundTint='#00D6FB'
+							Location='7,2'
+							MinimumSize='0,19'
+							Name='searchInput'
+							PackLocation='nfn,nfn'
+							PackSize='a,f'
+							PalBgTint='back1'
+							RStyleDefault='/Styles.New.whiteOutline_palW.rs_default'
+							ScrollExtent='322,19'
+							Size='322,19'
+							Style='/Styles.New.textbox.default.style'
+						></Textbox>
+					</Page>
 					<Data
 						bg='bg'
 						buttonview='buttonView'
@@ -538,13 +574,14 @@ xxx attrib 8:    info here
 						lootAll='lootAll'
 						money='money'
 						Name='CodeData'
+						searchInput='searchBar.searchInput'
 						Size='128,64'
 					/>
 					<Composite
 						BackgroundScrolls='false'
 						BackgroundTint='#1CFFFF'
 						GetsInput='false'
-						Location='8,249'
+						Location='8,374'
 						MaximumSize='16384,19'
 						Name='money'
 						Orientation='Horizontal'
@@ -553,9 +590,9 @@ xxx attrib 8:    info here
 						Padding='External'
 						PalBgTint='line1'
 						RStyleDefault='/Styles.New.whiteOutline_palW.rs_default'
-						ScrollExtent='211,17'
+						ScrollExtent='326,17'
 						Selectable='true'
-						Size='211,17'
+						Size='326,17'
 						SpacingType='Fill'
 					>
 						<Data
@@ -567,8 +604,8 @@ xxx attrib 8:    info here
 							MinimumSize='0,16'
 							Name='cash'
 							PackSize='a,a'
-							ScrollExtent='105,16'
-							Size='105,16'
+							ScrollExtent='163,16'
+							Size='163,16'
 						>
 							<Text
 								Font='bold_11'
@@ -593,19 +630,19 @@ xxx attrib 8:    info here
 								OpacityRelativeMin='0.50'
 								PackSize='a,f'
 								PalText='text1'
-								ScrollExtent='75,16'
-								Size='75,16'
+								ScrollExtent='133,16'
+								Size='133,16'
 								TextAlignmentVertical='Center'
 								TextColor='#96F4FC'
 							>xxx value</Text>
 						</Page>
 						<Page
-							Location='105,0'
+							Location='163,0'
 							MinimumSize='0,16'
 							Name='bank'
 							PackSize='a,a'
-							ScrollExtent='106,16'
-							Size='106,16'
+							ScrollExtent='163,16'
+							Size='163,16'
 						>
 							<Text
 								Font='bold_11'
@@ -631,8 +668,8 @@ xxx attrib 8:    info here
 								OpacityRelativeMin='0.50'
 								PackSize='a,f'
 								PalText='text1'
-								ScrollExtent='106,16'
-								Size='106,16'
+								ScrollExtent='163,16'
+								Size='163,16'
 								TextAlignmentVertical='Center'
 								TextColor='#96F4FC'
 							>xxx value</Text>
@@ -641,19 +678,21 @@ xxx attrib 8:    info here
 					<Button
 						BackgroundTint='#2DAAC6'
 						LocalText='Change View'
-						Location='46,265'
+						Location='104,390'
 						MinimumSize='0,19'
 						Name='buttonView'
 						oldiconvisible='false'
-						OnPress='parent.icons.visible=oldIconVisible
+						OnPress='parent.icons.visible=oldIconVisible
+
+
 oldIconVisible=parent.details.visible'
 						OpacityRelativeMin='0.70'
-						PackLocation='fff,fff'
-						PackSize='a,f'
+						PackLocation='cfc,fff'
+						PackSize='f,f'
 						PalBgTint='default'
 						ScrollExtent='130,19'
 						Size='130,19'
-						Style='hud.style'
+						Style='/Styles.New.buttons.hud.style'
 						TextColor='#000000'
 						Visible='false'
 					>Change View</Button>
@@ -1003,8 +1042,9 @@ oldIconVisible=parent.details.visible'
 					<Page
 						BackgroundColor='#FFFFFF'
 						BackgroundTint='#1CFFFF'
-						Lightsaber.SizeX='221'
-						Lightsaber.SizeY='230'
+						Lightsaber.SizeX='336'
+						Lightsaber.SizeY='329'
+						Location='0,24'
 						Name='icons'
 						OnHide='parent.details.visible=true'
 						OnShow='parent.details.visible=false'
@@ -1013,13 +1053,13 @@ Lightsaber.SizeY=SizeY'
 						PackSize='a,a'
 						PalBgTint='line1'
 						RStyleDefault='/Styles.New.whiteOutline_palW.rs_default'
-						ScrollExtent='221,230'
+						ScrollExtent='336,329'
 						Selectable='true'
-						Size='221,230'
+						Size='336,329'
 					>
 						<VolumePage
 							BackgroundColor='#FFFFFF'
-							CellCount='3,1'
+							CellCount='4,1'
 							CellDragAccepts='GameObject'
 							CellSelectionOverlay='/Styles.New.overlay.rs_default'
 							CellSelectionOverlayOpacity='0.90'
@@ -1029,14 +1069,18 @@ Lightsaber.SizeY=SizeY'
 							MinimumScrollExtent='136,68'
 							MultiSelection='false'
 							Name='volume'
-							OnHide='parent.details.visible=true
+							OnHide='parent.details.visible=true
+
+
 parent.scrollIcon.visible=visible'
-							OnShow='parent.details.visible=false
+							OnShow='parent.details.visible=false
+
+
 parent.scrollIcon.visible=visible'
-							PackLocation='nfn.nfn'
+							PackLocation='nfn,nfn'
 							PackSize='a,a'
-							ScrollExtent='200,215'
-							Size='200,215'
+							ScrollExtent='315,314'
+							Size='315,314'
 						>
 							<Button
 								DragAccepts='CraftIngredient,GameObject'
@@ -1071,22 +1115,22 @@ parent.scrollIcon.visible=visible'
 							Color='#01B5C9'
 							Control='volume'
 							Enabled='false'
-							Location='208,7'
+							Location='323,7'
 							Name='scroll'
 							OpacityRelativeMin='0.40'
 							PackLocation='fff,nfn'
 							PackSize='f,a'
 							PalColor='scrollDefault'
-							ScrollExtent='10,215'
-							Size='10,215'
+							ScrollExtent='10,314'
+							Size='10,314'
 							Style='vHud4.style'
 						>
 						</Scrollbar>
 						<Image
 							Name='Lightsaber'
 							Opacity='0.60'
-							ScrollExtent='221,230'
-							Size='221,230'
+							ScrollExtent='336,329'
+							Size='336,329'
 							SourceRect='305,162,353,208'
 							SourceResource='ui_new_icons_temp5'
 						/>
@@ -1096,9 +1140,9 @@ parent.scrollIcon.visible=visible'
 							PackLocation='nfn,nfn'
 							PackSize='a,a'
 							RStyleDefault='/Styles.New.whiteOutline_palW.rs_default'
-							ScrollExtent='221,230'
+							ScrollExtent='336,329'
 							Selectable='true'
-							Size='221,230'
+							Size='336,329'
 						>
 							<Page
 								BackgroundColor='#FFFFFF'
@@ -1109,8 +1153,8 @@ parent.scrollIcon.visible=visible'
 								PackSize='a,a'
 								PalBgTint='line1'
 								RStyleDefault='/Styles.New.whiteOutline_palW.rs_default'
-								ScrollExtent='221,230'
-								Size='221,230'
+								ScrollExtent='336,329'
+								Size='336,329'
 							/>
 							<Page
 								BackgroundColor='#FFFFFF'
@@ -1121,8 +1165,8 @@ parent.scrollIcon.visible=visible'
 								PackSize='a,a'
 								PalBgTint='back1'
 								RStyleDefault='/Styles.New.viewer.rs_default'
-								ScrollExtent='200,217'
-								Size='200,217'
+								ScrollExtent='315,316'
+								Size='315,316'
 							/>
 							<Page
 								BackgroundColor='#FFFFFF'
@@ -1134,8 +1178,8 @@ parent.scrollIcon.visible=visible'
 								PackSize='a,a'
 								PalBgTint='back2'
 								RStyleDefault='/Styles.New.fatFrameInside_palW.rs_default'
-								ScrollExtent='204,220'
-								Size='204,220'
+								ScrollExtent='319,319'
+								Size='319,319'
 							/>
 						</Page>
 						<Namespace
@@ -1377,15 +1421,16 @@ parent.scrollIcon.visible=visible'
 					<Page
 						BackgroundOpacity='0.70'
 						BackgroundTint='#1CFFFF'
+						Location='0,24'
 						Name='details'
 						OnHide='parent.icons.visible=true'
 						OnShow='parent.icons.visible=false'
 						PackSize='a,a'
 						PalBgTint='line1'
 						RStyleDefault='/Styles.New.whiteOutline_palW.rs_default'
-						ScrollExtent='221,230'
+						ScrollExtent='336,355'
 						Selectable='true'
-						Size='221,230'
+						Size='336,355'
 						Visible='false'
 					>
 						<TableHeader
@@ -1394,13 +1439,13 @@ parent.scrollIcon.visible=visible'
 							ButtonStyle='/Styles.New.buttons.newInFrame2.style'
 							CursorResize='/Styles.Cursors.resizeHoriz'
 							Location='4,5'
-							MinimumScrollExtent='201,0'
+							MinimumScrollExtent='316,0'
 							MinimumSize='0,19'
 							Name='header'
 							OpacityRelativeMin='0.80'
 							PackSize='a,f'
-							ScrollExtent='201,19'
-							Size='200,19'
+							ScrollExtent='316,19'
+							Size='315,19'
 							Table='table'
 						>
 						</TableHeader>
@@ -1419,7 +1464,7 @@ parent.scrollIcon.visible=visible'
 							GridColorHorizontal='#1CFFFF'
 							GridColorVertical='#1CFFFF'
 							Location='2,29'
-							MinimumScrollExtent='201,58'
+							MinimumScrollExtent='316,58'
 							Name='table'
 							OpacityRelativeMin='0.50'
 							PackSize='a,a'
@@ -1431,12 +1476,11 @@ parent.scrollIcon.visible=visible'
 							PalSelectionRect='listline'
 							PalText='text1'
 							RStyleDefault='/Styles.New.pill_lrg.rs_default'
-							ScrollExtent='201,197'
-							SelectionAllowedMultiRow='false'
+							ScrollExtent='316,322'
 							SelectionColorBackground='#35CBD7'
 							SelectionColorRect='#37FD06'
 							SelectionTextColor='#003842'
-							Size='201,197'
+							Size='316,322'
 							TableModel='model'
 						/>
 						<TableModelDefault
@@ -1494,13 +1538,13 @@ parent.scrollIcon.visible=visible'
 						<Scrollbar
 							Control='table'
 							Enabled='false'
-							Location='205,22'
+							Location='320,22'
 							Name='scroll'
 							OpacityRelativeMin='0.40'
 							PackLocation='fff,nfn'
 							PackSize='f,a'
-							ScrollExtent='11,201'
-							Size='11,201'
+							ScrollExtent='11,326'
+							Size='11,326'
 							Style='/Styles.scrollbar.default.vHud4.style'
 						>
 						</Scrollbar>
@@ -1511,8 +1555,8 @@ parent.scrollIcon.visible=visible'
 							PackLocation='nfn,nfn'
 							PackSize='a,a'
 							PalBgTint='outline1'
-							ScrollExtent='221,230'
-							Size='221,230'
+							ScrollExtent='336,355'
+							Size='336,355'
 						>
 							<Page
 								BackgroundOpacity='0.70'
@@ -1523,8 +1567,8 @@ parent.scrollIcon.visible=visible'
 								PackSize='a,a'
 								PalBgTint='line1'
 								RStyleDefault='/Styles.New.whiteOutline_palW.rs_default'
-								ScrollExtent='221,230'
-								Size='221,230'
+								ScrollExtent='336,355'
+								Size='336,355'
 							>
 								<Page
 									BackgroundColor='#FFFFFF'
@@ -1535,8 +1579,8 @@ parent.scrollIcon.visible=visible'
 									PackSize='a,a'
 									PalBgTint='back1'
 									RStyleDefault='/Styles.New.pill_lrg.rs_default'
-									ScrollExtent='201,197'
-									Size='201,197'
+									ScrollExtent='316,322'
+									Size='316,322'
 								/>
 							</Page>
 							<Page
@@ -1549,30 +1593,30 @@ parent.scrollIcon.visible=visible'
 								PackSize='a,a'
 								PalBgTint='back2'
 								RStyleDefault='/Styles.New.fatFrameInside.rs_default'
-								ScrollExtent='216,228'
-								Size='216,228'
+								ScrollExtent='331,353'
+								Size='331,353'
 							/>
 						</Page>
 					</Page>
 					<Page
 						BackgroundColor='#FFFFFF'
 						BackgroundTint='#1CFFFF'
-						Location='0,231'
+						Location='0,356'
 						Name='bg'
 						PackLocation='nfn,fff'
 						PackSize='a,f'
 						PalBgTint='line1'
 						RStyleDefault='/Styles.New.whiteOutline_palW.rs_default'
-						ScrollExtent='221,59'
-						Size='221,59'
+						ScrollExtent='336,59'
+						Size='336,59'
 					>
 						<Page
 							Location='0,1'
 							Name='capacity'
 							PackSize='a'
 							RStyleDefault='/Styles.New.whiteOutline.rs_default'
-							ScrollExtent='221,40'
-							Size='221,40'
+							ScrollExtent='336,40'
+							Size='336,40'
 						>
 							<Text
 								BackgroundColor='#000055'
@@ -1602,8 +1646,8 @@ parent.scrollIcon.visible=visible'
 								OpacityRelativeMin='0.80'
 								PackSize='a'
 								PalText='text1'
-								ScrollExtent='112,19'
-								Size='112,19'
+								ScrollExtent='227,19'
+								Size='227,19'
 								TextAlignment='Right'
 								TextAlignmentVertical='Center'
 								TextColor='#96F4FC'
@@ -1616,8 +1660,8 @@ parent.scrollIcon.visible=visible'
 								PackLocation='nfn,fff'
 								PackSize='a,f'
 								PalBgTint='back3'
-								ScrollExtent='207,18'
-								Size='207,18'
+								ScrollExtent='322,18'
+								Size='322,18'
 								Visible='false'
 							>
 								<Page
@@ -1631,22 +1675,22 @@ parent.scrollIcon.visible=visible'
 									PackSize='p,a'
 									PalColor='exp'
 									RStyleDefault='/Styles.New.pill_smallest.rs_default'
-									ScrollExtent='103,14'
-									Size='103,14'
+									ScrollExtent='160,14'
+									Size='160,14'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
 									BackgroundOpacity='0.80'
 									Color='#01687E'
 									DragAccepts='GameObject'
-									Location='163,2'
+									Location='255,2'
 									Name='containerLimit'
 									OpacityRelativeMin='1.00'
 									PackLocation='fff'
 									PackSize='p,a'
 									PalColor='back2'
-									ScrollExtent='42,14'
-									Size='42,14'
+									ScrollExtent='65,14'
+									Size='65,14'
 								/>
 							</Page>
 							<Page
@@ -1660,8 +1704,8 @@ parent.scrollIcon.visible=visible'
 								PackSize='a,a'
 								PalBgTint='back2'
 								RStyleDefault='/Styles.New.pill_med.rs_default'
-								ScrollExtent='213,31'
-								Size='213,31'
+								ScrollExtent='328,31'
+								Size='328,31'
 							/>
 						</Page>
 						<Page
@@ -1674,8 +1718,8 @@ parent.scrollIcon.visible=visible'
 							PackSize='a,f'
 							PalBgTint='line2'
 							RStyleDefault='/Styles.New.whiteOutline_palW.rs_default'
-							ScrollExtent='221,59'
-							Size='221,59'
+							ScrollExtent='336,59'
+							Size='336,59'
 						/>
 						<Page
 							BackgroundColor='#FFFFFF'
@@ -1689,51 +1733,55 @@ parent.scrollIcon.visible=visible'
 							PackSize='a,a'
 							PalBgTint='back4'
 							RStyleDefault='/Styles.New.pill_lrg.rs_default'
-							ScrollExtent='215,60'
-							Size='215,60'
+							ScrollExtent='330,60'
+							Size='330,60'
 						/>
 					</Page>
 					<Button
 						BackgroundTint='#2DAAC6'
 						LocalText='[@inventory_loot_all]'
-						Location='46,265'
+						Location='104,390'
 						MinimumSize='0,19'
 						Name='lootAll'
 						oldiconvisible='false'
-						OnPress='parent.icons.visible=oldIconVisible
+						OnPress='parent.icons.visible=oldIconVisible
+
+
 oldIconVisible=parent.details.visible'
 						OpacityRelativeMin='0.70'
-						PackLocation='fff,fff'
-						PackSize='a,f'
+						PackLocation='cfc,fff'
+						PackSize='f,f'
 						PalBgTint='default'
 						ScrollExtent='130,19'
 						Size='130,19'
-						Style='hud.style'
+						Style='/Styles.New.buttons.hud.style'
 						TextColor='#000000'
 					>@inventory_loot_all</Button>
 					<Button
 						BackgroundTint='#2DAAC6'
 						LocalText='Use'
-						Location='46,265'
+						Location='104,390'
 						MinimumSize='0,19'
 						Name='defaultButton'
 						oldiconvisible='false'
-						OnPress='parent.icons.visible=oldIconVisible
+						OnPress='parent.icons.visible=oldIconVisible
+
+
 oldIconVisible=parent.details.visible'
 						OpacityRelativeMin='0.70'
-						PackLocation='fff,fff'
-						PackSize='a,f'
+						PackLocation='cfc,fff'
+						PackSize='f,f'
 						PalBgTint='default'
 						ScrollExtent='130,19'
 						Size='130,19'
-						Style='hud.style'
+						Style='/Styles.New.buttons.hud.style'
 						TextColor='#000000'
 						Visible='false'
 					>Use</Button>
 					<Page
 						BackgroundColor='#FFFFFF'
 						BackgroundTint='#00FFFF'
-						Location='2,240'
+						Location='2,365'
 						Name='info'
 						PackLocation='nfn,fff'
 						PackSize='f,f'
@@ -1796,15 +1844,15 @@ oldIconVisible=parent.details.visible'
 					</Page>
 				</Page>
 				<Page
-					Location='444,0'
+					Location='605,0'
 					MaximumSize='232,16384'
 					MinimumSize='88,150'
 					Name='EQ'
 					OnHide='parent.pack=t'
 					OnShow='parent.pack=t'
 					PackSize='f,a'
-					ScrollExtent='223,291'
-					Size='223,291'
+					ScrollExtent='232,416'
+					Size='232,416'
 				>
 					<Data
 						centerbutton='inner.viewerpage.controlpage.center'
@@ -1830,8 +1878,8 @@ oldIconVisible=parent.details.visible'
 						OpacityRelativeMin='0.20'
 						PackSize='a,f'
 						PalText='header'
-						ScrollExtent='205,19'
-						Size='205,19'
+						ScrollExtent='214,19'
+						Size='214,19'
 						TextAlignment='Center'
 						TextColor='#97FFFF'
 					>xxx character name here</Text>
@@ -1839,8 +1887,8 @@ oldIconVisible=parent.details.visible'
 						Name='inner'
 						PackSize='a,a'
 						RStyleDefault='rs_default'
-						ScrollExtent='223,291'
-						Size='223,291'
+						ScrollExtent='232,416'
+						Size='232,416'
 					>
 						<Page
 							BackgroundTint='#1CFFFF'
@@ -1849,12 +1897,12 @@ oldIconVisible=parent.details.visible'
 							PackSize='a,a'
 							PalBgTint='line1'
 							RStyleDefault='/Styles.New.whiteOutline_palW.rs_default'
-							ScrollExtent='216,257'
-							Size='216,257'
+							ScrollExtent='225,382'
+							Size='225,382'
 						>
 							<Page
 								BackgroundTint='#00D6FB'
-								Location='89,226'
+								Location='93,351'
 								Name='ControlPage'
 								PackLocation='cpc,fff'
 								PackSize='f,f'
@@ -1917,14 +1965,14 @@ oldIconVisible=parent.details.visible'
 							</Page>
 							<Image
 								Color='#00D6FB'
-								Location='19,97'
+								Location='19,98'
 								Name='New Image'
 								Opacity='0.20'
 								PackLocation='cfc,cfc'
 								PackSize='a,a'
 								PalColor='back1'
-								ScrollExtent='178,62'
-								Size='178,62'
+								ScrollExtent='187,187'
+								Size='187,187'
 								SourceRect='266,0,512,252'
 								SourceResource='ui_rebel_deco'
 								Visible='false'
@@ -1942,12 +1990,12 @@ oldIconVisible=parent.details.visible'
 								PackSize='a,a'
 								PalBgTint='back1'
 								RStyleDefault='/Styles.New.viewer.rs_default'
-								ScrollExtent='214,254'
-								Size='214,254'
+								ScrollExtent='223,379'
+								Size='223,379'
 							/>
 							<Runner
 								Color='#1CFFFF'
-								Location='7,-68'
+								Location='7,-5'
 								Name='original'
 								Opacity='0.60'
 								PackLocation='cpc,cpc'
@@ -1960,8 +2008,8 @@ oldIconVisible=parent.details.visible'
 								RunEffectorsOn='/effectors.opacity.fast.fadefull'
 								RunPaused='false'
 								RunSimultaneous='2'
-								ScrollExtent='202,392'
-								Size='202,392'
+								ScrollExtent='211,392'
+								Size='211,392'
 							>
 								<Page
 									BackgroundColor='#FFFFFF'
@@ -1971,8 +2019,8 @@ oldIconVisible=parent.details.visible'
 									Opacity='0.00'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
@@ -1982,8 +2030,8 @@ oldIconVisible=parent.details.visible'
 									Opacity='0.00'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
@@ -1993,8 +2041,8 @@ oldIconVisible=parent.details.visible'
 									Opacity='0.00'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
@@ -2004,8 +2052,8 @@ oldIconVisible=parent.details.visible'
 									Opacity='0.00'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
@@ -2015,8 +2063,8 @@ oldIconVisible=parent.details.visible'
 									Opacity='0.00'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
@@ -2026,206 +2074,206 @@ oldIconVisible=parent.details.visible'
 									Opacity='0.00'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
 									BackgroundOpacity='1.00'
 									Location='1,148'
 									Name='light24'
-									Opacity='0.02'
+									Opacity='0.00'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
 									BackgroundOpacity='1.00'
 									Location='1,218'
 									Name='light17'
-									Opacity='0.02'
+									Opacity='0.00'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
 									BackgroundOpacity='1.00'
 									Location='1,138'
 									Name='light25'
-									Opacity='0.08'
+									Opacity='0.02'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
 									BackgroundOpacity='1.00'
 									Location='1,228'
 									Name='light16'
-									Opacity='0.08'
+									Opacity='0.02'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
 									BackgroundOpacity='1.00'
 									Location='1,128'
 									Name='light26'
-									Opacity='0.15'
+									Opacity='0.03'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
 									BackgroundOpacity='1.00'
 									Location='1,238'
 									Name='light15'
-									Opacity='0.15'
+									Opacity='0.03'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
 									BackgroundOpacity='1.00'
 									Location='1,118'
 									Name='light27'
-									Opacity='0.22'
+									Opacity='0.05'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
 									BackgroundOpacity='1.00'
 									Location='1,248'
 									Name='light14'
-									Opacity='0.22'
+									Opacity='0.05'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
 									BackgroundOpacity='1.00'
 									Location='1,108'
 									Name='light28'
-									Opacity='0.28'
+									Opacity='0.07'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
 									BackgroundOpacity='1.00'
 									Location='1,258'
 									Name='light13'
-									Opacity='0.28'
+									Opacity='0.07'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
 									BackgroundOpacity='1.00'
 									Location='1,98'
 									Name='light29'
-									Opacity='0.35'
+									Opacity='0.08'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
 									BackgroundOpacity='1.00'
 									Location='1,268'
 									Name='light12'
-									Opacity='0.35'
+									Opacity='0.08'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
 									BackgroundOpacity='1.00'
 									Location='1,88'
 									Name='light30'
-									Opacity='0.42'
+									Opacity='0.10'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
 									BackgroundOpacity='1.00'
 									Location='1,278'
 									Name='light11'
-									Opacity='0.42'
+									Opacity='0.10'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
 									BackgroundOpacity='1.00'
 									Location='1,78'
 									Name='light31'
-									Opacity='0.48'
+									Opacity='0.12'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
 									BackgroundOpacity='1.00'
 									Location='1,288'
 									Name='light10'
-									Opacity='0.48'
+									Opacity='0.12'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
 									BackgroundOpacity='1.00'
 									Location='1,68'
 									Name='light32'
-									Opacity='0.40'
+									Opacity='0.13'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
 									BackgroundOpacity='1.00'
 									Location='1,298'
 									Name='light9'
-									Opacity='0.40'
+									Opacity='0.13'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
@@ -2235,8 +2283,8 @@ oldIconVisible=parent.details.visible'
 									Opacity='0.00'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
@@ -2246,8 +2294,8 @@ oldIconVisible=parent.details.visible'
 									Opacity='0.00'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
@@ -2257,8 +2305,8 @@ oldIconVisible=parent.details.visible'
 									Opacity='0.00'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
@@ -2268,8 +2316,8 @@ oldIconVisible=parent.details.visible'
 									Opacity='0.00'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
@@ -2279,8 +2327,8 @@ oldIconVisible=parent.details.visible'
 									Opacity='0.00'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
@@ -2290,8 +2338,8 @@ oldIconVisible=parent.details.visible'
 									Opacity='0.00'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
@@ -2301,8 +2349,8 @@ oldIconVisible=parent.details.visible'
 									Opacity='0.00'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
@@ -2312,8 +2360,8 @@ oldIconVisible=parent.details.visible'
 									Opacity='0.00'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
@@ -2323,8 +2371,8 @@ oldIconVisible=parent.details.visible'
 									Opacity='0.00'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
@@ -2334,8 +2382,8 @@ oldIconVisible=parent.details.visible'
 									Opacity='0.00'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
@@ -2345,8 +2393,8 @@ oldIconVisible=parent.details.visible'
 									Opacity='0.00'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
@@ -2356,8 +2404,8 @@ oldIconVisible=parent.details.visible'
 									Opacity='0.00'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
@@ -2367,8 +2415,8 @@ oldIconVisible=parent.details.visible'
 									Opacity='0.00'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
@@ -2378,30 +2426,30 @@ oldIconVisible=parent.details.visible'
 									Opacity='0.00'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
 									BackgroundOpacity='1.00'
 									Location='1,-12'
 									Name='light40'
-									Opacity='0.02'
+									Opacity='0.00'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
 									BackgroundOpacity='1.00'
 									Location='1,378'
 									Name='light1'
-									Opacity='0.02'
+									Opacity='0.00'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.line.rs_default'
-									ScrollExtent='202,5'
-									Size='202,5'
+									ScrollExtent='211,5'
+									Size='211,5'
 								/>
 							</Runner>
 							<DataSource
@@ -2422,8 +2470,8 @@ oldIconVisible=parent.details.visible'
 								PackSize='a,a'
 								PalBgTint='back1'
 								RStyleDefault='/Styles.New.viewer.rs_default'
-								ScrollExtent='214,254'
-								Size='214,254'
+								ScrollExtent='223,379'
+								Size='223,379'
 							/>
 							<Page
 								BackgroundColor='#FFFFFF'
@@ -2435,8 +2483,8 @@ oldIconVisible=parent.details.visible'
 								PackSize='a,a'
 								PalBgTint='back1'
 								RStyleDefault='/Styles.New.pill_lrg.rs_default'
-								ScrollExtent='196,220'
-								Size='196,220'
+								ScrollExtent='205,345'
+								Size='205,345'
 							/>
 							<Page
 								BackgroundColor='#FFFFFF'
@@ -2448,8 +2496,8 @@ oldIconVisible=parent.details.visible'
 								PackSize='a,a'
 								PalBgTint='line1'
 								RStyleDefault='/Styles.New.whiteOutline_palW.rs_default'
-								ScrollExtent='206,243'
-								Size='206,243'
+								ScrollExtent='215,368'
+								Size='215,368'
 								Visible='false'
 							>
 								<Page
@@ -2461,8 +2509,8 @@ oldIconVisible=parent.details.visible'
 									PackSize='a,a'
 									PalBgTint='back1'
 									RStyleDefault='/Styles.New.whitebox_palW.rs_default'
-									ScrollExtent='206,225'
-									Size='206,225'
+									ScrollExtent='215,350'
+									Size='215,350'
 								/>
 							</Page>
 							<Page
@@ -2474,8 +2522,8 @@ oldIconVisible=parent.details.visible'
 								PackSize='a,a'
 								PalBgTint='back1'
 								RStyleDefault='/Styles.New.viewer.rs_default'
-								ScrollExtent='206,243'
-								Size='206,243'
+								ScrollExtent='215,368'
+								Size='215,368'
 								Visible='false'
 							>
 								<Page
@@ -2488,8 +2536,8 @@ oldIconVisible=parent.details.visible'
 									PackSize='a,a'
 									PalBgTint='textdark'
 									RStyleDefault='/Styles.New.whitebox.rs_default'
-									ScrollExtent='196,199'
-									Size='196,199'
+									ScrollExtent='205,324'
+									Size='205,324'
 								/>
 								<Page
 									BackgroundColor='#FFFFFF'
@@ -2499,8 +2547,8 @@ oldIconVisible=parent.details.visible'
 									PackLocation='nfn,nfn'
 									PackSize='a,a'
 									RStyleDefault='/Styles.New.whiteOutlineBroken.rs_default'
-									ScrollExtent='206,225'
-									Size='206,225'
+									ScrollExtent='215,350'
+									Size='215,350'
 								/>
 							</Page>
 						</Page>
@@ -2510,32 +2558,32 @@ oldIconVisible=parent.details.visible'
 						Name='bg'
 						PackLocation='nfn,nfn'
 						PackSize='a,a'
-						ScrollExtent='223,291'
+						ScrollExtent='232,416'
 						Selectable='true'
-						Size='223,291'
+						Size='232,416'
 					>
 						<Page
 							BackgroundOpacity='0.30'
 							Enabled='false'
-							Location='192,15'
+							Location='200,15'
 							Name='box'
 							PackLocation='fpf,nfn'
 							PackSize='p,a'
 							RStyleDefault='/Styles.New.whitebox.rs_default'
-							ScrollExtent='31,95'
-							Size='31,95'
+							ScrollExtent='32,220'
+							Size='32,220'
 							Visible='false'
 						/>
 						<Page
 							BackgroundOpacity='0.30'
 							Enabled='false'
-							Location='41,10'
+							Location='42,10'
 							Name='box'
 							PackLocation='npn,fff'
 							PackSize='p,a'
 							RStyleDefault='/Styles.New.whitebox.rs_default'
-							ScrollExtent='31,239'
-							Size='31,239'
+							ScrollExtent='32,364'
+							Size='32,364'
 							Visible='false'
 						/>
 						<Page
@@ -2547,8 +2595,8 @@ oldIconVisible=parent.details.visible'
 							PackSize='a,a'
 							PalBgTint='line1'
 							RStyleDefault='/Styles.New.whiteOutline.rs_default'
-							ScrollExtent='223,291'
-							Size='223,291'
+							ScrollExtent='232,416'
+							Size='232,416'
 						/>
 						<Page
 							BackgroundColor='#FFFFFF'
@@ -2560,8 +2608,8 @@ oldIconVisible=parent.details.visible'
 							PackSize='a,a'
 							PalBgTint='back1'
 							RStyleDefault='/Styles.New.fatFrameInside_palW.rs_default'
-							ScrollExtent='218,284'
-							Size='218,284'
+							ScrollExtent='227,409'
+							Size='227,409'
 						/>
 					</Page>
 				</Page>
@@ -2570,39 +2618,17 @@ oldIconVisible=parent.details.visible'
 				Name='bg'
 				PackLocation='nfn,nfn'
 				PackSize='a,a'
-				ScrollExtent='682,337'
-				Size='682,337'
+				ScrollExtent='852,462'
+				Size='852,462'
 			>
 				<Page
-					Location='668,8'
-					Name='mmc'
-					PackLocation='fff,nfn'
-					PackSize='f,f'
-					RStyleDefault='/Styles.New.thin_mmc.rs_default'
-					ScrollExtent='16,10'
-					Size='16,10'
-				>
-					<Button
-						BackgroundColor='#FFFFFF'
-						BackgroundOpacity='0.80'
-						IsCancelButton='true'
-						Location='0,-3'
-						Name='close'
-						OpacityRelativeMin='1.00'
-						PackLocation='fff,cfc'
-						PackSize='f,f'
-						ScrollExtent='16,16'
-						Size='16,16'
-						Style='/Styles.Frame.buttonClose.style'
-					></Button>
-				</Page>
-				<Page
+					Location='8,5'
 					MinimumSize='0,19'
 					Name='caption'
 					PackLocation='nfn,nfn'
 					PackSize='a,f'
-					ScrollExtent='532,19'
-					Size='532,19'
+					ScrollExtent='702,19'
+					Size='702,19'
 				>
 					<Text
 						Enabled='false'
@@ -2615,142 +2641,51 @@ oldIconVisible=parent.details.visible'
 						OpacityRelativeMin='0.80'
 						PackSize='a,f'
 						PalText='titletext'
-						ScrollExtent='532,19'
-						Size='532,19'
+						ScrollExtent='702,19'
+						Size='702,19'
 						TextAlignmentVertical='Bottom'
 						TextCapital='true'
 						TextColor='#00354F'
 					>xxx container name here</Text>
 				</Page>
 				<Page
-					BackgroundTint='#00D6FB'
-					GetsInput='false'
-					Location='1,0'
+					BackgroundColor='#FFFFFF'
+					BackgroundOpacity='1.00'
+					BackgroundTint='#2DAAC6'
+					Location='811,5'
+					Name='mmc'
+					PackLocation='fff,nfn'
+					PackSize='f,f'
+					PalBgTint='default'
+					RStyleDefault='/Styles.New.thin_mmc.rs_default'
+					ScrollExtent='20,20'
+					Size='20,20'
+				>
+					<Button
+						BackgroundColor='#FFFFFF'
+						BackgroundOpacity='1.00'
+						BackgroundTint='#2DAAC6'
+						IsCancelButton='true'
+						Name='close'
+						PackLocation='fff,cfc'
+						PackSize='f,f'
+						PalBgTint='default'
+						ScrollExtent='20,20'
+						Size='20,20'
+						Style='/Styles.Frame.buttonClose.style'
+						TextColor='#000000'
+					></Button>
+				</Page>
+				<Page
+					BackgroundOpacity='1.00'
 					Name='frame'
 					PackLocation='nfn,nfn'
 					PackSize='a,a'
-					PalBgTint='baselight'
 					RStyleDefault='/Styles.New.thin_in.rs_default'
-					ScrollExtent='681,337'
-					Selectable='true'
-					Size='681,337'
+					ScrollExtent='852,462'
+					Size='852,462'
 				>
 					<Page
-						BackgroundColor='#FFFFFF'
-						GetsInput='false'
-						Location='1,0'
-						Name='lines'
-						PackSize='a,a'
-						RStyleDefault='/Styles.space.boxes.generic4.rs_default'
-						ScrollExtent='681,337'
-						Size='681,337'
-					>
-						<Page
-							BackgroundColor='#FFFFFF'
-							GetsInput='false'
-							Location='0,315'
-							Name='outlineBL'
-							OpacityRelativeMin='0.80'
-							PackLocation='nfn,fff'
-							PackSize='p,f'
-							ScrollExtent='533,22'
-							Size='533,22'
-						>
-							<Page
-								BackgroundColor='#FFFFFF'
-								BackgroundOpacity='1.00'
-								BackgroundTint='#1CFFFF'
-								GetsInput='false'
-								Location='0,13'
-								Name='outline1'
-								OpacityRelativeMin='0.80'
-								PackSize='a,a'
-								PalBgTint='line1'
-								RStyleDefault='/Styles.space.boxes.boxlinebottomLeft2.rs_default'
-								ScrollExtent='533,9'
-								Size='533,9'
-							/>
-						</Page>
-						<Page
-							BackgroundColor='#FFFFFF'
-							GetsInput='false'
-							Location='189,315'
-							Name='outlineBR'
-							OpacityRelativeMin='0.80'
-							PackLocation='fff,fff'
-							PackSize='p,f'
-							RStyleDefault='/Styles.space.boxes.boxlineTopLeft.rs_default'
-							ScrollExtent='492,22'
-							Size='492,22'
-						>
-							<Page
-								BackgroundColor='#FFFFFF'
-								BackgroundOpacity='1.00'
-								BackgroundTint='#1CFFFF'
-								GetsInput='false'
-								Location='0,13'
-								Name='outline1'
-								OpacityRelativeMin='0.80'
-								PackSize='a,a'
-								PalBgTint='line1'
-								RStyleDefault='/Styles.space.boxes.boxlinebottomRight2.rs_default'
-								ScrollExtent='492,9'
-								Size='492,9'
-							/>
-						</Page>
-						<Page
-							BackgroundColor='#FFFFFF'
-							GetsInput='false'
-							Location='189,0'
-							Name='outlineTR'
-							OpacityRelativeMin='0.80'
-							PackLocation='fff,nfn'
-							PackSize='p,f'
-							ScrollExtent='492,22'
-							Size='492,22'
-						>
-							<Page
-								BackgroundColor='#FFFFFF'
-								BackgroundOpacity='1.00'
-								BackgroundTint='#1CFFFF'
-								GetsInput='false'
-								Name='outline1'
-								OpacityRelativeMin='0.80'
-								PackSize='a,a'
-								PalBgTint='line1'
-								RStyleDefault='/Styles.space.boxes.boxlineTopRight2.rs_default'
-								ScrollExtent='492,9'
-								Size='492,9'
-							/>
-						</Page>
-						<Page
-							BackgroundColor='#FFFFFF'
-							GetsInput='false'
-							Name='outlineTL'
-							OpacityRelativeMin='0.80'
-							PackLocation='nfn,nfn'
-							PackSize='p,f'
-							RStyleDefault='/Styles.space.boxes.boxlineTopLeft.rs_default'
-							ScrollExtent='533,22'
-							Size='533,22'
-						>
-							<Page
-								BackgroundColor='#FFFFFF'
-								BackgroundOpacity='1.00'
-								BackgroundTint='#1CFFFF'
-								GetsInput='false'
-								Name='outline1'
-								OpacityRelativeMin='0.80'
-								PackSize='a,a'
-								PalBgTint='line1'
-								RStyleDefault='/Styles.space.boxes.boxlineTopLeft2.rs_default'
-								ScrollExtent='533,9'
-								Size='533,9'
-							/>
-						</Page>
-					</Page>
-					<Page
-						BackgroundColor='#1FE6F5'
 						BackgroundOpacity='1.00'
 						BackgroundTint='#1FE6F5'
 						Location='-1,0'
@@ -2758,97 +2693,36 @@ oldIconVisible=parent.details.visible'
 						PackLocation='nfn,nfn'
 						PackSize='a,f'
 						PalBgTint='titleBar'
-						RStyleDefault='main_TR.rs_default'
-						ScrollExtent='682,29'
-						Size='682,29'
+						RStyleDefault='/Styles.New.thin_in.rs_default'
+						ScrollExtent='852,29'
+						Size='852,29'
 					/>
 					<Page
-						BackgroundColor='#1FE6F5'
 						BackgroundOpacity='1.00'
 						BackgroundTint='#1FE6F5'
-						Location='0,314'
+						Location='0,439'
 						Name='bottom'
 						PackLocation='nfn,fff'
 						PackSize='a,f'
 						PalBgTint='bottomBar'
-						RStyleDefault='main_BR.rs_default'
-						ScrollExtent='681,23'
-						Size='681,23'
+						RStyleDefault='/Styles.New.thin_in.rs_default'
+						ScrollExtent='851,23'
+						Size='851,23'
 					/>
-					<Namespace
-						Name='main_TR'
-						Size='128,64'
-					>
-						<RectangleStyle
-							Center='default.c'
-							East='default.e'
-							Name='rs_default'
-							West='default.w'
-						/>
-						<Namespace
-							Name='default'
-						>
-							<ImageStyle
-								Name='e'
-								Source='ui_rebel_final'
-								SourceRect='291,263,438,290'
-							/>
-							<ImageStyle
-								Name='w'
-								Source='ui_rebel_final'
-								SourceRect='277,263,291,290'
-							/>
-							<ImageStyle
-								Name='c'
-								Source='ui_rebel_final'
-								SourceRect='290,263,291,290'
-							/>
-						</Namespace>
-					</Namespace>
-					<Namespace
-						Name='main_BR'
-						Size='128,64'
-					>
-						<RectangleStyle
-							Center='default.c'
-							East='default.e'
-							Name='rs_default'
-							West='default.w'
-						/>
-						<Namespace
-							Name='default'
-						>
-							<ImageStyle
-								Name='e'
-								Source='ui_rebel_final'
-								SourceRect='421,299,438,324'
-							/>
-							<ImageStyle
-								Name='w'
-								Source='ui_rebel_final'
-								SourceRect='395,299,414,324'
-							/>
-							<ImageStyle
-								Name='c'
-								Source='ui_rebel_final'
-								SourceRect='416,299,417,324'
-							/>
-						</Namespace>
-					</Namespace>
 				</Page>
 				<Page
 					BackgroundOpacity='1.00'
 					BackgroundTint='#00D6FB'
 					GetsInput='false'
-					Location='0,5'
+					Location='8,8'
 					Name='back'
 					PackLocation='nfn,nfn'
 					PackSize='a,a'
 					PalBgTint='back1'
 					RStyleDefault='/Styles.New.thin_in.rs_default'
-					ScrollExtent='682,329'
+					ScrollExtent='836,446'
 					Selectable='true'
-					Size='682,329'
+					Size='836,446'
 				/>
 				<Page
 					BackgroundOpacity='1.00'
@@ -2859,9 +2733,53 @@ oldIconVisible=parent.details.visible'
 					PackSize='a,a'
 					PalBgTint='back1'
 					RStyleDefault='/Styles.space.spaceglow.rs_default'
-					ScrollExtent='682,337'
+					ScrollExtent='852,462'
 					Selectable='true'
-					Size='682,337'
+					Size='852,462'
 				/>
+				<Button
+					Color='#2DAAC6'
+					Location='36,5'
+					MaximumSize='48,48'
+					Name='examineButton'
+					oldExamVisible='false'
+					oldExamVisibleTmp='false'
+					OnPress='oldExamVisibleTmp=parent.parent.comp.exam.visible
+
+
+parent.parent.comp.exam.visible=oldExamVisible
+
+
+oldExamVisible=oldExamVisibleTmp'
+					OpacityRelativeMin='1.00'
+					PackLocation='nfn,nfn'
+					PackSize='f,f'
+					PalColor='default'
+					ScrollExtent='28,8'
+					Size='28,8'
+					Style='/Styles.New.buttons.pane_arrow.style'
+					TextColor='#000000'
+				></Button>
+				<Button
+					Location='206,5'
+					MaximumSize='48,48'
+					Name='eqButton'
+					oldEqVisible='false'
+					oldEqVisibleTmp='false'
+					OnPress='oldEqVisibleTmp=parent.parent.comp.eq.visible
+
+
+parent.parent.comp.eq.visible=oldEqVisible
+
+
+oldEqVisible=oldEqVisibleTmp'
+					OpacityRelativeMin='1.00'
+					PackLocation='fff,nfn'
+					PackSize='f,f'
+					ScrollExtent='28,8'
+					Size='28,8'
+					Style='/Styles.New.buttons.pane_arrow.style'
+					TextColor='#000000'
+				></Button>
 			</Page>
 		</Page>

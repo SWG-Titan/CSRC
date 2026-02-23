@@ -580,7 +580,7 @@
 						>
 							<Text
 								Enabled='false'
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='[@ui_droid:available_commands]'
 								Margin='2,2,2,2'
 								MaximumSize='16384,20'
@@ -816,7 +816,7 @@
 						<Text
 							BackgroundTint='#1CFFFF'
 							Enabled='false'
-							Font='bold_12'
+							Font='bold_11'
 							LocalText='Description of commands and chipsa
 a
 a
@@ -944,7 +944,7 @@ a</Text>
 						>
 							<Text
 								Enabled='false'
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='[@ui_droid:loaded_commands]'
 								Margin='2,2,2,2'
 								MaximumSize='16384,20'
@@ -1664,7 +1664,7 @@ a</Text>
 					>
 						<Text
 							Enabled='false'
-							Font='bold_12'
+							Font='bold_11'
 							LocalText='Description of commands and chips
 a
 a

@@ -410,6 +410,7 @@ namespace SwgCuiHudNamespace
 		CuiObjectTextManager::computeBestFitBoxExtent (foundObject, box);
 	
 		const Transform & transform_o2w = foundObject.getTransform_o2w ();
+		Vector const scale = foundObject.getScale ();
 		
 		Vector vs [8];
 		box.getCornerVectors (vs);
@@ -424,8 +425,9 @@ namespace SwgCuiHudNamespace
 		for (int i = 0; i < 8; ++i)
 		{
 			Vector tmpScreenVect;
-			
-			Vector testVector (transform_o2w.rotateTranslate_l2p (vs [i]));
+			// Scale corners before transform; rotateTranslate_l2p does not apply scale
+			Vector scaledCorner (vs [i].x * scale.x, vs [i].y * scale.y, vs [i].z * scale.z);
+			Vector testVector (transform_o2w.rotateTranslate_l2p (scaledCorner));
 			
 			//-- don't reveal extents for objects imbedded in terrain
 			if (isOnTerrain)

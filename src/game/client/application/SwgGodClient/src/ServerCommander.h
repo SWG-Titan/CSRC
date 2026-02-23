@@ -48,6 +48,7 @@ public:
 	unsigned int          grantSkill            (const CreatureObject & obj, const std::string & skillName);
 	unsigned int          revokeSkill           (const CreatureObject & obj, const std::string & skillName);
 	virtual void          setObjectTransform    (ClientObject* obj, const Transform& transform, bool pushUndo);
+	void                 setObjectScale        (ClientObject* obj, const Vector& scale);
 
 	unsigned int          scriptReload          (const std::string& scriptName);
 	unsigned int          scriptAttach          (const ClientObject& obj, const std::string& scriptName);

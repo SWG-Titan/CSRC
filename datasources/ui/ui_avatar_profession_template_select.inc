@@ -454,12 +454,12 @@
 							MouseOverSound='ui_rollover'
 							MouseOverTextColor='#18393D'
 							MouseOverTextMargin='3,0,3,0'
-							MouseOverTextStyle='starwars_24'
+							MouseOverTextStyle='starwars_21'
 							Name='style'
 							NormalIconColor='#00D6FB'
 							NormalTextColor='#62FF15'
 							NormalTextMargin='3,0,3,0'
-							NormalTextStyle='starwars_24'
+							NormalTextStyle='starwars_21'
 							PalActivatedText='textactivated'
 							PalDisabledText='textdisabled'
 							PalHoverText='texthover'
@@ -508,7 +508,7 @@
 				/>
 				<Text
 					Color='#FFFF00'
-					Font='starwars_24'
+					Font='starwars_21'
 					LocalText='Entertainer'
 					Location='-1,125'
 					Name='Title'
@@ -520,7 +520,7 @@
 				>Entertainer</Text>
 				<Text
 					Color='#000000'
-					Font='starwars_24'
+					Font='starwars_21'
 					LocalText='Entertainer'
 					Location='1,127'
 					Name='Title2'

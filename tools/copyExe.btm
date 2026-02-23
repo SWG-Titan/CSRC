@@ -43,9 +43,6 @@ copy %1 ..\src\compile\win32\TextureBuilder\optimized\TextureBuilder_o.exe ..\ex
 echo Viewer...
 copy %1 ..\src\compile\win32\Viewer\optimized\Viewer_o.exe ..\exe\win32
 
-echo WorldSnapshotViewer...
-copy %1 ..\src\compile\win32\WorldSnapshotViewer\optimized\WorldSnapshotViewer_o.exe ..\exe\win32
-
 echo MayaExporter...
 copy %1 ..\src\compile\win32\MayaExporter\optimized\MayaExporter.mll ..\exe\win32
 

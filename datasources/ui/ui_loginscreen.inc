@@ -11,7 +11,7 @@
 			cancelbutton='pageButtonsBottom.prev.buttonPrev'
 			finishbutton='pageButtonsBottom.next.buttonNext'
 			help='pagebuttonsbottom.help.text'
-			localbutton='flow.LocalButton'
+			localButton='flow.LocalButton'
 			Name='CodeData'
 			pagenormal='flow'
 			pagesession='session'
@@ -258,7 +258,7 @@ parent.pageButtonsBottom.visible=true'
 				Size='298,124'
 			>
 				<Text
-					Font='bold_12'
+					Font='bold_11'
 					LocalText='[@USERNAME]'
 					Location='8,5'
 					MinimumSize='0,19'
@@ -286,7 +286,7 @@ parent.pageButtonsBottom.visible=true'
 					Style='/Styles.textbox.login.Style_out'
 				></Textbox>
 				<Text
-					Font='bold_12'
+					Font='bold_11'
 					LocalText='[@PASSWORD]'
 					Location='8,61'
 					MinimumSize='0,19'

@@ -32,6 +32,7 @@ class GroupObjectWindow;
 class MainToolBar;
 class RegionBrowser;
 class ObjectEditor;
+class StackerTool;
 class QDockWidget;
 class QSettings;
 class QWorkspace;
@@ -48,6 +49,7 @@ class MainFrame: public QMainWindow
 
 	//we want window actions to directly show or hide these member windows
 	friend ActionsWindow;
+	friend ActionsTool;
 
 public:
 
@@ -151,6 +153,7 @@ private:
 	FilterWindow*      m_filterWindow;
 	BookmarkBrowser*   m_bookmarkBrowser;
 	FavoritesWindow*   m_favoritesWindow;
+	StackerTool*       m_stackTool;
 
 	QDockWindow*       m_consoleDock;
 	QDockWindow*       m_treeBrowserDock;
@@ -160,6 +163,7 @@ private:
 	QDockWindow*       m_bookmarkBrowserDock;
 	QDockWindow*       m_regionsViewDock;
 	QDockWindow*       m_favoritesWindowDock;
+	QDockWindow*       m_stackToolDock;
 
 	QSettings*         m_settings;
 

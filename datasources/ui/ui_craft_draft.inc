@@ -65,7 +65,7 @@ parent.assembly.visible=false'
 					BackgroundColor='#FFFFFF'
 					ColorCarat='#FFFFFF'
 					ColorSelection='#FFFFFF'
-					Font='bold_12'
+					Font='bold_11'
 					LocalText='[@ui_craft:cpt_draft_help]'
 					Location='0,13'
 					MaxLines='1'
@@ -108,7 +108,6 @@ parent.assembly.visible=false'
 					</DataSource>
 					<Scrollbar
 						Control='tabs'
-						Enabled='false'
 						Location='197,32'
 						Name='scroll'
 						PackLocation='fff,nfn'
@@ -119,9 +118,7 @@ parent.assembly.visible=false'
 					>
 					</Scrollbar>
 					<TabbedPane
-						ActiveTab='0'
 						BackgroundColor='#009977'
-						DataSource='TabData'
 						Location='0,20'
 						MinimumScrollExtent='198,0'
 						MinimumSize='0,19'
@@ -130,6 +127,9 @@ parent.assembly.visible=false'
 						PackSize='p,f'
 						ScrollExtent='198,19'
 						Size='189,19'
+						Style='/Styles.New.tabs.horizontal_10.style'
+						DataSource='TabData'
+						ActiveTab='0'
 						Style='/Styles.New.tabs.horizontal_10.style'
 					>
 					</TabbedPane>
@@ -150,7 +150,7 @@ parent.assembly.visible=false'
 					>@ui_craft:check_draft_show_all</Checkbox>
 					<Text
 						Enabled='false'
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='[@ui_craft:draft_schematics]'
 						Location='1,0'
 						MinimumSize='0,19'
@@ -476,7 +476,7 @@ parent.assembly.visible=false'
 					>
 						<Text
 							Enabled='false'
-							Font='bold_12'
+							Font='bold_11'
 							LocalText='[@ui_craft:draft_ingredients]'
 							MinimumSize='0,19'
 							Name='labelIngredients'
@@ -491,7 +491,6 @@ parent.assembly.visible=false'
 						>@ui_craft:draft_ingredients</Text>
 						<Scrollbar
 							Control='content'
-							Enabled='false'
 							Location='303,23'
 							Name='scroll'
 							Opacity='0.90'
@@ -530,7 +529,7 @@ parent.assembly.visible=false'
 								Visible='false'
 							>xxx data_obj_name</Text>
 							<Text
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='xxx attrib 1:    info here
 xxx attrib 2:    info here
 xxx attrib 3:    info here
@@ -559,7 +558,7 @@ xxx attrib 7:    info here
 xxx attrib 8:    info here
 </Text>
 							<Text
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='xxx Description goes into this field with all the other text ok you can stop now.'
 								Location='4,121'
 								Name='textDesc'

@@ -10,7 +10,6 @@
 			ScrollExtent='240,420'
 			Size='240,420'
 			UserMovable='true'
-			UserResizable='false'
 			Visible='false'
 		>
 			<Data
@@ -30,13 +29,12 @@
 				textSnapMeters='textSnapMeters'
 			/>
 			<Text
-				Font='bold_12'
+				Font='bold_11'
 				LocalText='Decorator Options'
 				Location='8,6'
 				Name='labelTitle'
 				ScrollExtent='200,16'
 				Size='200,16'
-				TextColor='#FFFFFF'
 			>Decorator Options</Text>
 			<Checkbox
 				Color='#96F4FC'
@@ -129,6 +127,7 @@
 			>Spawning</Button>
 			<Text
 				Font='bold_11'
+				LocalText='X: 0.00  Z: 0.00  Y: 0.00'
 				Location='10,278'
 				MaxLines='1'
 				Name='textPosition'
@@ -138,6 +137,7 @@
 			>X: 0.00  Z: 0.00  Y: 0.00</Text>
 			<Text
 				Font='bold_11'
+				LocalText='Selection: (none)'
 				Location='10,294'
 				MaxLines='2'
 				Name='textSelection'

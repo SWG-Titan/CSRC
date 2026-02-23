@@ -15,10 +15,12 @@
 #include "UIMessage.h"
 #include "UIPage.h"
 #include "UIText.h"
+#include "UITextbox.h"
 #include "UITextStyle.h"
 #include "UIVolumePage.h"
 #include "UnicodeUtils.h"
 #include "clientGame/ContainerInterface.h"
+#include "sharedObject/Container.h"
 #include "clientGame/CreatureObject.h"
 #include "clientGame/Game.h"
 #include "clientGame/ClientCommandQueue.h"
@@ -31,7 +33,10 @@
 #include "clientUserInterface/CuiMenuInfoTypes.h"
 #include "clientUserInterface/CuiMoney.h"
 #include "clientUserInterface/CuiPreferences.h"
+#include "clientUserInterface/CuiMenuInfoTypes.h"
 #include "clientUserInterface/CuiRadialMenuManager.h"
+#include "clientUserInterface/CuiStringIds.h"
+#include "UIPopupMenu.h"
 #include "clientUserInterface/CuiSettings.h"
 #include "clientUserInterface/CuiSoundManager.h"
 #include "clientUserInterface/CuiSounds.h"
@@ -92,7 +97,8 @@ m_capacityContainedLimitBar (0),
 m_capacityText              (0),
 m_ownedByUI                 (false),
 m_capacityArea              (0),
-m_saveInventoryOrder        (true)
+m_saveInventoryOrder        (true),
+m_searchInput               (0)
 {
 	getCodeDataObject (TUIText,         m_label,         "label",             true);
 	getCodeDataObject (TUIButton,       m_buttonView,    "buttonView",        true);
@@ -127,6 +133,14 @@ m_saveInventoryOrder        (true)
 
 	//-- optionals
 	getCodeDataObject (TUIButton,       m_buttonUp,      "buttonUp",  true);
+
+	UIWidget * searchWidget = 0;
+	if (getCodeDataObject (TUIWidget, searchWidget, "searchInput", true))
+	{
+		m_searchInput = dynamic_cast<UITextbox *>(searchWidget);
+		if (m_searchInput)
+			registerMediatorObject (*m_searchInput, true);
+	}
 
 	UIWidget *widget = 0;
 	if (getCodeDataObject (TUIWidget, widget, "Icon", true))
@@ -327,6 +341,15 @@ void SwgCuiInventoryContainer::performActivate ()
 	if (m_defaultButton)
 		m_defaultButton->AddCallback (this);
 
+	if (m_searchInput)
+	{
+		m_searchInput->AddCallback (this);
+		m_searchInput->SetEditable (true);
+		m_searchInput->SetEditableUnicode (true);
+		m_searchInput->SetGetsInput (true);
+		m_searchInput->SetSelected (false);
+	}
+
 	setIsUpdating (true);
 
 	if (m_containerProvider)
@@ -352,6 +375,9 @@ void SwgCuiInventoryContainer::performDeactivate ()
 
 	if (m_defaultButton)
 		m_defaultButton->RemoveCallback (this);
+
+	if (m_searchInput)
+		m_searchInput->RemoveCallback (this);
 
 	if (m_viewer)
 	{
@@ -423,7 +449,6 @@ bool SwgCuiInventoryContainer::OnMessage( UIWidget *context, const UIMessage & m
 			return false;
 		}
 	}
-
 	return true;
 }
 
@@ -548,6 +573,18 @@ void SwgCuiInventoryContainer::OnButtonPressed( UIWidget *context )
 		}
 
 		CuiSoundManager::play (CuiSounds::radial_complete);
+	}
+}
+
+//----------------------------------------------------------------------
+
+void SwgCuiInventoryContainer::OnTextboxChanged( UIWidget *context )
+{
+	if (context == m_searchInput && m_searchInput)
+	{
+		Unicode::String filterText;
+		m_searchInput->GetLocalText(filterText);
+		setSearchFilter(filterText);
 	}
 }
 
@@ -795,12 +832,74 @@ void SwgCuiInventoryContainer::clearObjectsAndViewers ()
 
 //-----------------------------------------------------------------
 
+namespace
+{
+	bool itemOrDescendantsMatchSearch (ClientObject const & obj, Unicode::String const & filterLower)
+	{
+		if (filterLower.empty ())
+			return true;
+
+		Unicode::String itemName = obj.getLocalizedName ();
+		Unicode::toLower (itemName);
+		if (itemName.find (filterLower) != Unicode::String::npos)
+			return true;
+
+		Container const * const container = ContainerInterface::getContainer (obj);
+		if (container)
+		{
+			for (ContainerConstIterator it = container->begin (); it != container->end (); ++it)
+			{
+				ClientObject * const child = dynamic_cast<ClientObject *>((*it).getObject ());
+				if (child && itemOrDescendantsMatchSearch (*child, filterLower))
+					return true;
+			}
+		}
+		return false;
+	}
+}
+
+//-----------------------------------------------------------------
+
+void SwgCuiInventoryContainer::setSearchFilter (const Unicode::String & filter)
+{
+	if (m_searchFilter != filter)
+	{
+		m_searchFilter = filter;
+		m_forceUpdate = true;
+		updateContents ();
+	}
+}
+
+//-----------------------------------------------------------------
+
+const Unicode::String & SwgCuiInventoryContainer::getSearchFilter () const
+{
+	return m_searchFilter;
+}
+
+//-----------------------------------------------------------------
+
 void SwgCuiInventoryContainer::updateContents ()
 {
 	ObjectWatcherVector owv;
 	if (m_containerProvider)
 	{
 		m_containerProvider->getObjectVector (owv);
+	}
+
+	if (!m_searchFilter.empty ())
+	{
+		Unicode::String filterLower = m_searchFilter;
+		Unicode::toLower (filterLower);
+
+		ObjectWatcherVector filtered;
+		for (ObjectWatcherVector::const_iterator it = owv.begin (); it != owv.end (); ++it)
+		{
+			ClientObject * const obj = it->getPointer ();
+			if (obj && itemOrDescendantsMatchSearch (*obj, filterLower))
+				filtered.push_back (*it);
+		}
+		owv = filtered;
 	}
 
 	const bool changed = (owv != *m_objects);
@@ -1461,6 +1560,40 @@ void SwgCuiInventoryContainer::openSelectedRadial()
 {
 	if(m_icons)
 		m_icons->openSelectedRadial();
+}
+
+//-----------------------------------------------------------------
+
+void SwgCuiInventoryContainer::handleContextMenuExamine (ClientObject & obj)
+{
+	Cui::MenuInfoTypes::executeCommandForMenu (Cui::MenuInfoTypes::EXAMINE, obj.getNetworkId (), 0);
+	CuiSoundManager::play (CuiSounds::radial_complete);
+}
+
+//-----------------------------------------------------------------
+
+void SwgCuiInventoryContainer::handleContextMenuDrop (const SwgCuiInventoryContainer::ObjectWatcherVector & objects)
+{
+	for (ObjectWatcherVector::const_iterator it = objects.begin (); it != objects.end (); ++it)
+	{
+		ClientObject * const obj = it->getPointer ();
+		if (obj)
+			CuiInventoryManager::dropObject (obj->getNetworkId ());
+	}
+	CuiSoundManager::play (CuiSounds::radial_complete);
+}
+
+//-----------------------------------------------------------------
+
+void SwgCuiInventoryContainer::handleContextMenuDelete (const SwgCuiInventoryContainer::ObjectWatcherVector & objects)
+{
+	for (ObjectWatcherVector::const_iterator it = objects.begin (); it != objects.end (); ++it)
+	{
+		ClientObject * const obj = it->getPointer ();
+		if (obj)
+			CuiInventoryManager::destroyObject (obj->getNetworkId (), false);
+	}
+	CuiSoundManager::play (CuiSounds::radial_complete);
 }
 
 // ======================================================================

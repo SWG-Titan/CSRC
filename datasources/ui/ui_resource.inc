@@ -69,7 +69,7 @@
 			>
 			</Sliderbar>
 			<Text
-				Font='bold_12'
+				Font='bold_11'
 				LocalText='[@cpt_res_quantity_select]'
 				Location='39,64'
 				Margin='2,2,2,2'
@@ -454,7 +454,7 @@
 				textdisplay='textDisplay'
 			/>
 			<Text
-				Font='bold_12'
+				Font='bold_11'
 				LocalText='[@res_setres_text]'
 				Location='36,32'
 				MaxLines='1'
@@ -501,7 +501,7 @@
 					BackgroundTint='#00D6FB'
 					CellHeight='19'
 					DefaultTextColor='#96F4FC'
-					DefaultTextStyle='bold_12'
+					DefaultTextStyle='bold_11'
 					GridColorHorizontal='#1CFFFF'
 					GridColorVertical='#1CFFFF'
 					Location='4,49'
@@ -1047,7 +1047,7 @@
 					BackgroundTint='#00D6FB'
 					CellHeight='19'
 					DefaultTextColor='#96F4FC'
-					DefaultTextStyle='bold_12'
+					DefaultTextStyle='bold_11'
 					GridColorHorizontal='#1CFFFF'
 					GridColorVertical='#1CFFFF'
 					Location='10,37'
@@ -1664,7 +1664,7 @@ parent.compBg.location=location'
 					Size='314,136'
 				>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='[@res_resourcename]'
 						Location='9,8'
 						Margin='2,0,0,0'
@@ -2370,7 +2370,7 @@ parent.compBg.location=location'
 							Size='123,142'
 						>
 							<Text
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='[@res_integrity]'
 								Location='13,0'
 								MinimumSize='0,19'
@@ -2468,7 +2468,7 @@ parent.compBg.location=location'
 							Size='123,142'
 						>
 							<Text
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='[@res_capacity]'
 								Location='14,0'
 								MinimumSize='0,19'
@@ -2564,7 +2564,7 @@ parent.compBg.location=location'
 							Size='122,55'
 						>
 							<Text
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='[@res_actualrate]'
 								Location='15,-4'
 								MinimumSize='0,19'
@@ -2645,7 +2645,7 @@ parent.compBg.location=location'
 							Size='122,55'
 						>
 							<Text
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='[@res_specrate]'
 								Location='15,-5'
 								MinimumSize='0,19'

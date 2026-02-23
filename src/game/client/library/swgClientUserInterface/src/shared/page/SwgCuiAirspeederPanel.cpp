@@ -32,11 +32,8 @@ namespace
 
 SwgCuiAirspeederPanel * SwgCuiAirspeederPanel::createInto(UIPage & parent)
 {
-	UIPage * page = NULL;
-	parent.GetCodeDataObject(TUIPage, page, "airspeederPanel");
-	if (!page)
-		return NULL;
-	return new SwgCuiAirspeederPanel(*page);
+	// parent is the AirspeederPanel page from /GroundHUD.AirspeederPanel - use it directly
+	return new SwgCuiAirspeederPanel(parent);
 }
 
 //----------------------------------------------------------------------

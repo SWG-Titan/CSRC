@@ -1,0 +1,163 @@
+<!DOCTYPE UI><UI version="3.0" stdsetdef="1">
+<class>BaseStackerTool</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>BaseStackerTool</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>260</width>
+            <height>220</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Stacker Tool</string>
+    </property>
+    <grid>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
+            <number>11</number>
+        </property>
+        <property name="spacing">
+            <number>6</number>
+        </property>
+        <widget class="QLabel" row="0" column="0">
+            <property name="name">
+                <cstring>m_countLabel</cstring>
+            </property>
+            <property name="text">
+                <string>Count:</string>
+            </property>
+        </widget>
+        <widget class="QSpinBox" row="0" column="1">
+            <property name="name">
+                <cstring>m_countSpinBox</cstring>
+            </property>
+            <property name="minValue">
+                <number>2</number>
+            </property>
+            <property name="maxValue">
+                <number>100</number>
+            </property>
+            <property name="value">
+                <number>2</number>
+            </property>
+        </widget>
+        <widget class="QLabel" row="1" column="0">
+            <property name="name">
+                <cstring>m_orientationLabel</cstring>
+            </property>
+            <property name="text">
+                <string>Orientation:</string>
+            </property>
+        </widget>
+        <widget class="QComboBox" row="1" column="1">
+            <property name="name">
+                <cstring>m_orientationCombo</cstring>
+            </property>
+            <item>
+                <property name="text">
+                    <string>+X</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>-X</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>+Y</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>-Y</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>+Z</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>-Z</string>
+                </property>
+            </item>
+        </widget>
+        <widget class="QLabel" row="2" column="0">
+            <property name="name">
+                <cstring>m_distanceLabel</cstring>
+            </property>
+            <property name="text">
+                <string>Distance (m):</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit" row="2" column="1">
+            <property name="name">
+                <cstring>m_distanceEdit</cstring>
+            </property>
+            <property name="text">
+                <string>0</string>
+            </property>
+        </widget>
+        <widget class="QCheckBox" row="3" column="0" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>m_useMeshExtentCheck</cstring>
+            </property>
+            <property name="text">
+                <string>Stack against object mesh (extent) - for seamless wall stacking</string>
+            </property>
+        </widget>
+        <widget class="QGroupBox" row="4" column="0" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>m_gimbalGroup</cstring>
+            </property>
+            <property name="title">
+                <string>Axis Legend (Gimbal)</string>
+            </property>
+            <property name="alignment">
+                <set>AlignCenter</set>
+            </property>
+            <grid>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <property name="margin">
+                    <number>6</number>
+                </property>
+                <property name="spacing">
+                    <number>4</number>
+                </property>
+                <widget class="QLabel" row="0" column="0" rowspan="1" colspan="6">
+                    <property name="name">
+                        <cstring>m_gimbalLegend</cstring>
+                    </property>
+                    <property name="text">
+                        <string>X (red)  Y (green)  Z (blue)  --  + = forward, - = backward</string>
+                    </property>
+                    <property name="alignment">
+                        <set>AlignCenter</set>
+                    </property>
+                </widget>
+            </grid>
+        </widget>
+        <widget class="QPushButton" row="5" column="0" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>m_stackButton</cstring>
+            </property>
+            <property name="text">
+                <string>Stack</string>
+            </property>
+        </widget>
+    </grid>
+</widget>
+<customwidgets>
+</customwidgets>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

@@ -170,7 +170,7 @@
 						>
 							<Text
 								Enabled='false'
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='[@ui_weapongroupassignment:weapon_groups_available]'
 								Location='4,0'
 								Margin='2,2,2,2'
@@ -286,7 +286,7 @@
 								>
 									<Text
 										Enabled='false'
-										Font='bold_12'
+										Font='bold_11'
 										LocalText='[@ui_weapongroupassignment:all_weapons]'
 										Location='0,26'
 										Margin='2,2,2,2'
@@ -382,7 +382,7 @@
 									Size='219,222'
 								>
 									<Text
-										Font='bold_12'
+										Font='bold_11'
 										LocalText='xxx attrib 1:    info here
 xxx attrib 2:    info here
 xxx attrib 3:    info here
@@ -543,7 +543,7 @@ xxx attrib 8:    info here
 								>
 									<Text
 										Enabled='false'
-										Font='bold_12'
+										Font='bold_11'
 										LocalText='[@ui_weapongroupassignment:selected_group]'
 										Location='0,26'
 										Margin='2,2,2,2'
@@ -639,7 +639,7 @@ xxx attrib 8:    info here
 									Size='221,222'
 								>
 									<Text
-										Font='bold_12'
+										Font='bold_11'
 										LocalText='xxx attrib 1:    info here
 xxx attrib 2:    info here
 xxx attrib 3:    info here

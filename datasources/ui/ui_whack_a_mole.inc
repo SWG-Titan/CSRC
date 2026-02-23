@@ -22,11 +22,11 @@
 				CellSelectionOverlayOpacity='1.00'
 				CellSize='89,89'
 				Location='12,27'
-				MinimumScrollExtent='202,89'
+				MinimumScrollExtent='297,89'
 				Name='buttons'
 				OpacityRelativeMin='1.00'
 				PackSize='a,a'
-				ScrollExtent='291,92'
+				ScrollExtent='297,92'
 				Size='291,92'
 			>
 				<Button

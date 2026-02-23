@@ -35,7 +35,7 @@
 					BackgroundColor='#FFFFFF'
 					ColorCarat='#FFFFFF'
 					ColorSelection='#FFFFFF'
-					Font='bold_12'
+					Font='bold_11'
 					LocalText='xxx text'
 					Location='5,3'
 					MaxLines='10'

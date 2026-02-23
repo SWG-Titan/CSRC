@@ -2535,7 +2535,6 @@ end
 									Name='details'
 									PackSize='a,a'
 									ScrollExtent='424,619'
-									ScrollLocation='0,161'
 									Size='424,245'
 									SpacingType='Constant'
 								>

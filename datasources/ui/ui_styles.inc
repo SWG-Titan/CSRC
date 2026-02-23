@@ -418,7 +418,7 @@
 					ImageAutoAngle='false'
 					ImageSegmentAngle='0.03'
 					ImageStyle='c'
-					ImageUvs='c0.00,0.00;0.00,0.00;0.00,0.00;0.00,0.00'
+					ImageUvs='c0.33,0.34;0.33,0.30;0.34,0.30;0.34,0.34'
 					Name='style'
 				/>
 				<ImageStyle
@@ -906,7 +906,7 @@
 					ImageAutoAngle='false'
 					ImageSegmentAngle='0.03'
 					ImageStyle='c'
-					ImageUvs='c0.00,0.00;0.00,0.00;0.00,0.00;0.00,0.00'
+					ImageUvs='c0.34,0.34;0.33,0.30;0.34,0.30;0.34,0.34'
 					Name='style'
 				/>
 				<ImageStyle

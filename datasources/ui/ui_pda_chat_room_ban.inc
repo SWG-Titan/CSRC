@@ -31,7 +31,7 @@
 			>
 				<Text
 					Enabled='false'
-					Font='bold_12'
+					Font='bold_11'
 					LocalText='[@ui_chatroom:room_name_label]'
 					Location='0,-2'
 					MaxLines='1'
@@ -48,7 +48,7 @@
 				>@ui_chatroom:room_name_label</Text>
 				<Text
 					Enabled='false'
-					Font='bold_12'
+					Font='bold_11'
 					LocalText='xxx room name here'
 					Location='0,20'
 					MaxLines='1'
@@ -64,7 +64,7 @@
 				>xxx room name here</Text>
 				<Text
 					Enabled='false'
-					Font='bold_12'
+					Font='bold_11'
 					LocalText='[@ui_chatroom:ban_name]'
 					Location='5,39'
 					MaxLines='1'

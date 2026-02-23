@@ -3041,6 +3041,8 @@ void Direct3d9::convertTransformToMatrix(const Transform &transform, D3DMATRIX &
 
 void Direct3d9::convertScaleAndTransformToMatrix(const Vector &scale, const Transform &transform, D3DMATRIX & matrix)
 {
+	// Scale must be applied in object space (before rotation): M = Transform * Scale
+	// So scale each column of the rotation by the corresponding scale component
 #ifdef FFP
 	matrix._11 = transform.matrix[0][0] * scale.x;
 	matrix._12 = transform.matrix[1][0] * scale.x;
@@ -3063,17 +3065,17 @@ void Direct3d9::convertScaleAndTransformToMatrix(const Vector &scale, const Tran
 	matrix._44 = 1.0f;
 #else
 	matrix._11 = transform.matrix[0][0] * scale.x;
-	matrix._12 = transform.matrix[0][1] * scale.x;
-	matrix._13 = transform.matrix[0][2] * scale.x;
+	matrix._12 = transform.matrix[0][1] * scale.y;
+	matrix._13 = transform.matrix[0][2] * scale.z;
 	matrix._14 = transform.matrix[0][3];
 
-	matrix._21 = transform.matrix[1][0] * scale.y;
+	matrix._21 = transform.matrix[1][0] * scale.x;
 	matrix._22 = transform.matrix[1][1] * scale.y;
-	matrix._23 = transform.matrix[1][2] * scale.y;
+	matrix._23 = transform.matrix[1][2] * scale.z;
 	matrix._24 = transform.matrix[1][3];
 
-	matrix._31 = transform.matrix[2][0] * scale.z;
-	matrix._32 = transform.matrix[2][1] * scale.z;
+	matrix._31 = transform.matrix[2][0] * scale.x;
+	matrix._32 = transform.matrix[2][1] * scale.y;
 	matrix._33 = transform.matrix[2][2] * scale.z;
 	matrix._34 = transform.matrix[2][3];
 

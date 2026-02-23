@@ -355,6 +355,26 @@ void ServerCommander::setObjectTransform(ClientObject* obj, const Transform& tra
 
 //-----------------------------------------------------------------
 
+void ServerCommander::setObjectScale(ClientObject* obj, const Vector& scale)
+{
+	NOT_NULL(obj);
+
+	if (Game::getSinglePlayer())
+	{
+		obj->setScale(scale);
+	}
+	else
+	{
+		char buf[256];
+		IGNORE_RETURN(_snprintf(buf, sizeof(buf), "object setScale %s %g %g %g",
+			obj->getNetworkId().getValueString().c_str(),
+			scale.x, scale.y, scale.z));
+		issueCommand(buf);
+	}
+}
+
+//-----------------------------------------------------------------
+
 /**
  * Build a command to ask the server to reload a given script from disk
  *

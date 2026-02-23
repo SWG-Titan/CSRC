@@ -539,7 +539,7 @@ parent.compBg.location=location'
 		>
 			<Text
 				BackgroundOpacity='1.00'
-				Font='bold_19'
+				Font='bold_18'
 				LocalText='group group group group group '
 				Location='123,6'
 				Margin='15,5,10,10'
@@ -552,7 +552,7 @@ parent.compBg.location=location'
 			>group group group group group </Text>
 			<Text
 				BackgroundOpacity='1.00'
-				Font='bold_19'
+				Font='bold_18'
 				LocalText='advertise'
 				Location='8,6'
 				Margin='5,10,10,5'
@@ -579,7 +579,7 @@ parent.compBg.location=location'
 			>exclaim</Text>
 			<Text
 				BackgroundOpacity='1.00'
-				Font='bold_19'
+				Font='bold_18'
 				LocalText='default'
 				Location='124,210'
 				MinimumSize='16,16'
@@ -593,7 +593,7 @@ parent.compBg.location=location'
 			>default</Text>
 			<Text
 				BackgroundOpacity='1.00'
-				Font='bold_19'
+				Font='bold_18'
 				LocalText='whisper'
 				Location='478,82'
 				MinimumSize='16,16'
@@ -607,7 +607,7 @@ parent.compBg.location=location'
 			>whisper</Text>
 			<Text
 				BackgroundOpacity='1.00'
-				Font='bold_19'
+				Font='bold_18'
 				LocalText='moan'
 				Location='6,78'
 				Margin='10,6,10,6'
@@ -620,7 +620,7 @@ parent.compBg.location=location'
 			>moan</Text>
 			<Text
 				BackgroundOpacity='1.00'
-				Font='bold_19'
+				Font='bold_18'
 				LocalText='threaten'
 				Location='472,138'
 				MinimumSize='16,16'
@@ -634,7 +634,7 @@ parent.compBg.location=location'
 			>threaten</Text>
 			<Text
 				BackgroundOpacity='1.00'
-				Font='bold_19'
+				Font='bold_18'
 				LocalText='shout'
 				Location='600,78'
 				Margin='16,14,16,14'
@@ -647,7 +647,7 @@ parent.compBg.location=location'
 			>shout</Text>
 			<Text
 				BackgroundOpacity='1.00'
-				Font='bold_19'
+				Font='bold_18'
 				LocalText='icy'
 				Location='256,84'
 				Margin='12,4,12,16'
@@ -661,7 +661,7 @@ parent.compBg.location=location'
 			>icy</Text>
 			<Text
 				BackgroundOpacity='1.00'
-				Font='bold_19'
+				Font='bold_18'
 				LocalText='sarcastic'
 				Location='252,146'
 				MinimumSize='16,16'
@@ -675,7 +675,7 @@ parent.compBg.location=location'
 			>sarcastic</Text>
 			<Text
 				BackgroundOpacity='1.00'
-				Font='bold_19'
+				Font='bold_18'
 				LocalText='droid'
 				Location='4,148'
 				Margin='14,10,14,10'
@@ -688,7 +688,7 @@ parent.compBg.location=location'
 			>droid</Text>
 			<Text
 				BackgroundOpacity='1.00'
-				Font='bold_19'
+				Font='bold_18'
 				LocalText='double_ring'
 				Location='356,144'
 				Margin='8,4,8,4'
@@ -701,7 +701,7 @@ parent.compBg.location=location'
 			>double_ring</Text>
 			<Text
 				BackgroundOpacity='1.00'
-				Font='bold_19'
+				Font='bold_18'
 				LocalText='chatter'
 				Location='354,82'
 				MinimumSize='16,16'
@@ -715,7 +715,7 @@ parent.compBg.location=location'
 			>chatter</Text>
 			<Text
 				BackgroundOpacity='1.00'
-				Font='bold_19'
+				Font='bold_18'
 				LocalText='shutter'
 				Location='128,150'
 				MinimumSize='16,16'
@@ -729,7 +729,7 @@ parent.compBg.location=location'
 			>shutter</Text>
 			<Text
 				BackgroundOpacity='1.00'
-				Font='bold_19'
+				Font='bold_18'
 				LocalText='scream'
 				Location='116,78'
 				Margin='16,12,16,12'
@@ -742,7 +742,7 @@ parent.compBg.location=location'
 			>scream</Text>
 			<Text
 				BackgroundOpacity='1.00'
-				Font='bold_19'
+				Font='bold_18'
 				LocalText='sing'
 				Location='135,274'
 				MinimumSize='16,16'
@@ -756,7 +756,7 @@ parent.compBg.location=location'
 			>sing</Text>
 			<Text
 				BackgroundOpacity='1.00'
-				Font='bold_19'
+				Font='bold_18'
 				LocalText='evil'
 				Location='8,270'
 				Margin='18,18,10,6'
@@ -769,7 +769,7 @@ parent.compBg.location=location'
 			>evil</Text>
 			<Text
 				BackgroundOpacity='1.00'
-				Font='bold_19'
+				Font='bold_18'
 				LocalText='sing2'
 				Location='248,271'
 				Margin='10,6,10,6'
@@ -784,7 +784,7 @@ parent.compBg.location=location'
 			>sing2</Text>
 			<Text
 				BackgroundOpacity='1.00'
-				Font='bold_19'
+				Font='bold_18'
 				LocalText='sing3'
 				Location='609,236'
 				Margin='10,6,10,6'
@@ -797,7 +797,7 @@ parent.compBg.location=location'
 			>sing3</Text>
 			<Text
 				BackgroundOpacity='1.00'
-				Font='bold_19'
+				Font='bold_18'
 				LocalText='sad'
 				Location='607,163'
 				Margin='10,6,10,6'
@@ -810,7 +810,7 @@ parent.compBg.location=location'
 			>sad</Text>
 			<Text
 				BackgroundOpacity='1.00'
-				Font='bold_19'
+				Font='bold_18'
 				LocalText='evil2'
 				Location='476,200'
 				Margin='10,6,10,6'
@@ -823,7 +823,7 @@ parent.compBg.location=location'
 			>evil2</Text>
 			<Text
 				BackgroundOpacity='1.00'
-				Font='bold_19'
+				Font='bold_18'
 				LocalText='poetry'
 				Location='356,200'
 				Margin='10,6,10,6'

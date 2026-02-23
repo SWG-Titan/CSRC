@@ -19,6 +19,7 @@ class NetworkId;
 class Object;
 class SwgCuiInventoryInfo;
 class UIButton;
+class UIText;
 
 namespace MessageDispatch
 {
@@ -60,8 +61,11 @@ private:
 
 	void                     applyRotationToServer         (void);
 	bool                     canBeRotated                  (void);
+	void                     updateCaptionTextToFit        (void);
 
 	typedef Watcher<Object> ObjectWatcher;
+
+	UIText *                            m_captionText;
 
 	SwgCuiInventoryInfo *              m_info;
 	MessageDispatch::Callback *        m_callback;

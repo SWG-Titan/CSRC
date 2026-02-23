@@ -58,6 +58,7 @@
 #include "ServerObjectData.h"
 #include "SnapToGridSettings.h"
 #include "UnicodeUtils.h"
+#include "clientUserInterface/CuiTextManager.h"
 
 #include <qapplication.h>
 #include <qcheckbox.h>
@@ -459,8 +460,6 @@ void GodClientData::draw()
 
 void GodClientData::draw(const Camera& camera)
 {	
-	UNREF(camera);
-
 	Graphics::setStaticShader(ShaderTemplateList::get3dVertexColorZStaticShader());
 	
 	cleanSelectedObjectList();
@@ -489,7 +488,7 @@ void GodClientData::draw(const Camera& camera)
 
 		const Object* const ghost =(*it)->ghost; 
 		
-		//draw ghosts' extents and axes (ghosts always get axes)
+		//draw ghosts' extents and axes (ghosts always get axes) with labeled gimbal
 		if(ghost)
 		{
 			const Extent* const extent     = NON_NULL(ghost->getAppearance()->getSelectionExtent());
@@ -510,7 +509,50 @@ void GodClientData::draw(const Camera& camera)
 				frameSize = h > w ? h : w;
 				frameSize = frameSize > l ? frameSize : l;
 			}
-			Graphics::drawFrame(frameSize*2);
+			frameSize *= 2;
+
+			// Draw labeled gimbal: axis lines, colored spheres at endpoints, and text labels
+			// Scale axis lengths by object scale so they match the extent
+			Vector const scale = ghost->getScale();
+			Vector const center = ghost->getAppearanceSphereCenter_w();
+			Vector const i = ghost->getObjectFrameI_w();
+			Vector const j = ghost->getObjectFrameJ_w();
+			Vector const k = ghost->getObjectFrameK_w();
+			Vector const xEnd = center + i * (frameSize * scale.x);
+			Vector const yEnd = center + j * (frameSize * scale.y);
+			Vector const zEnd = center + k * (frameSize * scale.z);
+			real const r = frameSize * std::max(std::max(scale.x, scale.y), scale.z);
+
+			Graphics::setObjectToWorldTransformAndScale(Transform::identity, Vector::xyz111);
+			Graphics::drawLine(center, xEnd, VectorArgb::solidRed);
+			Graphics::drawLine(center, yEnd, VectorArgb::solidGreen);
+			Graphics::drawLine(center, zEnd, VectorArgb::solidBlue);
+
+			real const sphereRadius = r * 0.08f;
+			Graphics::drawSphere2(xEnd, sphereRadius, 8, 4, 8, VectorArgb::solidRed);
+			Graphics::drawSphere2(yEnd, sphereRadius, 8, 4, 8, VectorArgb::solidGreen);
+			Graphics::drawSphere2(zEnd, sphereRadius, 8, 4, 8, VectorArgb::solidBlue);
+
+			// Enqueue text labels at axis endpoints
+			CuiTextManager::TextEnqueueInfo info;
+			info.backgroundOpacity = 0.0f;
+			info.opacity = 1.0f;
+			info.textSize = 1.2f;
+			if (camera.projectInWorldSpace(xEnd, &info.screenVect.x, &info.screenVect.y, &info.screenVect.z, false))
+			{
+				info.textColor = UIColor(255, 0, 0);
+				CuiTextManager::enqueueText(Unicode::narrowToWide("X"), info);
+			}
+			if (camera.projectInWorldSpace(yEnd, &info.screenVect.x, &info.screenVect.y, &info.screenVect.z, false))
+			{
+				info.textColor = UIColor(0, 255, 0);
+				CuiTextManager::enqueueText(Unicode::narrowToWide("Z"), info);
+			}
+			if (camera.projectInWorldSpace(zEnd, &info.screenVect.x, &info.screenVect.y, &info.screenVect.z, false))
+			{
+				info.textColor = UIColor(0, 0, 255);
+				CuiTextManager::enqueueText(Unicode::narrowToWide("Y"), info);
+			}
 		}
 	}
 
@@ -1534,6 +1576,17 @@ void GodClientData::synchronizeSelectionWithGhosts()
 					}
 				}
 
+				if (obj->getScale() != selObj->ghost->getScale())
+				{
+					NetworkId objId = obj->getNetworkId();
+					ServerCommander::getInstance().setObjectScale(obj, selObj->ghost->getScale());
+					if (NetworkIdManager::getObjectById(objId) != obj)
+					{
+						iteratorsInvalidated = true;
+						break;
+					}
+				}
+
 				selObj->ghost->kill();
 
 				//-- Ensure the ghost gets an alter call this upcoming frame so it gets deleted properly.
@@ -1645,6 +1698,7 @@ Object* GodClientData::createGhost(ClientObject& obj)
 	RenderWorld::addObjectNotifications (*ghost);
 
 	ghost->setTransform_o2p(obj.getTransform_o2p());
+	ghost->setScale(obj.getScale());
 	ClientWorld::queueObject(ghost);
 	++m_createdCount;
 
@@ -2314,6 +2368,85 @@ void GodClientData::snapToGridDlg()
 //-----------------------------------------------------------------
 
 /**
+ * Stack copies of the selected object along the chosen axis.
+ * orientationIndex: 0=+X, 1=-X, 2=+Z, 3=-Z, 4=+Y, 5=-Y
+ * distanceFromExtent: meters from the extent edge to place the next object
+ * useMeshExtent: when true, use the object's mesh extent for seamless wall stacking
+ */
+void GodClientData::stackObjects(int count, int orientationIndex, real distanceFromExtent, bool useMeshExtent)
+{
+	if (m_selectedObjects.empty())
+		return;
+
+	SelectedObject* const selObj = NON_NULL(m_selectedObjects.front());
+	Object const* const obj = selObj->ghost ? selObj->ghost : selObj->obj.getPointer();
+	if (!obj)
+		return;
+
+	ClipboardObject clipObj(*obj);
+	std::string const& templateName = clipObj.serverObjectTemplateName.empty() ? clipObj.sharedObjectTemplateName : clipObj.serverObjectTemplateName;
+	if (templateName.empty())
+		return;
+
+	BoxExtent extent;
+	if (useMeshExtent)
+	{
+		Appearance const* const app = obj->getAppearance();
+		if (!app)
+			return;
+		Extent const* const ext = app->getSelectionExtent();
+		BoxExtent const* const boxExt = ext ? dynamic_cast<BoxExtent const*>(ext) : 0;
+		if (!boxExt)
+			return;
+		Vector corners[8];
+		boxExt->getCornerVectors(corners);
+		Vector const scale = obj->getScale();
+		Transform const& xform = obj->getTransform_o2w();
+		extent.setMin(Vector::maxXYZ);
+		extent.setMax(Vector::negativeMaxXYZ);
+		for (int i = 0; i < 8; ++i)
+		{
+			Vector v(corners[i].x * scale.x, corners[i].y * scale.y, corners[i].z * scale.z);
+			v = xform.rotateTranslate_l2p(v);
+			extent.updateMinAndMax(v);
+		}
+		extent.calculateCenterAndRadius();
+	}
+	else if (!getSelectionExtent(false, extent))
+		return;
+
+	Vector const& minPt = extent.getMin();
+	Vector const& maxPt = extent.getMax();
+	Vector const center = extent.getCenter();
+	real extentX = maxPt.x - minPt.x;
+	real extentY = maxPt.y - minPt.y;
+	real extentZ = maxPt.z - minPt.z;
+
+	Vector offset;
+	switch (orientationIndex)
+	{
+		case 0: offset = Vector(extentX + distanceFromExtent, 0, 0); break;
+		case 1: offset = Vector(-(extentX + distanceFromExtent), 0, 0); break;
+		case 2: offset = Vector(0, extentY + distanceFromExtent, 0); break;
+		case 3: offset = Vector(0, -(extentY + distanceFromExtent), 0); break;
+		case 4: offset = Vector(0, 0, extentZ + distanceFromExtent); break;
+		case 5: offset = Vector(0, 0, -(extentZ + distanceFromExtent)); break;
+		default: offset = Vector(extentZ + distanceFromExtent, 0, 0); break;
+	}
+
+	CellProperty const* const cellProperty = obj->getParentCell() ? obj->getParentCell() : CellProperty::getWorldCellProperty();
+	Transform baseTransform = clipObj.transform;
+
+	for (int i = 1; i < count; ++i)
+	{
+		baseTransform.setPosition_p(baseTransform.getPosition_p() + offset);
+		IGNORE_RETURN(ServerCommander::getInstance().createObject("stacker", templateName, cellProperty, baseTransform));
+	}
+}
+
+//-----------------------------------------------------------------
+
+/**
  * Move all selected objects to the new X value
  */
 void GodClientData::setSelectionX(real newX)
@@ -2476,6 +2609,63 @@ void GodClientData::setSelectionRoll(real newRoll)
 	if(m_createdCount)
 		emitMessage(MessageDispatch::MessageBase(Messages::GHOSTS_CREATED));
 
+	emitMessage(MessageDispatch::MessageBase(GodClientData::Messages::SELECTED_OBJECTS_CHANGED));
+}
+
+//-----------------------------------------------------------------
+
+void GodClientData::setSelectionScaleX(real x)
+{
+	m_createdCount = 0;
+	for(SelectedObjectList_t::iterator itr = m_selectedObjects.begin(); itr != m_selectedObjects.end(); ++itr)
+	{
+		SelectedObject* selObj = NON_NULL(*itr);
+		if(!selObj->ghost)
+			selObj->ghost = NON_NULL(createGhost(*selObj->obj));
+		Vector scale = selObj->ghost->getScale();
+		scale.x = x;
+		selObj->ghost->setScale(scale);
+	}
+	if(m_createdCount)
+		emitMessage(MessageDispatch::MessageBase(Messages::GHOSTS_CREATED));
+	emitMessage(MessageDispatch::MessageBase(GodClientData::Messages::SELECTED_OBJECTS_CHANGED));
+}
+
+//-----------------------------------------------------------------
+
+void GodClientData::setSelectionScaleY(real y)
+{
+	m_createdCount = 0;
+	for(SelectedObjectList_t::iterator itr = m_selectedObjects.begin(); itr != m_selectedObjects.end(); ++itr)
+	{
+		SelectedObject* selObj = NON_NULL(*itr);
+		if(!selObj->ghost)
+			selObj->ghost = NON_NULL(createGhost(*selObj->obj));
+		Vector scale = selObj->ghost->getScale();
+		scale.y = y;
+		selObj->ghost->setScale(scale);
+	}
+	if(m_createdCount)
+		emitMessage(MessageDispatch::MessageBase(Messages::GHOSTS_CREATED));
+	emitMessage(MessageDispatch::MessageBase(GodClientData::Messages::SELECTED_OBJECTS_CHANGED));
+}
+
+//-----------------------------------------------------------------
+
+void GodClientData::setSelectionScaleZ(real z)
+{
+	m_createdCount = 0;
+	for(SelectedObjectList_t::iterator itr = m_selectedObjects.begin(); itr != m_selectedObjects.end(); ++itr)
+	{
+		SelectedObject* selObj = NON_NULL(*itr);
+		if(!selObj->ghost)
+			selObj->ghost = NON_NULL(createGhost(*selObj->obj));
+		Vector scale = selObj->ghost->getScale();
+		scale.z = z;
+		selObj->ghost->setScale(scale);
+	}
+	if(m_createdCount)
+		emitMessage(MessageDispatch::MessageBase(Messages::GHOSTS_CREATED));
 	emitMessage(MessageDispatch::MessageBase(GodClientData::Messages::SELECTED_OBJECTS_CHANGED));
 }
 

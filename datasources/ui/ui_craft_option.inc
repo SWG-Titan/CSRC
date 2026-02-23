@@ -17,7 +17,7 @@
 				Name='CodeData'
 			/>
 			<Text
-				Font='bold_12'
+				Font='bold_11'
 				LocalText='[@ui_craft:cpt_crafting_completion]'
 				Location='26,44'
 				Margin='2,2,2,2'
@@ -45,7 +45,7 @@
 			>
 				<Text
 					BackgroundColor='#FFFFFF'
-					Font='bold_12'
+					Font='bold_11'
 					LocalText='[@ui_craft:cpt_option_help]'
 					Location='0,13'
 					MaxLines='1'

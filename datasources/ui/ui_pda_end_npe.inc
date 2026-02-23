@@ -71,7 +71,7 @@
 					<ButtonStyle
 						MouseOverSound='ui_rollover'
 						Name='style'
-						NormalTextStyle='bold_14'
+						NormalTextStyle='bold_15'
 						ReleaseSound='ui_deselect'
 						RStyleActivated='rs_activated'
 						RStyleDefault='rs_default'
@@ -121,7 +121,7 @@
 					<ButtonStyle
 						MouseOverSound='ui_rollover'
 						Name='style'
-						NormalTextStyle='bold_14'
+						NormalTextStyle='bold_15'
 						ReleaseSound='ui_deselect'
 						RStyleActivated='rs_activated'
 						RStyleDefault='rs_default'
@@ -172,7 +172,7 @@
 						MouseOverSound='ui_rollover'
 						Name='style'
 						NormalIconColor='#EEEEEE'
-						NormalTextStyle='bold_14'
+						NormalTextStyle='bold_15'
 						ReleaseSound='ui_deselect'
 						RStyleActivated='rs_activated'
 						RStyleDefault='rs_default'

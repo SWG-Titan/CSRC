@@ -552,6 +552,7 @@
 		>
 			<Checkbox
 				Color='#96F4FC'
+				LocalTooltip='This option will hide characters on galaxies that are no longer available.'
 				Location='345,18'
 				MinimumSize='0,19'
 				Name='checkHideClosed'

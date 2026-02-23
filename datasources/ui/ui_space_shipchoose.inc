@@ -213,7 +213,7 @@
 						Size='208,21'
 					>
 						<Text
-							Font='bold_14'
+							Font='bold_15'
 							LocalText='[@ui_shipchoose:condition]'
 							Margin='4,4,4,4'
 							MaximumSize='16384,24'
@@ -227,7 +227,7 @@
 							TextColor='#96F4FC'
 						>@ui_shipchoose:condition</Text>
 						<Text
-							Font='bold_14'
+							Font='bold_15'
 							LocalText='XXX'
 							Location='126,0'
 							Margin='4,4,4,4'
@@ -258,7 +258,7 @@
 					>
 						<Text
 							Enabled='false'
-							Font='bold_14'
+							Font='bold_15'
 							LocalText='[@ui_shipchoose:parkinglocation]'
 							Margin='4,4,4,4'
 							MaximumSize='16384,24'
@@ -274,7 +274,7 @@
 						>@ui_shipchoose:parkinglocation</Text>
 						<Text
 							Enabled='false'
-							Font='bold_14'
+							Font='bold_15'
 							LocalText='XXX'
 							Location='126,0'
 							Margin='4,4,4,4'
@@ -551,7 +551,7 @@
 								Size='208,24'
 							>
 								<Text
-									Font='bold_14'
+									Font='bold_15'
 									LocalText='XXX'
 									Margin='4,4,4,4'
 									MaximumSize='16384,24'
@@ -569,7 +569,7 @@
 							<Page
 								BackgroundTint='#1CFFFF'
 								GetsInput='false'
-								Location='0,45'
+								Location='0,63'
 								MaximumSize='16384,21'
 								Name='condition'
 								PackLocation='nfn,nfn'
@@ -580,7 +580,7 @@
 								Size='208,21'
 							>
 								<Text
-									Font='bold_14'
+									Font='bold_15'
 									LocalText='[@ui_shipchoose:condition]'
 									Margin='4,4,4,4'
 									MaximumSize='16384,24'
@@ -594,7 +594,7 @@
 									TextColor='#96F4FC'
 								>@ui_shipchoose:condition</Text>
 								<Text
-									Font='bold_14'
+									Font='bold_15'
 									LocalText='XXX'
 									Location='126,0'
 									Margin='4,4,4,4'
@@ -625,7 +625,7 @@
 								Visible='false'
 							>
 								<Text
-									Font='bold_14'
+									Font='bold_15'
 									LocalText='[@ui_shipchoose:parkinglocation]'
 									Margin='4,4,4,4'
 									MaximumSize='16384,24'
@@ -639,7 +639,7 @@
 									TextColor='#96F4FC'
 								>@ui_shipchoose:parkinglocation</Text>
 								<Text
-									Font='bold_14'
+									Font='bold_15'
 									LocalText='XXX'
 									Location='126,0'
 									Margin='4,4,4,4'
@@ -863,7 +863,7 @@
 								Size='208,24'
 							>
 								<Text
-									Font='bold_14'
+									Font='bold_15'
 									LocalText='XXX'
 									Margin='4,4,4,4'
 									MaximumSize='16384,24'
@@ -892,7 +892,7 @@
 								Size='208,21'
 							>
 								<Text
-									Font='bold_14'
+									Font='bold_15'
 									LocalText='[@ui_shipchoose:condition]'
 									Margin='4,4,4,4'
 									MaximumSize='16384,24'
@@ -906,7 +906,7 @@
 									TextColor='#96F4FC'
 								>@ui_shipchoose:condition</Text>
 								<Text
-									Font='bold_14'
+									Font='bold_15'
 									LocalText='XXX'
 									Location='126,0'
 									Margin='4,4,4,4'
@@ -937,7 +937,7 @@
 								Visible='false'
 							>
 								<Text
-									Font='bold_14'
+									Font='bold_15'
 									LocalText='[@ui_shipchoose:parkinglocation]'
 									Margin='4,4,4,4'
 									MaximumSize='16384,24'
@@ -951,7 +951,7 @@
 									TextColor='#96F4FC'
 								>@ui_shipchoose:parkinglocation</Text>
 								<Text
-									Font='bold_14'
+									Font='bold_15'
 									LocalText='XXX'
 									Location='126,0'
 									Margin='4,4,4,4'

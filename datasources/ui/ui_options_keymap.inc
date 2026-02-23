@@ -205,6 +205,7 @@
 									>
 										<Scrollbar
 											Control='table'
+											Enabled='false'
 											Location='435,7'
 											Name='scroll'
 											PackLocation='fff,cfc,'

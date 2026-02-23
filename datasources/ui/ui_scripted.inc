@@ -17597,7 +17597,7 @@ parent.compBg.location=location'
 					Size='195,46'
 				>
 					<Text
-						Font='bold_19'
+						Font='bold_18'
 						LocalText='JACKPOT'
 						Location='14,5'
 						Name='amount'
@@ -19226,7 +19226,7 @@ parent.compBg.location=location'
 						Size='158,24'
 					>
 						<Text
-							Font='bold_19'
+							Font='bold_18'
 							LocalText='JACKPOT'
 							Location='1,0'
 							MinimumSize='64,0'
@@ -20449,7 +20449,7 @@ parent.compBg.location=location'
 					Size='117,42'
 				>
 					<Text
-						Font='bold_19'
+						Font='bold_18'
 						LocalText='ALL BETS'
 						Name='allBets'
 						PackLocation='cfc,cfc'

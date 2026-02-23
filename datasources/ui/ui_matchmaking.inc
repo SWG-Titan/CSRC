@@ -64,7 +64,7 @@
 				TextOpacityRelativeApply='true'
 				TextOpacityRelativeMin='0.70'
 				DataSource='TabData'
-				ActiveTab='2'
+				ActiveTab='0'
 				Style='/Styles.New.tabs.horizontal_10.style'
 				TargetPage='target'
 			>
@@ -3907,7 +3907,7 @@
 							PalText='header'
 							ScrollExtent='364,19'
 							Size='364,19'
-							TextColor='#FF0000'
+							TextColor='#97FFFF'
 							Visible='false'
 						>@ui_who:too_many_matches</Text>
 						<Text

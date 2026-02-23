@@ -68,7 +68,7 @@
 					CellPadding='5,3'
 					ColumnSizeDataSource='dsColSizes'
 					DefaultTextColor='#96F4FC'
-					DefaultTextStyle='bold_12'
+					DefaultTextStyle='bold_11'
 					GridColorHorizontal='#1CFFFF'
 					GridColorVertical='#1CFFFF'
 					Location='7,26'
@@ -366,7 +366,7 @@ LINE ELEVEN
 							CellCount='1,2'
 							CellSize='64,64'
 							Location='5,18'
-							MinimumScrollExtent='4,134'
+							MinimumScrollExtent='70,134'
 							Name='volume'
 							OnHide='parent.visible=visible'
 							OnShow='parent.visible=visible'
@@ -379,7 +379,7 @@ LINE ELEVEN
 								BackgroundColor='#FFFFFF'
 								BackgroundTint='#008080'
 								Enabled='false'
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='xxx
 LINE ONE
 LINE TWO
@@ -420,7 +420,7 @@ LINE ELEVEN
 								BackgroundColor='#FFFFFF'
 								BackgroundTint='#008080'
 								Enabled='false'
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='xxx
 LINE ONE
 LINE TWO
@@ -459,7 +459,7 @@ LINE ELEVEN
 </Text>
 						</VolumePage>
 						<Text
-							Font='bold_12'
+							Font='bold_11'
 							LocalText='Attachments'
 							Location='-1,-2'
 							Name='label'

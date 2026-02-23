@@ -843,7 +843,7 @@
 				>
 					<Text
 						Enabled='false'
-						Font='starwars_20'
+						Font='starwars_18'
 						LocalText='[@ui:cpt_collections]'
 						Location='2,1'
 						Margin='6,-2,0,0'

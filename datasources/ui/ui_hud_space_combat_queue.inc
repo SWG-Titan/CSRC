@@ -41,7 +41,7 @@
 			>@combat_queue_clear</Button>
 			<Text
 				Enabled='false'
-				Font='bold_12'
+				Font='bold_11'
 				LocalText='xxx Enemy Name'
 				Location='5,111'
 				Name='NameText'
@@ -93,7 +93,7 @@
 				/>
 				<Text
 					Enabled='false'
-					Font='bold_12'
+					Font='bold_11'
 					LocalText='xxx action name'
 					Location='25,0'
 					Margin='4,0,4,0'
@@ -114,12 +114,12 @@
 				CellSize='132,24'
 				GetsInput='false'
 				Location='2,4'
-				MinimumScrollExtent='4,80'
+				MinimumScrollExtent='138,80'
 				MultiSelection='false'
 				Name='QueuePage'
 				PackSize='a,a'
 				RStyleDefault='/Styles.window.chat.tiny_frame.rs_default'
-				ScrollExtent='136,107'
+				ScrollExtent='138,107'
 				Size='136,107'
 			>
 				<Page
@@ -145,7 +145,7 @@
 					/>
 					<Text
 						Enabled='false'
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='xxx action name'
 						Location='33,0'
 						Name='NameText'
@@ -182,7 +182,7 @@
 					/>
 					<Text
 						Enabled='false'
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='xxx action name'
 						Location='33,0'
 						Name='NameText'
@@ -219,7 +219,7 @@
 					/>
 					<Text
 						Enabled='false'
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='xxx action name'
 						Location='33,0'
 						Name='NameText'
@@ -236,7 +236,6 @@
 			</VolumePage>
 			<Scrollbar
 				Control='QueuePage'
-				Enabled='false'
 				Location='136,4'
 				Name='Scroll'
 				Opacity='0.70'

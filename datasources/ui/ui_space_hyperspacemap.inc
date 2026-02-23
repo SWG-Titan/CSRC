@@ -112,7 +112,7 @@
 						BackgroundColor='#FFFFFF'
 						ColorCarat='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='[@ui_travel:label_city]'
 						Name='labelCity'
 						PackLocation='nfn,nfn'
@@ -154,7 +154,7 @@
 						BackgroundColor='#FFFFFF'
 						ColorCarat='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='[@ui_travel:label_planet]'
 						Name='labelPlanet'
 						PackLocation='nfn,nfn'
@@ -194,6 +194,7 @@
 				PackSize='a,a'
 				ScrollExtent='501,623'
 				Size='501,623'
+				true='true'
 				Visible='false'
 			>
 				<Text
@@ -317,7 +318,7 @@
 					/>
 				</Runner>
 				<Text
-					Font='bold_12'
+					Font='bold_11'
 					LocalText='xxx received: tatooine'
 					Location='0,335'
 					Name='textStatus'
@@ -883,7 +884,7 @@
 						Name='buttonOrdMantell'
 						PackLocation='cpc,cpc'
 						PackSize='p,p'
-						ScrollExtent='80,80'
+						ScrollExtent='75,75'
 						Size='75,75'
 						Style='/Styles.New.buttons.planetLrg.style'
 					></Button>
@@ -1497,7 +1498,7 @@
 				>@ui_hyperspace:travel_to</Text>
 				<Text
 					BackgroundColor='#E05410'
-					Font='bold_12'
+					Font='bold_11'
 					LocalText='[@ui_hyperspace:selected_point]'
 					Location='33,20'
 					MinimumSize='0,19'
@@ -1511,7 +1512,7 @@
 				>@ui_hyperspace:selected_point</Text>
 				<Text
 					BackgroundColor='#E05410'
-					Font='bold_12'
+					Font='bold_11'
 					LocalText='xxx selected hyperspace point'
 					Location='123,20'
 					MaxLines='1'
@@ -1527,7 +1528,7 @@
 				>xxx selected hyperspace point</Text>
 				<Text
 					BackgroundColor='#E05410'
-					Font='bold_12'
+					Font='bold_11'
 					LocalText='xxx tatooine system (-1000, -5000, -8000)'
 					Location='239,44'
 					MinimumSize='0,19'
@@ -1542,7 +1543,7 @@
 				>xxx tatooine system (-1000, -5000, -8000)</Text>
 				<Text
 					BackgroundColor='#E05410'
-					Font='bold_12'
+					Font='bold_11'
 					LocalText='xxx This is a really long text string so we can test that the really long text string will scroll and otherwise work correctly when designers go and write a book for each hyperspace location.'
 					Location='32,66'
 					Name='hyperspacePointDescription'

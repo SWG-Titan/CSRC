@@ -24,6 +24,7 @@
 #include "GodClientPerforce.h"
 #include "GroupObjectWindow.h"
 #include "IconLoader.h"
+#include "ActionsWindow.h"
 #include "MainFrame.h"
 #include "ObjectEditor.h"
 #include "ServerCommander.h"
@@ -40,6 +41,7 @@ ActionsTool::ActionsTool()
 : QObject(),
   Singleton<ActionsTool>(),
   m_snapToGrid(0),
+  m_stackObject(0),
   m_saveAsBrush(0),
   m_createBrush(0),
   m_deleteBrush(0),
@@ -54,6 +56,7 @@ ActionsTool::ActionsTool()
 
 	//create the actions
 	m_snapToGrid              = new ActionHack("Snap To Grid...",           IL_PIXMAP(hi16_action_random_rotate), "&Snap To Grid...", 0, p, "snap_to_grid");
+	m_stackObject             = new ActionHack("Stacker",                    IL_PIXMAP(hi16_action_random_rotate), "Stac&ker",          0, p, "stacker");
 	m_saveAsBrush             = new ActionHack("Save As Brush",             IL_PIXMAP(hi16_action_editcopy),      "Save As &Brush",   0, p, "save_as_brush");
 	m_createBrush             = new ActionHack("Create Brush",              IL_PIXMAP(hi16_action_editcopy),      "Create Brush",     0, p, "create_brush");
 	m_deleteBrush             = new ActionHack("Delete Brush",              IL_PIXMAP(hi16_action_editdelete),    "Delete Brush",     0, p, "delete_brush");
@@ -66,6 +69,7 @@ ActionsTool::ActionsTool()
 
 	//connect them to slots
 	IGNORE_RETURN(connect(m_snapToGrid,              SIGNAL(activated()), this, SLOT(onSnapToGrid())));
+	IGNORE_RETURN(connect(m_stackObject,             SIGNAL(activated()), this, SLOT(onStackObject())));
 	IGNORE_RETURN(connect(m_saveAsBrush,             SIGNAL(activated()), this, SLOT(onSaveAsBrush())));
 	IGNORE_RETURN(connect(m_createBrush,             SIGNAL(activated()), this, SLOT(onCreateBrush())));
 	IGNORE_RETURN(connect(m_deleteBrush,             SIGNAL(activated()), this, SLOT(onDeleteBrush())));
@@ -82,6 +86,7 @@ ActionsTool::ActionsTool()
 ActionsTool::~ActionsTool()
 {
 	m_snapToGrid              = 0;
+	m_stackObject             = 0;
 	m_saveAsBrush             = 0;
 	m_createBrush             = 0;
 	m_deleteBrush             = 0;
@@ -194,6 +199,14 @@ void ActionsTool::onShowSphereTree() const
 void ActionsTool::onSnapToGrid() const
 {
 	GodClientData::getInstance().snapToGridDlg();
+}
+
+//-----------------------------------------------------------------
+
+void ActionsTool::onStackObject() const
+{
+	MainFrame::getInstance().m_stackToolDock->show();
+	ActionsWindow::getInstance().m_stackTool->setOn(true);
 }
 
 //-----------------------------------------------------------------

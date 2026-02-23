@@ -134,7 +134,7 @@
 				</Page>
 				<Text
 					BackgroundColor='#FFFFFF'
-					Font='bold_12'
+					Font='bold_11'
 					LocalText='[@ui_chatroom:create_path_prefix]'
 					Location='9,7'
 					MaxLines='1'
@@ -154,7 +154,7 @@
 					BackgroundTint='#03546B'
 					ColorCarat='#FFFFFF'
 					ColorSelection='#FFFFFF'
-					Font='bold_12'
+					Font='bold_11'
 					LocalText='xxx chatroom path swg.cluster.game.chat here'
 					Location='5,26'
 					Name='textPath'
@@ -171,7 +171,7 @@
 				>xxx chatroom path swg.cluster.game.chat here</Text>
 				<Text
 					BackgroundColor='#FFFFFF'
-					Font='bold_12'
+					Font='bold_11'
 					LocalText='[@ui_chatroom:create_room_name]'
 					Location='9,66'
 					MaxLines='1'
@@ -187,7 +187,7 @@
 				>@ui_chatroom:create_room_name</Text>
 				<Text
 					BackgroundColor='#FFFFFF'
-					Font='bold_12'
+					Font='bold_11'
 					LocalText='[@ui_chatroom:create_room_title]'
 					Location='9,119'
 					MaxLines='1'

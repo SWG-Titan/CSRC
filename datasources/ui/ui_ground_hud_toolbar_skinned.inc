@@ -1172,9 +1172,9 @@
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
-						LocalText='999'
+						LocalText='9999'
 						Location='4,14'
 						MaximumSize='40,14'
 						MinimumSize='36,14'
@@ -1188,12 +1188,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -1209,12 +1210,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -1230,12 +1232,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -1251,12 +1254,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -1272,12 +1276,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -1293,12 +1298,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -1314,12 +1320,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -1335,12 +1342,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -1356,12 +1364,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -1377,12 +1386,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -1398,12 +1408,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -1419,6 +1430,7 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Pie
@@ -1915,7 +1927,7 @@
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='F2'
 						Location='2,0'
@@ -1936,7 +1948,7 @@
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='F2'
 						Location='40,0'
@@ -1957,7 +1969,7 @@
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='F2'
 						Location='78,0'
@@ -1978,7 +1990,7 @@
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='F2'
 						Location='116,0'
@@ -1999,7 +2011,7 @@
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='F2'
 						Location='154,0'
@@ -2020,7 +2032,7 @@
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='F2'
 						Location='192,0'
@@ -2041,7 +2053,7 @@
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='F2'
 						Location='230,0'
@@ -2062,7 +2074,7 @@
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='F2'
 						Location='268,0'
@@ -2083,7 +2095,7 @@
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='F2'
 						Location='306,0'
@@ -2104,7 +2116,7 @@
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='F2'
 						Location='344,0'
@@ -2125,7 +2137,7 @@
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='F2'
 						Location='382,0'
@@ -2146,7 +2158,7 @@
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='F2'
 						Location='420,0'
@@ -3841,7 +3853,7 @@
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -3857,12 +3869,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -3878,12 +3891,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -3899,12 +3913,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -3920,12 +3935,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -3941,12 +3957,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -3962,12 +3979,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -3983,12 +4001,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -4004,12 +4023,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -4025,12 +4045,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -4046,12 +4067,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -4067,12 +4089,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -4088,12 +4111,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -4109,12 +4133,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -4130,12 +4155,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -4151,12 +4177,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -4172,12 +4199,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -4193,12 +4221,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -4214,12 +4243,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -4235,12 +4265,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -4256,12 +4287,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -4277,12 +4309,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -4298,12 +4331,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -4319,12 +4353,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='5,14'
@@ -4340,12 +4375,13 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='9999'
 						Location='4,14'
@@ -4361,6 +4397,7 @@
 						Size='36,14'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
+						TextColor='#1CFFFF'
 						Visible='false'
 					>9999</Text>
 					<Pie
@@ -5123,7 +5160,7 @@
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='F2'
 						Location='2,0'
@@ -5144,7 +5181,7 @@
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='F2'
 						Location='40,0'
@@ -5165,7 +5202,7 @@
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='F2'
 						Location='78,0'
@@ -5186,7 +5223,7 @@
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='F2'
 						Location='116,0'
@@ -5207,7 +5244,7 @@
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='F2'
 						Location='154,0'
@@ -5228,7 +5265,7 @@
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='F2'
 						Location='192,0'
@@ -5249,7 +5286,7 @@
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='F2'
 						Location='230,0'
@@ -5270,7 +5307,7 @@
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='F2'
 						Location='268,0'
@@ -5291,7 +5328,7 @@
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='F2'
 						Location='306,0'
@@ -5312,7 +5349,7 @@
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='F2'
 						Location='344,0'
@@ -5333,7 +5370,7 @@
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='F2'
 						Location='382,0'
@@ -5354,7 +5391,7 @@
 					<Text
 						BackgroundColor='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='F2'
 						Location='420,0'

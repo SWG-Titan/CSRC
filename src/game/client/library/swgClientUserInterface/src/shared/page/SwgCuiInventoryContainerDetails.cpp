@@ -20,9 +20,12 @@
 #include "swgClientUserInterface/SwgCuiInventoryContainerDetailsTableModel.h"
 
 #include "UIData.h"
+#include "UIManager.h"
 #include "UIMessage.h"
 #include "UIPage.h"
+#include "UIPopupMenu.h"
 #include "UITable.h"
+#include "clientUserInterface/CuiMenuInfoTypes.h"
 
 
 //======================================================================
@@ -298,6 +301,63 @@ bool SwgCuiInventoryContainerDetails::OnMessage       (UIWidget *context, const 
 
 		else if (msg.Type == UIMessage::ContextRequest)
 		{
+			if (m_containerMediator->getType () == SwgCuiInventoryContainer::T_inventorySelf ||
+				m_containerMediator->getType () == SwgCuiInventoryContainer::T_datapadSelf)
+			{
+				UITable::LongVector sel = m_table->GetSelectedRows ();
+				const SwgCuiInventoryContainer::ObjectWatcherVector & objects = m_containerMediator->getObjects ();
+				const int numObjects = static_cast<int>(objects.size ());
+
+				if (sel.empty () && rowLogical >= 0 && rowLogical < numObjects)
+				{
+					const int visualRow = m_tableModel->GetVisualDataRowIndex (rowLogical);
+					if (visualRow >= 0)
+						sel.push_back (visualRow);
+				}
+
+				SwgCuiInventoryContainer::ObjectWatcherVector selectedObjects;
+				for (UITable::LongVector::const_iterator it = sel.begin (); it != sel.end (); ++it)
+				{
+					const int visualIndex = static_cast<int>(*it);
+					const int logicalIndex = m_tableModel->GetLogicalDataRowIndex (visualIndex);
+					if (logicalIndex >= 0 && logicalIndex < numObjects)
+						selectedObjects.push_back (objects [logicalIndex]);
+				}
+
+				if (!selectedObjects.empty ())
+				{
+					UIPopupMenu * const pop = new UIPopupMenu (&getPage ());
+					pop->SetStyle (getPage ().FindPopupStyle ());
+
+					static const std::string examineId ("examine");
+					static const std::string dropId ("drop");
+					static const std::string deleteId ("delete");
+
+					if (selectedObjects.size () == 1)
+					{
+						IGNORE_RETURN (pop->AddItem (examineId, Cui::MenuInfoTypes::getLocalizedLabel (Cui::MenuInfoTypes::EXAMINE, 0)));
+						IGNORE_RETURN (pop->AddItem (dropId, Cui::MenuInfoTypes::getLocalizedLabel (Cui::MenuInfoTypes::ITEM_DROP, 0)));
+						IGNORE_RETURN (pop->AddItem (deleteId, Cui::MenuInfoTypes::getLocalizedLabel (Cui::MenuInfoTypes::ITEM_DESTROY, 0)));
+					}
+					else
+					{
+						char buf [64];
+						snprintf (buf, sizeof (buf), "Drop Selected (%d)", static_cast<int>(selectedObjects.size ()));
+						IGNORE_RETURN (pop->AddItem (dropId, Unicode::narrowToWide (buf)));
+						snprintf (buf, sizeof (buf), "Delete Selected (%d)", static_cast<int>(selectedObjects.size ()));
+						IGNORE_RETURN (pop->AddItem (deleteId, Unicode::narrowToWide (buf)));
+					}
+
+					pop->SetVisible (true);
+					pop->AddCallback (this);
+					pop->SetLocation (UIManager::gUIManager ().GetLastMouseCoord ());
+					UIManager::gUIManager ().PushContextWidget (*pop);
+
+					m_pendingContextMenuObjects = selectedObjects;
+					return false;
+				}
+			}
+
 			if (viewer)
 			{
 				return m_containerMediator->handleRadialMenu (*viewer, context->GetWorldLocation () + msg.MouseCoords);
@@ -410,6 +470,41 @@ void SwgCuiInventoryContainerDetails::OnGenericSelectionChanged (UIWidget * cont
 	}
 }
 
+//-----------------------------------------------------------------
+
+void SwgCuiInventoryContainerDetails::OnPopupMenuSelection (UIWidget * context)
+{
+	UIPopupMenu * const pop = dynamic_cast<UIPopupMenu *>(context);
+	if (!pop || !m_containerMediator)
+		return;
+
+	UINarrowString const & sel = pop->GetSelectedName ();
+
+	static const std::string examineId ("examine");
+	static const std::string dropId ("drop");
+	static const std::string deleteId ("delete");
+
+	if (sel == examineId)
+	{
+		if (m_pendingContextMenuObjects.size () == 1)
+		{
+			ClientObject * const obj = m_pendingContextMenuObjects.back ().getPointer ();
+			if (obj)
+				m_containerMediator->handleContextMenuExamine (*obj);
+		}
+	}
+	else if (sel == dropId)
+	{
+		m_containerMediator->handleContextMenuDrop (m_pendingContextMenuObjects);
+	}
+	else if (sel == deleteId)
+	{
+		m_containerMediator->handleContextMenuDelete (m_pendingContextMenuObjects);
+	}
+
+	m_pendingContextMenuObjects.clear ();
+}
+
 //----------------------------------------------------------------------
 
 void SwgCuiInventoryContainerDetails::updateSelection ()
@@ -423,9 +518,9 @@ void SwgCuiInventoryContainerDetails::updateSelection ()
 
 	m_table->SelectRow (-1);
 
-	if (!sel.empty ())
+	for (SwgCuiInventoryContainer::ObjectWatcherVector::const_iterator sit = sel.begin (); sit != sel.end (); ++sit)
 	{
-		const SwgCuiInventoryContainer::ObjectWatcher & watcher = sel.back ();
+		const SwgCuiInventoryContainer::ObjectWatcher & watcher = *sit;
 		const SwgCuiInventoryContainer::ObjectWatcherVector::const_iterator it = std::find (objects.begin (), objects.end (), watcher);
 
 		if (it != objects.end ())

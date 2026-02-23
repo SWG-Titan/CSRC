@@ -72,6 +72,7 @@ void ConfigGodClient::install()
 	KEY_STRING2(localServerSrcPath, "c:/work/swg/current/dsrc/sku.0/sys.server/compiled/game");
 	KEY_STRING2(localServerDataPath, "c:/work/swg/current/data/sku.0/sys.server/compiled/game");
 	KEY_STRING2(localServerCrcStringTable, "c:/work/swg/current/data/sku.0/sys.server/built/game/misc/object_template_crc_string_table.iff");
+	KEY_STRING2(buildoutsRoot, "");
 
 	KEY_INT2(frameRateLimit, 0);
 

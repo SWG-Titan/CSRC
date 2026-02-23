@@ -743,6 +743,7 @@ xxx attrib 8:    info here
 						<Button
 							DragAccepts='GameObject'
 							LocalText='[@datapad_guild_waypoint]'
+							LocalTooltip='/guildWaypoints'
 							Location='280,168'
 							MaximumSize='181,24'
 							MinimumSize='0,19'
@@ -757,6 +758,7 @@ xxx attrib 8:    info here
 						<Button
 							DragAccepts='GameObject'
 							LocalText='[@datapad_city_waypoint]'
+							LocalTooltip='/cityWaypoints'
 							Location='280,193'
 							MaximumSize='181,24'
 							MinimumSize='0,19'

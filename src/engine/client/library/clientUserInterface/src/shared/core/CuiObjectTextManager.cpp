@@ -817,6 +817,10 @@ bool  CuiObjectTextManager::getObjectHeadPoint     (const Object & object, const
 	Vector currentHeadPoint = getCurrentObjectHeadPoint_o (object);
 //	currentHeadPoint.y *= 1.05f;
 	currentHeadPoint.y += offset * 1.05f;
+	// Apply object scale so nameplate position matches scaled object
+	currentHeadPoint.x *= object.getScale().x;
+	currentHeadPoint.y *= object.getScale().y;
+	currentHeadPoint.z *= object.getScale().z;
 	
 	const Vector & headPoint = object.rotateTranslate_o2w (currentHeadPoint);
 	Vector screenVect;
@@ -842,6 +846,10 @@ void CuiObjectTextManager::renderTextAbove (const ClientObject & object, const C
 
 	Vector currentHeadPoint = getCurrentObjectHeadPoint_o (object);
 //	currentHeadPoint.y *= 1.05f;
+	// Apply object scale so nameplate position matches scaled object
+	currentHeadPoint.x *= object.getScale().x;
+	currentHeadPoint.y *= object.getScale().y;
+	currentHeadPoint.z *= object.getScale().z;
 	
 	const Vector & headPoint = object.rotateTranslate_o2w (currentHeadPoint);
 	

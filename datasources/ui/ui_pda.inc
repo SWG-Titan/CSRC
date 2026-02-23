@@ -14,6 +14,8 @@
 		Tooltip='[@ui_charsheet:strength_tooltip]'
 		Visible='false'
 	>
+		<include>ui_pda_examine.inc</include>
+		<include>ui_pda_inventory.inc</include>
 		<include>ui_gcw_information.inc</include>
 		<Page
 			Location='85,18'
@@ -3311,11 +3313,9 @@ Brawler</Text>
 		<include>ui_pda_color_test.inc</include>
 		<include>ui_pda_consent.inc</include>
 		<include>ui_pda_data_storage.inc</include>
-		<include>ui_pda_examine.inc</include>
 		<include>ui_pda_font_sizer.inc</include>
 		<include>ui_pda_imagedesigner.inc</include>
 		<include>ui_inputbox.inc</include>
-		<include>ui_pda_inventory.inc</include>
 		<include>ui_pda_permissionlist.inc</include>
 		<include>ui_pda_pm_browser.inc</include>
 		<include>ui_pda_pm_composer.inc</include>
@@ -3332,4 +3332,3 @@ Brawler</Text>
 		<include>ui_pda_location_display.inc</include>
 		<include>ui_pda_decoratorspawn.inc</include>
 	</Page>
-

@@ -31,7 +31,7 @@
 			>
 			</Scrollbar>
 			<Text
-				Font='bold_19'
+				Font='bold_18'
 				Location='89,278'
 				Name='CandidateInfo'
 				PackLocation='fff,fff'
@@ -706,7 +706,7 @@
 		>
 			<Text
 				BackgroundColor='#FFFFFF'
-				Font='bold_19'
+				Font='bold_18'
 				LocalText='[@server_disconnected]'
 				Location='7,5'
 				MaxLines='1'

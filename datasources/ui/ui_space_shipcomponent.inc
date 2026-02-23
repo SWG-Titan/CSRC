@@ -272,7 +272,6 @@
 							<Scrollbar
 								BackgroundColor='#FFFFFF'
 								Control='tree'
-								Enabled='false'
 								Location='334,5'
 								Name='scrollTree'
 								OpacityRelativeMin='0.40'
@@ -369,7 +368,7 @@
 									Size='281,36'
 								>
 									<Text
-										Font='bold_14'
+										Font='bold_15'
 										LocalText='[@ui_shipcomponents:selectedcomponent]'
 										Margin='4,4,4,4'
 										MaxLines='1'
@@ -414,7 +413,7 @@
 									Size='270,225'
 								>
 									<Text
-										Font='bold_12'
+										Font='bold_11'
 										LocalText='xxx attrib 1:    info here
 xxx attrib 2:    info here
 xxx attrib 3:    info here
@@ -469,7 +468,6 @@ xxx attrib 8:    info here
 </Text>
 									<Scrollbar
 										Control='textAttribs'
-										Enabled='false'
 										Location='258,7'
 										Name='Scroll'
 										Opacity='0.90'
@@ -594,7 +592,7 @@ xxx attrib 8:    info here
 									Size='281,36'
 								>
 									<Text
-										Font='bold_14'
+										Font='bold_15'
 										LocalText='[@ui_shipcomponents:installedcomponent]'
 										Margin='4,4,4,4'
 										MaxLines='1'
@@ -639,7 +637,7 @@ xxx attrib 8:    info here
 									Size='273,225'
 								>
 									<Text
-										Font='bold_12'
+										Font='bold_11'
 										LocalText='xxx attrib 1:    info here
 xxx attrib 2:    info here
 xxx attrib 3:    info here
@@ -692,7 +690,6 @@ xxx attrib 8:    info here
 </Text>
 									<Scrollbar
 										Control='textAttribs'
-										Enabled='false'
 										Location='261,7'
 										Name='Scroll'
 										Opacity='0.90'

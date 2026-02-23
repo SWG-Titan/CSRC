@@ -12,6 +12,7 @@ FORMS	= BaseGameWindow.ui \
 	BaseGroupObjectWindow.ui \
 	BaseObjectTransformWindow.ui \
 	BaseSnapToGridSettings.ui \
+	BaseStackerTool.ui \
 	BaseTriggerWindow.ui \
 	BaseFilterWindow.ui \
 	BaseRegionBrowser.ui \

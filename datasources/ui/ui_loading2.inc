@@ -188,7 +188,7 @@
 			</Page>
 		</Page>
 		<Text
-			Font='bold_24'
+			Font='bold_25'
 			LocalText='0'
 			Location='261,156'
 			Name='scrollingnumbers'
@@ -205,7 +205,7 @@
 			ColorCarat='#FFFFFF'
 			ColorSelection='#FFFFFF'
 			Enabled='false'
-			Font='bold_24'
+			Font='bold_25'
 			LocalText='Planet Name Here'
 			Location='1,124'
 			MaxLines='1'

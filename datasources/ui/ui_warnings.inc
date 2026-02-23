@@ -1,44 +1,40 @@
 	<Page
 		AbsorbsInput='false'
+		BackgroundOpacity='0.50'
 		Name='Warnings'
 		ScrollExtent='600,150'
 		Size='600,150'
-		BackgroundColor='#000000'
-		BackgroundOpacity='0.50'
+		UserDragScrollable='true'
+		UserMovable='true'
 		Visible='false'
 		VisualEditLock='true'
-		UserResizable='false'
-		UserMovable='true'
-		UserDragScrollable='true'
 	>
 		<Button
 			LocalText='Clear'
-			Location='0,0'
 			Name='buttonClear'
 			OnPress='parent.text.localtext=\"\"'
 			RStyleDefault='/Styles.New.buttons.hud.style'
 			ScrollExtent='35,15'
 			Size='35,15'
 			Style='/Styles.New.buttons.hud.style'
-			Visible='true'
 		>Clear</Button>
 		<Text
 			Font='fixed_12'
 			LocalText='WARNING: here is a warning.  Please fix it.  Thank you.'
+			Location='10,10'
 			Name='text'
 			PreLocalized='true'
 			ScrollExtent='580,140'
 			Size='580,140'
-			Location='10,10'
 		></Text>
 		<Scrollbar
 			Control='text'
+			Enabled='false'
 			Location='585,5'
 			Name='scroll'
-			ScrollExtent='10,213'
+			ScrollExtent='10,140'
 			Size='10,140'
 			Style='/Styles.scrollbar.default.vHud4.style'
-			Visible='true'
 		>
 		</Scrollbar>
 	</Page>

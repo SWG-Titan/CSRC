@@ -12,6 +12,7 @@
 #include "clientGame/Game.h"
 #include "clientGame/WorldSnapshot.h"
 #include "fileInterface/StdioFile.h"
+#include "sharedFile/FileStreamer.h"
 #include "sharedFile/Iff.h"
 #include "sharedFoundation/ConstCharCrcString.h"
 #include "sharedFoundation/CrcStringTable.h"
@@ -231,6 +232,9 @@ void BuildoutAreaSupport::saveBuildoutArea(std::string const &areaName)
 	// determine the client and server datatable filenames
 	std::string serverTabFilename, serverIffFilename, clientTabFilename, clientIffFilename;
 	getBuildoutAreaTableNames(areaName, serverTabFilename, serverIffFilename, clientTabFilename, clientIffFilename);
+
+	// create directories for output files if they do not exist
+	preModifyBuildoutArea(serverTabFilename, serverIffFilename, clientTabFilename, clientIffFilename);
 
 	// find the buildout in the cache and save it
 	BuildoutAreaCacheMap::iterator i = s_buildoutAreaCacheMap.find(serverTabFilename);
@@ -1026,10 +1030,24 @@ void BuildoutAreaSupportNamespace::getBuildoutAreaTableNames(std::string const &
 	buildoutPath += '\\';
 	buildoutPath += areaName;
 
-	serverTabFilename = s_serverSrcPath + buildoutPath + ".tab";
-	serverIffFilename = s_serverDataPath + buildoutPath + ".iff";
-	clientTabFilename = s_clientSrcPath + buildoutPath + ".tab";
-	clientIffFilename = s_clientDataPath + buildoutPath + ".iff";
+	// When buildoutsRoot is set, save/load buildouts locally instead of dsrc/data
+	char const * const buildoutsRoot = ConfigGodClient::getData().buildoutsRoot;
+	if (buildoutsRoot && buildoutsRoot[0] != '\0')
+	{
+		std::string const serverBase = std::string(buildoutsRoot) + "\\sku.0\\sys.server\\compiled\\game";
+		std::string const sharedBase = std::string(buildoutsRoot) + "\\sku.0\\sys.shared\\compiled\\game";
+		serverTabFilename = serverBase + buildoutPath + ".tab";
+		serverIffFilename = serverBase + buildoutPath + ".iff";
+		clientTabFilename = sharedBase + buildoutPath + ".tab";
+		clientIffFilename = sharedBase + buildoutPath + ".iff";
+	}
+	else
+	{
+		serverTabFilename = s_serverSrcPath + buildoutPath + ".tab";
+		serverIffFilename = s_serverDataPath + buildoutPath + ".iff";
+		clientTabFilename = s_clientSrcPath + buildoutPath + ".tab";
+		clientIffFilename = s_clientDataPath + buildoutPath + ".iff";
+	}
 }
 
 // ----------------------------------------------------------------------
@@ -1037,7 +1055,14 @@ void BuildoutAreaSupportNamespace::getBuildoutAreaTableNames(std::string const &
 void BuildoutAreaSupportNamespace::createDirectoriesForFiles(std::vector<std::string> const &fileList)
 {
 	for (std::vector<std::string>::const_iterator i = fileList.begin(); i != fileList.end(); ++i)
-		Os::createDirectories((*i).substr(0, (*i).rfind('\\')).c_str());
+	{
+		std::string::size_type sep = (*i).rfind('\\');
+		std::string::size_type const f = (*i).rfind('/');
+		if (f != std::string::npos && (sep == std::string::npos || f > sep))
+			sep = f;
+		if (sep != std::string::npos)
+			Os::createDirectories((*i).substr(0, sep).c_str());
+	}
 }
 
 // ----------------------------------------------------------------------
@@ -1104,8 +1129,18 @@ CachedBuildoutArea *BuildoutAreaSupportNamespace::loadBuildoutArea(BuildoutArea 
 	CachedBuildoutArea &cachedBuildoutArea = s_buildoutAreaCacheMap[serverTabFilename];
 
 	Iff iff;
+	bool opened = iff.open(serverIffFilename.c_str(), true);
+	// If .iff missing but .tab exists (e.g. from create_blank_buildouts), compile first
+	if (!opened && FileStreamer::exists(serverTabFilename.c_str()))
+	{
+		preModifyBuildoutArea(serverTabFilename, serverIffFilename, clientTabFilename, clientIffFilename);
+		DataTableWriter writer;
+		writer.loadFromSpreadsheet(serverTabFilename.c_str());
+		writer.save(serverIffFilename.c_str());
+		opened = iff.open(serverIffFilename.c_str(), true);
+	}
 
-	if (iff.open(serverIffFilename.c_str(), true))
+	if (opened)
 	{
 		DataTable areaBuildoutTable;
 		areaBuildoutTable.load(iff);
@@ -1230,10 +1265,21 @@ CachedBuildoutArea *BuildoutAreaSupportNamespace::loadBuildoutArea(BuildoutArea 
 		}
 	}
 
-	if (iff.open(clientIffFilename.c_str(), true))
+	// If client .iff missing but .tab exists, compile first
+	Iff clientIff;
+	bool clientOpened = clientIff.open(clientIffFilename.c_str(), true);
+	if (!clientOpened && FileStreamer::exists(clientTabFilename.c_str()))
+	{
+		DataTableWriter writer;
+		writer.loadFromSpreadsheet(clientTabFilename.c_str());
+		writer.save(clientIffFilename.c_str());
+		clientOpened = clientIff.open(clientIffFilename.c_str(), true);
+	}
+
+	if (clientOpened)
 	{
 		DataTable areaBuildoutTable;
-		areaBuildoutTable.load(iff);
+		areaBuildoutTable.load(clientIff);
 
 		int const buildoutRowCount = areaBuildoutTable.getNumRows();
 		if (buildoutRowCount > 0)

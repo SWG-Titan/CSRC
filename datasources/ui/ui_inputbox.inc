@@ -42,7 +42,7 @@
 				</Scrollbar>
 				<Text
 					Enabled='false'
-					Font='bold_12'
+					Font='bold_11'
 					LocalText='lblPrompt'
 					Location='8,6'
 					MaxLines='20'

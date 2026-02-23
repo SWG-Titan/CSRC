@@ -159,6 +159,7 @@ public:
 	void             showTriggerVolumes         ();
 	void             clearSpheres               ();
 	void             snapToGridDlg              ();
+	void             stackObjects               (int count, int orientationIndex, real distanceFromExtent, bool useMeshExtent = false);
 	void             setTransformDlg            ();
 	void             toggleShowObjectAxes       (const ClientObject* const obj);
 	void             togglePauseParticleSystem  (ClientObject* const obj);
@@ -206,6 +207,9 @@ public:
 	void             setSelectionYaw               (real yaw);
 	void             setSelectionPitch             (real pitch);
 	void             setSelectionRoll              (real roll);
+	void             setSelectionScaleX            (real x);
+	void             setSelectionScaleY            (real y);
+	void             setSelectionScaleZ             (real z);
 	void             translateSelection            (real x, real y, bool alongGround);
 	void             translateSelectionY           (real y);
 	void             scaleSelection                (real dx, real dy);

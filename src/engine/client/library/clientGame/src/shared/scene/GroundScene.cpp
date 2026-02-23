@@ -103,6 +103,9 @@
 #include "sharedCollision/CollideParameters.h"
 #include "sharedCollision/CollisionInfo.h"
 #include "sharedCollision/CollisionProperty.h"
+#include "sharedCollision/Intersect3d.h"
+#include "sharedMath/Ray3d.h"
+#include "sharedMath/Sphere.h"
 #include "sharedCollision/CollisionWorld.h"
 #include "sharedDebug/DebugFlags.h"
 #include "sharedDebug/InstallTimer.h"
@@ -155,6 +158,7 @@
 #include "sharedNetworkMessages/UpdateMissileMessage.h"
 #include "sharedNetworkMessages/UpdatePostureMessage.h"
 #include "sharedNetworkMessages/UpdatePvpStatusMessage.h"
+#include "sharedNetworkMessages/UpdateScaleMessage.h"
 #include "sharedNetworkMessages/UpdateTransformMessage.h"
 #include "sharedNetworkMessages/UpdateTransformWithParentMessage.h"
 #include "sharedObject/AlterScheduler.h"
@@ -835,6 +839,7 @@ void GroundScene::init (const char* const terrainFilename, CreatureObject* const
 	connectToMessage ("DeltasMessage");
 	connectToMessage ("UpdatePostureMessage");
 	connectToMessage ("UpdateCellPermissionMessage");
+	connectToMessage ("UpdateScaleMessage");
 	connectToMessage ("UpdateTransformMessage");
 	connectToMessage ("UpdateTransformWithParentMessage");
 	connectToMessage ("PlayMusicMessage");
@@ -893,7 +898,6 @@ GroundScene::GroundScene(
 	m_structurePlacementCamera (0),
 	m_flyByCamera(NULL),
 	m_currentView (-1),
-	m_disableWorldSnapshot(ConfigClientGame::getDisableWorldSnapshot()),
 	m_usingGodClientCamera(false),
 	m_usingGodClientInteriorCamera(false),
 	m_loading (true),
@@ -985,7 +989,7 @@ GroundScene::GroundScene(
 	const Vector &    startPosition, 
 	const float       startYaw, 
 	const float       timeInSeconds, 
-	const bool        disableSnapshot
+	const bool        /*disableSnapshot - deprecated, always buildout-only*/
 	)
 :	NetworkScene ("GroundScene"),
 	m_inputMap (0),
@@ -1002,7 +1006,6 @@ GroundScene::GroundScene(
 	m_structurePlacementCamera (0),
 	m_flyByCamera(NULL),
 	m_currentView (-1),
-	m_disableWorldSnapshot(disableSnapshot),
 	m_usingGodClientCamera(false),
 	m_usingGodClientInteriorCamera(false),
 	m_loading (true),
@@ -1379,24 +1382,8 @@ void GroundScene::postload (void)
 	FileName fileName (TerrainObject::getConstInstance ()->getAppearance ()->getAppearanceTemplate ()->getName ());
 	fileName.stripPathAndExt ();
 
-	if (!m_disableWorldSnapshot)
-	{
-		if (strstr(fileName.getString(), "_ws"))
-		{
-			//catch _ws files and skip loading the world snapshot
-			DEBUG_REPORT_LOG(true, ("GroundScene::postload: skipping world snapshot load for god client terrain %s\n", fileName.getString()));
-		}
-		else
-		{
-			//continue as normal
-			WorldSnapshot::load(fileName);
-		}
-		
-	}
-	else
-	{
-		SharedBuildoutAreaManager::load(fileName.getString());
-	}
+	// World snapshot deprecated - always use buildouts for full server authority
+	SharedBuildoutAreaManager::load(fileName.getString());
 
 	SpacePreloadedAssetManager::load(fileName);
 }
@@ -2492,7 +2479,7 @@ void GroundScene::receiveMessage(const MessageDispatch::Emitter &, const Message
 				delete clientObject;
 				existingObject = 0;
 
-				//-- mark the object so it never gets created again
+				//-- mark the object so it never gets created again (needed for God Client BuildoutAreaSupport addObject)
 				WorldSnapshot::removeObject (static_cast<int> (networkId.getValue ()));
 			}
 			else
@@ -2908,6 +2895,14 @@ void GroundScene::receiveMessage(const MessageDispatch::Emitter &, const Message
 		}
 	}
 
+	else if (message.isType("UpdateScaleMessage"))
+	{
+		Archive::ReadIterator ri = NON_NULL (gnm)->getByteStream().begin();
+		UpdateScaleMessage const usm(ri);
+		Object * const object = NetworkIdManager::getObjectById(usm.getNetworkId());
+		if (object)
+			object->setScale(usm.getScale());
+	}
 	else if (message.isType("UpdateTransformMessage"))
 	{
 		Archive::ReadIterator ri = NON_NULL (gnm)->getByteStream().begin();
@@ -3478,6 +3473,25 @@ namespace
 			Vector const & point = result.getPoint();
 			float const distSquared = point.magnitudeBetweenSquared(objectStart);
 
+			if (distSquared < minimumDistanceSquared)
+			{
+				minimumDistanceSquared = distSquared;
+				minimumObject          = &object;
+			}
+			return;
+		}
+
+		// Fallback for scaled objects: appearance collide may fail when extent/geometry
+		// is in a different space. Use appearance sphere (which accounts for scale).
+		Vector rayDir = worldEnd - worldStart;
+		if (!rayDir.normalize())
+			return;
+		Ray3d const ray(worldStart, rayDir);
+		Sphere const sphere(object.getAppearanceSphereCenter_w(), object.getAppearanceSphereRadius());
+		Intersect3d::ResultData data(false);
+		if (Intersect3d::intersectRaySphereWithData(ray, sphere, &data))
+		{
+			float const distSquared = data.m_length * data.m_length;
 			if (distSquared < minimumDistanceSquared)
 			{
 				minimumDistanceSquared = distSquared;

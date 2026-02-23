@@ -581,41 +581,21 @@ sub makesnap
     # Set the golddata schema name in the version_number table
     updateversion($dbSchema);
 
-    # execute the snapshot query
-    writelog("Executing the world snapshot query");
-    print STDERR "Executing the world snapshot query...\n";
-    unlink($snapShotOutputFile);
-    chdir("../../queries") || return endsnap();
-    asksystem("sqlplus $dbSchema/changeme\@swodb \@world_snapshot.sql") == 0 || return endsnap();
-
-    # Here are the commands to run to do a new snapshot by hand
-    # cd /swg/swg/test/exe/linux
-    # rm -f *.ws snapshot.log
-    # debug/SwgGameServer -- \@servercommon.cfg -s GameServer javaVMName=none -s WorldSnapshot createWorldSnapshots=/swg/swg/test/dsrc/sku.0/sys.client/built/game/snapshot/swg_object.txt 2> snapshot.log
-    # p4 edit /swg/swg/test/data/sku.0/sys.client/built/game/snapshot/...
-    # mv *.ws /swg/swg/test/data/sku.0/sys.client/built/game/snapshot
-
-    # build the snapshot files "debug/SwgGameServer -- @snapshot.cfg"
-    writelog("Creating snapshot files");
-    chdir("${depotdir}swg/$branch/exe/linux/") || return endsnap();
-    system("rm -f *.ws snapshot.log");
-    system("debug/SwgGameServer -- \@servercommon.cfg -s GameServer javaVMName=none -s WorldSnapshot createWorldSnapshots=$snapShotOutputFile 2> snapshot.log") == 0 || return endsnap();
+    # World snapshot deprecated - use buildouts for full server authority
+    writelog("World snapshot deprecated - skipping .ws generation (using buildouts)");
+    print STDERR "World snapshot deprecated - skipping .ws generation (using buildouts)...\n";
 
     print SOCKET SNAPSHOT_SUCCESSFULL;
 
-    # Send snapshot log, swg_object.txt, then all ws back to controller
-    writelog("Transmitting snapshot files back to the controller");
-    system("cp $snapShotOutputFile ${depotdir}swg/$branch/exe/linux/swg_object.txt");
-    opendir DH, "${depotdir}swg/$branch/exe/linux/" or return endsnap();
-    my @files;
-    foreach(readdir DH)
-    {
-        push @files, $_ if($_ =~ /\.ws$/ && -s "${depotdir}swg/$branch/exe/linux/$_");
-    }
-    closedir DH;
+    # Create and send minimal snapshot.log for protocol compatibility
+    writelog("Transmitting deprecation notice to controller");
+    chdir("${depotdir}swg/$branch/exe/linux/") || return endsnap();
+    my $snapshotLogPath = "snapshot.log";
+    open(SNPLOG, ">$snapshotLogPath") || return endsnap();
+    print SNPLOG "World snapshot deprecated. Use buildouts for full server authority.\n";
+    close(SNPLOG);
 
-    @files = sort @files;
-    unshift @files, "snapshot.log", "swg_object.txt";
+    my @files = ("snapshot.log");
 
     foreach (@files)
     {

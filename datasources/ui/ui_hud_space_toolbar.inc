@@ -67,6 +67,7 @@
 				PackSize='a,f'
 				ScrollExtent='279,12'
 				Size='279,12'
+				Style='/Styles.New.tabs.hud.style'
 				Visible='false'
 				DataSource='TabData'
 				ActiveTab='0'

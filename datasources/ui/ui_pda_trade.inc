@@ -292,7 +292,7 @@
 						textboxmoney='money.textboxMoney'
 					/>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='xxx player name'
 						Location='13,0'
 						MaxLines='1'
@@ -307,7 +307,7 @@
 						TextColor='#97FFFF'
 					>xxx player name</Text>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='[@ui_trade:offer_money_self]'
 						Location='10,474'
 						Margin='2,2,2,2'
@@ -410,7 +410,7 @@
 							SpacingType='Constant'
 						>
 							<Text
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='xxx data_obj_name'
 								Margin='2,2,2,2'
 								MinimumSize='0,19'
@@ -425,29 +425,21 @@
 								TextColor='#97FFFF'
 							>xxx data_obj_name</Text>
 							<Text
-								Font='bold_12'
-								LocalText='xxx attrib 1:    info here
-xxx attrib 2:    info here
-xxx attrib 3:    info here
-xxx attrib 4:    info here
-xxx attrib 5:    info here
-xxx attrib 6:    info here
-xxx attrib 7:    info here
-xxx attrib 8:    info here
-'
+								Font='bold_11'
+								LocalText='xxx attrib 1:    info herexxx attrib 2:    info herexxx attrib 3:    info herexxx attrib 4:    info herexxx attrib 5:    info herexxx attrib 6:    info herexxx attrib 7:    info herexxx attrib 8:    info here'
 								Location='3,20'
 								Name='textAttribs'
 								PackSize='a,f'
 								PalText='text1'
 								RStyleDefault='rs_default'
-								ScrollExtent='186,117'
-								Size='186,117'
+								ScrollExtent='186,78'
+								Size='186,78'
 								TextColor='#96F4FC'
 							>xxx attrib 1:    info herexxx attrib 2:    info herexxx attrib 3:    info herexxx attrib 4:    info herexxx attrib 5:    info herexxx attrib 6:    info herexxx attrib 7:    info herexxx attrib 8:    info here</Text>
 							<Text
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='xxx Description goes into this field with all the other text ok you can stop now.'
-								Location='3,138'
+								Location='3,99'
 								Name='textDesc'
 								PackSize='a,f'
 								PalText='text1'
@@ -507,7 +499,7 @@ xxx attrib 8:    info here
 								CellSize='64,64'
 								DragAccepts='GameObject'
 								Location='4,5'
-								MinimumScrollExtent='70,68'
+								MinimumScrollExtent='136,68'
 								Name='volume'
 								OnHide='parent.details.visible=trueparent.scrollIcon.visible=visible'
 								OnShow='parent.details.visible=falseparent.scrollIcon.visible=visible'
@@ -668,7 +660,7 @@ xxx attrib 8:    info here
 						textboxmoney='money.textboxMoney'
 					/>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='xxx player name'
 						Location='13,0'
 						MaxLines='1'
@@ -683,7 +675,7 @@ xxx attrib 8:    info here
 						TextColor='#97FFFF'
 					>xxx player name</Text>
 					<Text
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='[@ui_trade:offer_money_other]'
 						Location='10,474'
 						Margin='2,2,2,2'
@@ -786,7 +778,7 @@ xxx attrib 8:    info here
 							SpacingType='Constant'
 						>
 							<Text
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='xxx data_obj_name'
 								Margin='2,2,2,2'
 								MinimumSize='0,19'
@@ -801,29 +793,21 @@ xxx attrib 8:    info here
 								TextColor='#97FFFF'
 							>xxx data_obj_name</Text>
 							<Text
-								Font='bold_12'
-								LocalText='xxx attrib 1:    info here
-xxx attrib 2:    info here
-xxx attrib 3:    info here
-xxx attrib 4:    info here
-xxx attrib 5:    info here
-xxx attrib 6:    info here
-xxx attrib 7:    info here
-xxx attrib 8:    info here
-'
+								Font='bold_11'
+								LocalText='xxx attrib 1:    info herexxx attrib 2:    info herexxx attrib 3:    info herexxx attrib 4:    info herexxx attrib 5:    info herexxx attrib 6:    info herexxx attrib 7:    info herexxx attrib 8:    info here'
 								Location='3,20'
 								Name='textAttribs'
 								PackSize='a,f'
 								PalText='text1'
 								RStyleDefault='rs_default'
-								ScrollExtent='187,117'
-								Size='187,117'
+								ScrollExtent='187,78'
+								Size='187,78'
 								TextColor='#96F4FC'
 							>xxx attrib 1:    info herexxx attrib 2:    info herexxx attrib 3:    info herexxx attrib 4:    info herexxx attrib 5:    info herexxx attrib 6:    info herexxx attrib 7:    info herexxx attrib 8:    info here</Text>
 							<Text
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='xxx Description goes into this field with all the other text ok you can stop now.'
-								Location='3,138'
+								Location='3,99'
 								Name='textDesc'
 								PackSize='a,f'
 								PalText='text1'
@@ -882,7 +866,7 @@ xxx attrib 8:    info here
 								CellSize='64,64'
 								DragAccepts='GameObject'
 								Location='4,5'
-								MinimumScrollExtent='70,68'
+								MinimumScrollExtent='136,68'
 								Name='volume'
 								OnHide='parent.details.visible=trueparent.scrollIcon.visible=visible'
 								OnShow='parent.details.visible=falseparent.scrollIcon.visible=visible'

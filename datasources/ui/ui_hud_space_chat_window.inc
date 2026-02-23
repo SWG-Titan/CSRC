@@ -178,7 +178,7 @@ visible=false'
 					<Text
 						BackgroundColor='#FFFFFF'
 						DropToParent='true'
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='CHANNEL'
 						Location='10,11'
 						MaxLines='1'
@@ -932,7 +932,7 @@ visible=false'
 							PackLocation='nfn,nfn'
 							PackSize='a,a'
 							PalText='text1'
-							ScrollExtent='294,4816'
+							ScrollExtent='294,5217'
 							Size='294,64'
 							TextColor='#96F4FC'
 							TextOpacityRelativeMin='0.70'
@@ -12947,10 +12947,8 @@ visible=false'
 					/>
 				</DataSource>
 				<TabbedPane
-					ActiveTab='0'
 					BackgroundColor='#FFFFFF'
 					ContextCapable='true'
-					DataSource='TabData'
 					DragAccepts='command'
 					DropShadowDepth='1,1'
 					DropToParent='true'
@@ -12963,6 +12961,9 @@ visible=false'
 					Style='/Styles.space.tabs.style'
 					TextOpacityRelativeApply='true'
 					TextOpacityRelativeMin='0.70'
+					DataSource='TabData'
+					ActiveTab='0'
+					Style='/Styles.space.tabs.style'
 				>
 				</TabbedPane>
 				<Scrollbar

@@ -111,12 +111,12 @@
 			<PopupMenu
 				DataSource='test'
 				Location='492,310'
-				MaximumSize='101,72'
-				MinimumSize='101,72'
+				MaximumSize='103,72'
+				MinimumSize='103,72'
 				Name='buttons'
 				RStyleDefault='rs_default'
-				ScrollExtent='101,72'
-				Size='101,72'
+				ScrollExtent='103,72'
+				Size='103,72'
 				Style='/Styles.popupmenu.convo.style'
 			>
 			</PopupMenu>

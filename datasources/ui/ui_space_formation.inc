@@ -111,7 +111,7 @@
 							>@ui_formation:cpt_formation</Text>
 						</Page>
 						<Text
-							Font='bold_14'
+							Font='bold_15'
 							LocalText='Formations'
 							Location='6,34'
 							Margin='8,4,8,4'
@@ -147,7 +147,7 @@
 								CellSize='125,19'
 								DragType='SquadMember'
 								Location='5,0'
-								MinimumScrollExtent='0,331'
+								MinimumScrollExtent='125,331'
 								Name='buttonsFormations'
 								PackSize='a,a'
 								ScrollExtent='125,354'
@@ -495,7 +495,7 @@
 								Style='/Styles.Icon.Misc.formation'
 							/>
 							<Text
-								Font='bold_14'
+								Font='bold_15'
 								LocalText='xxx player name'
 								Location='0,27'
 								Margin='8,4,8,4'
@@ -518,7 +518,7 @@
 						<Text
 							ColorCarat='#FFFFFF'
 							ColorSelection='#FFFFFF'
-							Font='bold_14'
+							Font='bold_15'
 							LocalText='xxx formation name'
 							Location='33,-2'
 							Margin='8,4,8,4'
@@ -601,7 +601,7 @@
 						Size='141,28'
 					>
 						<Text
-							Font='bold_12'
+							Font='bold_11'
 							LocalText='xxx player name'
 							Margin='8,4,8,4'
 							MinimumSize='0,19'
@@ -628,7 +628,7 @@
 						SpacingType='Fill'
 					>
 						<Text
-							Font='bold_14'
+							Font='bold_15'
 							LocalText='Players'
 							Location='7,0'
 							Margin='8,4,8,4'
@@ -662,7 +662,7 @@
 								CellPadding='0,0'
 								CellSize='147,28'
 								DragType='SquadMember'
-								MinimumScrollExtent='0,196'
+								MinimumScrollExtent='147,196'
 								Name='v'
 								PackSize='a,a'
 								RStyleDefault='/Styles.New.whiteOutline_palW.rs_default'
@@ -681,7 +681,7 @@
 									Size='147,28'
 								>
 									<Text
-										Font='bold_12'
+										Font='bold_11'
 										LocalText='xxx player name'
 										Margin='8,4,8,4'
 										Name='text'
@@ -704,7 +704,7 @@
 									Size='147,28'
 								>
 									<Text
-										Font='bold_12'
+										Font='bold_11'
 										LocalText='xxx player name'
 										Margin='8,4,8,4'
 										Name='text'
@@ -727,7 +727,7 @@
 									Size='147,28'
 								>
 									<Text
-										Font='bold_12'
+										Font='bold_11'
 										LocalText='xxx player name'
 										Margin='8,4,8,4'
 										Name='text'
@@ -750,7 +750,7 @@
 									Size='147,28'
 								>
 									<Text
-										Font='bold_12'
+										Font='bold_11'
 										LocalText='xxx player name'
 										Margin='8,4,8,4'
 										Name='text'
@@ -773,7 +773,7 @@
 									Size='147,28'
 								>
 									<Text
-										Font='bold_12'
+										Font='bold_11'
 										LocalText='xxx player name'
 										Margin='8,4,8,4'
 										Name='text'
@@ -796,7 +796,7 @@
 									Size='147,28'
 								>
 									<Text
-										Font='bold_12'
+										Font='bold_11'
 										LocalText='xxx player name'
 										Margin='8,4,8,4'
 										Name='text'
@@ -819,7 +819,7 @@
 									Size='147,28'
 								>
 									<Text
-										Font='bold_12'
+										Font='bold_11'
 										LocalText='xxx player name'
 										Margin='8,4,8,4'
 										Name='text'

@@ -34,6 +34,7 @@
 #include "GroupObjectWindow.h"
 #include "ModificationHistory.h"
 #include "ObjectEditor.h"
+#include "StackerTool.h"
 #include "ObjectTemplateData.h"
 #include "RegionBrowser.h"
 #include "ServerCommander.h"
@@ -82,7 +83,8 @@ MainFrame::MainFrame(QWidget *theParent, const char *theName)
   m_groupObjectWindow(0),
   m_filterWindow(0),
   m_bookmarkBrowser(0),
-  m_favoritesWindow(0),
+	m_favoritesWindow(0),
+	m_stackTool(0),
   m_consoleDock(0),
   m_treeBrowserDock(0),
   m_objectEditorDock(0),
@@ -90,8 +92,9 @@ MainFrame::MainFrame(QWidget *theParent, const char *theName)
   m_filterWindowDock(0),
   m_bookmarkBrowserDock(0),
   m_regionsViewDock(0),
-  m_favoritesWindowDock(0),
-  m_settings(0),
+	m_favoritesWindowDock(0),
+	m_stackToolDock(0),
+	m_settings(0),
   m_actionsGame(0),
   m_actionsEdit(0),
   m_actionsView(0),
@@ -201,6 +204,14 @@ MainFrame::MainFrame(QWidget *theParent, const char *theName)
 		QMainWindow::addDockWindow(m_regionsViewDock, Qt::TornOff);
 		m_regionsViewDock->setCloseMode(QDockWindow::Always);
 		m_regionsViewDock->hide();
+
+		m_stackToolDock = new QDockWindow(QDockWindow::InDock, this, "Stacker Tool");
+		m_stackTool = new StackerTool(m_stackToolDock, "Stacker Widget");
+		m_stackToolDock->setWidget(m_stackTool);
+		m_stackToolDock->setResizeEnabled(true);
+		QMainWindow::addDockWindow(m_stackToolDock, Qt::Right);
+		m_stackToolDock->setCloseMode(QDockWindow::Always);
+		m_stackToolDock->hide();
 
 		//don't show the dock window list on right click (VERY annoying for some windows like the region viewer)
 		setDockMenuEnabled (false);
@@ -429,6 +440,7 @@ MainFrame::MainFrame(QWidget *theParent, const char *theName)
 		{
 			IGNORE_RETURN(m_actionsTool->m_saveAsBrush->addTo                     (&m_menus.tool.menu));
 			IGNORE_RETURN(m_actionsTool->m_snapToGrid->addTo                      (&m_menus.tool.menu));
+			IGNORE_RETURN(m_actionsTool->m_stackObject->addTo                      (&m_menus.tool.menu));
 			IGNORE_RETURN(m_actionsTool->m_sendSystemMessage->addTo               (&m_menus.tool.menu));
 		}
 
@@ -443,6 +455,7 @@ MainFrame::MainFrame(QWidget *theParent, const char *theName)
 			IGNORE_RETURN(m_actionsWindow->m_console->addTo          (&m_menus.window.menu));
 			IGNORE_RETURN(m_actionsWindow->m_gameWindow->addTo       (&m_menus.window.menu));
 			IGNORE_RETURN(m_actionsWindow->m_regionsView->addTo      (&m_menus.window.menu));
+			IGNORE_RETURN(m_actionsWindow->m_stackTool->addTo        (&m_menus.window.menu));
 		}
 
 		//-- Script menu stuff

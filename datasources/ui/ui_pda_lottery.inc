@@ -131,7 +131,7 @@
 						CellSize='64,64'
 						DragAccepts='GameObject'
 						Location='4,7'
-						MinimumScrollExtent='136,68'
+						MinimumScrollExtent='202,68'
 						Name='volume'
 						OnHide='parent.details.visible=true
 

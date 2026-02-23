@@ -52,6 +52,8 @@
 #include "sharedNetworkMessages/EditStatsMessage.h"
 #include "sharedNetworkMessages/EnterStructurePlacementModeMessage.h"
 #include "sharedNetworkMessages/EnterTicketPurchaseModeMessage.h"
+#include "sharedCollision/CollisionProperty.h"
+#include "sharedNetworkMessages/GenericValueTypeMessage.h"
 #include "sharedNetworkMessages/ShowAirspeederPanelMessage.h"
 #include "sharedNetworkMessages/NewbieTutorialEnableHudElement.h"
 #include "sharedNetworkMessages/NewbieTutorialHighlightUIElement.h"
@@ -59,6 +61,7 @@
 #include "sharedNetworkMessages/NewbieTutorialResponse.h"
 #include "sharedNetworkMessages/OpenHolocronToPageMessage.h"
 #include "sharedNetworkMessages/ResourceHarvesterActivatePageMessage.h"
+#include "sharedObject/Object.h"
 #include "sharedObject/NetworkIdManager.h"
 #include "sharedTerrain/TerrainObject.h"
 #include "sharedUtility/StartingLocationData.h"
@@ -453,6 +456,7 @@ void SwgCuiHudWindowManager::handlePerformActivate ()
 	connectToMessage (EnterStructurePlacementModeMessage::cms_name);
 	connectToMessage (EnterTicketPurchaseModeMessage::cms_name);
 	connectToMessage (ShowAirspeederPanelMessage::cms_name);
+	connectToMessage ("SetObjectCollidableMessage");
 	connectToMessage (NewbieTutorialRequest::cms_name);
 	connectToMessage (NewbieTutorialEnableHudElement::cms_name);
 	connectToMessage (ConsentRequestMessage::cms_name);
@@ -501,6 +505,7 @@ void SwgCuiHudWindowManager::handlePerformDeactivate ()
 	disconnectFromMessage (EnterStructurePlacementModeMessage::cms_name);
 	disconnectFromMessage (EnterTicketPurchaseModeMessage::cms_name);
 	disconnectFromMessage (ShowAirspeederPanelMessage::cms_name);
+	disconnectFromMessage ("SetObjectCollidableMessage");
 	disconnectFromMessage (NewbieTutorialRequest::cms_name);
 	disconnectFromMessage (NewbieTutorialEnableHudElement::cms_name);
 	disconnectFromMessage (ConsentRequestMessage::cms_name);
@@ -610,6 +615,21 @@ void SwgCuiHudWindowManager::receiveMessage(const MessageDispatch::Emitter & , c
 			CuiMediatorFactory::activateInWorkspace (CuiMediatorTypes::WS_AirspeederPanel);
 		else
 			CuiMediatorFactory::deactivateInWorkspace (CuiMediatorTypes::WS_AirspeederPanel);
+	}
+
+	//----------------------------------------------------------------------
+
+	else if (message.isType ("SetObjectCollidableMessage"))
+	{
+		Archive::ReadIterator ri = NON_NULL (safe_cast<const GameNetworkMessage *>(&message))->getByteStream().begin();
+		GenericValueTypeMessage<std::pair<NetworkId, bool> > const msg(ri);
+		Object * const obj = NetworkIdManager::getObjectById(msg.getValue().first);
+		if (obj)
+		{
+			CollisionProperty * const collision = obj->getCollisionProperty();
+			if (collision)
+				collision->setCollidable(msg.getValue().second);
+		}
 	}
 
 	//----------------------------------------------------------------------

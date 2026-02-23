@@ -875,6 +875,7 @@
 			</Page>
 		</Page>
 		<Data
+			airspeederPanel='AirspeederPanel'
 			AllTargets='AllTargets'
 			ButtonBar='ButtonBar'
 			chatinput='ChatWindow.input'
@@ -884,6 +885,7 @@
 			combatstate='CombatState'
 			currenttargetboxpage='CurrentTargetBoxPage'
 			debuginfopage='debuginfopage'
+			decoratorCameraPanel='DecoratorCameraPanel'
 			effectorDisable='effectorDisable'
 			effectorEnable='effectorEnable'
 			group='smlgroupwin'
@@ -896,8 +898,6 @@
 			pet='pet'
 			PetToolbar='PetToolbar'
 			questHelper='QuestHelper'
-			airspeederPanel='AirspeederPanel'
-			decoratorCameraPanel='DecoratorCameraPanel'
 			radarpage='radar'
 			reticleattack='Reticleattack'
 			reticledefault='Reticledefault'

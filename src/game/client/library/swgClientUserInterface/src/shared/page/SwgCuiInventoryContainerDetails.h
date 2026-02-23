@@ -13,6 +13,7 @@
 #include "UIEventCallback.h"
 #include "clientUserInterface/CuiMediator.h"
 #include "UITableModel.h"
+#include "swgClientUserInterface/SwgCuiInventoryContainer.h"
 
 // ======================================================================
 
@@ -21,7 +22,6 @@ class CallbackReceiver;
 class ClientObject;
 class CuiWidget3dObjectListViewer;
 class Object;
-class SwgCuiInventoryContainer;
 class SwgCuiInventoryContainerDetailsTableModel;
 class UIButton;
 class UITable;
@@ -56,6 +56,7 @@ public:
 
 	bool                       OnMessage                 (UIWidget *context, const UIMessage & msg );
 	void                       OnGenericSelectionChanged (UIWidget * context);
+	void                       OnPopupMenuSelection     (UIWidget * context);
 
 	ClientObject *             findDropDestination       (CuiWidget3dObjectListViewer * viewer, std::string & slotname);
 
@@ -100,6 +101,8 @@ private:
 
 	long                        m_originalRowHeight;
 	SwgCuiInventoryContainerDetailsNamespace::MyIconCallback * m_iconCallback;
+
+	SwgCuiInventoryContainer::ObjectWatcherVector m_pendingContextMenuObjects;
 };
 
 // ======================================================================

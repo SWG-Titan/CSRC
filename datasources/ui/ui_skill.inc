@@ -2594,7 +2594,6 @@
 						<Scrollbar
 							BackgroundColor='#FFFFFF'
 							Control='volume'
-							Enabled='false'
 							Location='410,6'
 							Name='scroll'
 							PackLocation='fff,nfn'

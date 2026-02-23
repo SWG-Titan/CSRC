@@ -84,7 +84,7 @@
 				>
 					<Text
 						BackgroundColor='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='[@ui_chatroom:info_title]'
 						MaxLines='1'
 						MinimumSize='0,19'
@@ -98,7 +98,7 @@
 					>@ui_chatroom:info_title</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='[@ui_chatroom:info_creator]'
 						Location='0,23'
 						MaxLines='1'
@@ -113,7 +113,7 @@
 					>@ui_chatroom:info_creator</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='[@ui_chatroom:info_owner]'
 						Location='0,46'
 						MaxLines='1'
@@ -128,7 +128,7 @@
 					>@ui_chatroom:info_owner</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='[@ui_chatroom:info_private_prefix]'
 						Location='0,69'
 						MaxLines='1'
@@ -143,7 +143,7 @@
 					>@ui_chatroom:info_private_prefix</Text>
 					<Text
 						BackgroundColor='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='[@ui_chatroom:info_moderated_prefix]'
 						Location='0,92'
 						MaxLines='1'
@@ -173,7 +173,7 @@
 						BackgroundColor='#FFFFFF'
 						BackgroundOpacity='0.40'
 						BackgroundTint='#00505E'
-						Font='bold_12'
+						Font='bold_11'
 						Margin='4,0,0,0'
 						MinimumSize='0,19'
 						Name='title'
@@ -190,7 +190,7 @@
 						BackgroundColor='#FFFFFF'
 						BackgroundOpacity='0.40'
 						BackgroundTint='#00505E'
-						Font='bold_12'
+						Font='bold_11'
 						Location='0,23'
 						Margin='4,0,0,0'
 						MinimumSize='0,19'
@@ -208,7 +208,7 @@
 						BackgroundColor='#FFFFFF'
 						BackgroundOpacity='0.40'
 						BackgroundTint='#00505E'
-						Font='bold_12'
+						Font='bold_11'
 						Location='0,46'
 						Margin='4,0,0,0'
 						MinimumSize='0,19'
@@ -226,7 +226,7 @@
 						BackgroundColor='#FFFFFF'
 						BackgroundOpacity='0.40'
 						BackgroundTint='#00505E'
-						Font='bold_12'
+						Font='bold_11'
 						Location='0,69'
 						Margin='4,0,0,0'
 						MinimumSize='0,19'
@@ -246,7 +246,7 @@
 						BackgroundTint='#00505E'
 						ColorCarat='#FFFFFF'
 						ColorSelection='#FFFFFF'
-						Font='bold_12'
+						Font='bold_11'
 						Location='0,92'
 						Margin='4,0,0,0'
 						MinimumSize='0,19'
@@ -436,7 +436,7 @@
 					>@ui_chatroom:who_deop</Button>
 				</Composite>
 				<Text
-					Font='bold_12'
+					Font='bold_11'
 					LocalText='[@ui_chatroom:who_table]'
 					Margin='2,2,2,2'
 					MaxLines='1'
@@ -473,7 +473,7 @@
 					CellPadding='6,3'
 					ColumnSizeDataSource='dsColSizes'
 					DefaultTextColor='#96F4FC'
-					DefaultTextStyle='bold_12'
+					DefaultTextStyle='bold_11'
 					GridColorHorizontal='#1CFFFF'
 					GridColorVertical='#1CFFFF'
 					Location='4,44'

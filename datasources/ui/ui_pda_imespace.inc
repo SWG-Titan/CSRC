@@ -24,7 +24,7 @@
 				ColorSelection='#FFFFFF'
 				DropShadowDepth='1,1'
 				DropShadowsEnabled='true'
-				Font='bold_12'
+				Font='bold_11'
 				Location='0,2'
 				MaximumSize='216,17'
 				MinimumSize='50,17'

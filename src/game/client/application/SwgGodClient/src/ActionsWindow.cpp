@@ -47,7 +47,8 @@ ActionsWindow::ActionsWindow()
   m_filters(0),
   m_console(0),
   m_gameWindow(0),
-  m_regionsView(0)
+  m_regionsView(0),
+  m_stackTool(0)
 {
 	QWidget * const p = &MainFrame::getInstance();
 
@@ -61,6 +62,7 @@ ActionsWindow::ActionsWindow()
 	m_console           = new ActionHack("Console",             IL_PIXMAP(hi16_action_window_new),   "&Console",              0, p, "console",           true);
 	m_gameWindow        = new ActionHack("Game Window",         IL_PIXMAP(hi16_action_window_new),   "&Game Window",          0, p, "game_window",       true);
 	m_regionsView       = new ActionHack("Region Viewer",       IL_PIXMAP(hi16_action_window_new),   "&Region Viewer",        0, p, "regionviewer",      true);
+	m_stackTool         = new ActionHack("Stacker",             IL_PIXMAP(hi16_action_window_new),   "Stac&ker",              0, p, "stacker",           true);
 
 	//connect the actions to slots
 	IGNORE_RETURN(connect(m_treeBrowser,       SIGNAL(toggled(bool)), this, SLOT(onTreeBrowser      (bool))));
@@ -72,6 +74,7 @@ ActionsWindow::ActionsWindow()
 	IGNORE_RETURN(connect(m_console,           SIGNAL(toggled(bool)), this, SLOT(onConsole          (bool))));
 	IGNORE_RETURN(connect(m_gameWindow,        SIGNAL(toggled(bool)), this, SLOT(onGameWindow       (bool))));
 	IGNORE_RETURN(connect(m_regionsView,       SIGNAL(toggled(bool)), this, SLOT(onRegionsView      (bool))));
+	IGNORE_RETURN(connect(m_stackTool,         SIGNAL(toggled(bool)), this, SLOT(onStackTool        (bool))));
 
 
 	//set up initial state of togglable actions
@@ -87,6 +90,8 @@ ActionsWindow::ActionsWindow()
 
 	//we want the filter window hidden initially
 	m_filters->doToggle        (false);
+	//stacker starts hidden
+	m_stackTool->setOn         (false);
 }
 
 //----------------------------------------------------------------------
@@ -101,6 +106,8 @@ ActionsWindow::~ActionsWindow()
 	m_filters           = 0;
 	m_console           = 0;
 	m_gameWindow        = 0;
+	m_regionsView       = 0;
+	m_stackTool         = 0;
 }
 
 //----------------------------------------------------------------------
@@ -191,6 +198,16 @@ void ActionsWindow::onRegionsView(bool b) const
 		MainFrame::getInstance().m_regionsViewDock->show();
 	else
 		MainFrame::getInstance().m_regionsViewDock->hide();
+}
+
+//----------------------------------------------------------------------
+
+void ActionsWindow::onStackTool(bool b) const
+{
+	if(b)
+		MainFrame::getInstance().m_stackToolDock->show();
+	else
+		MainFrame::getInstance().m_stackToolDock->hide();
 }
 
 //----------------------------------------------------------------------

@@ -575,7 +575,7 @@
 					BackgroundColor='#FFFFFF'
 					BackgroundTint='#000000'
 					CellAlignmentH='left'
-					CellCount='8,1'
+					CellCount='6,1'
 					CellCountFixed='8,1'
 					CellPadding='0,0'
 					CellSelectable='false'

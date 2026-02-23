@@ -101,8 +101,6 @@ private:
 	GameCamera*             m_cameras [CI_COUNT];
 	int                     m_currentView;
 
-	bool                    m_disableWorldSnapshot;
-
 	bool                    m_usingGodClientCamera;
 	bool                    m_usingGodClientInteriorCamera;
 

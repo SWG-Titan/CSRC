@@ -820,7 +820,7 @@ bool ObjectAttributeManager::formatDescriptionIfNewer (const NetworkId & id, Uni
 		return false;
 
 	
-	if (obj && CuiPreferences::getDebugExamine() && Game::getPlayerObject()->isAdmin())
+	if (obj && CuiPreferences::getDebugExamine())
 	{
 		static Unicode::String debugInfo;
 		debugInfo.clear ();
@@ -859,9 +859,7 @@ void ObjectAttributeManager::formatHeaderAndDesc (const ClientObject & obj, Unic
 	}
 	if (!obj.getLocalizedDescription (desc))
 	{
-#if PRODUCTION==1
-		desc.clear ();
-#endif
+
 	}
 }
 

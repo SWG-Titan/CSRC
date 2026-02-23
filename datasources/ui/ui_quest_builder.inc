@@ -6126,6 +6126,7 @@
 					/>
 					<Scrollbar
 						Control='TaskComposite'
+						Enabled='false'
 						Location='481,6'
 						Name='scroll'
 						OpacityRelativeMin='0.40'

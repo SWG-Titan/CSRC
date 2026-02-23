@@ -2,8 +2,8 @@
 		Name='AvCre'
 		PackSize='1,1'
 		pv.visible='false'
-		ScrollExtent='1280,1024'
-		Size='1280,1024'
+		ScrollExtent='1024,768'
+		Size='1024,768'
 		versiontest='true'
 		Visible='false'
 		VisualEditLock='true'
@@ -46,20 +46,20 @@
 			AbsorbsInput='false'
 			Activated='true'
 			BackgroundColor='#259C3A'
-			Location='0,974'
+			Location='0,718'
 			MaximumSize='16384,50'
 			Name='pageButtonsBottom'
 			PackLocation='cfc,fff'
 			PackSize='a,f'
-			ScrollExtent='1280,50'
-			Size='1280,50'
+			ScrollExtent='1024,50'
+			Size='1024,50'
 		>
 			<Page
 				AbsorbsInput='false'
 				Activated='true'
 				BackgroundColor='#259C3A'
 				BackgroundOpacity='1.00'
-				Location='1122,0'
+				Location='866,0'
 				MaximumSize='158,50'
 				MinimumSize='158,50'
 				Name='Next'
@@ -325,12 +325,12 @@
 			</Page>
 			<Page
 				BackgroundColor='#FFFFFF'
-				Location='248,0'
+				Location='198,0'
 				Name='help'
 				PackLocation='cfc,fff'
 				PackSize='p,f'
-				ScrollExtent='785,50'
-				Size='785,50'
+				ScrollExtent='628,50'
+				Size='628,50'
 			>
 				<Text
 					ColorCarat='#FFFFFF'
@@ -341,8 +341,8 @@
 					PackLocation='nfn,nfn'
 					PackSize='a,a'
 					PalText='text1'
-					ScrollExtent='785,50'
-					Size='785,50'
+					ScrollExtent='628,50'
+					Size='628,50'
 					TextAlignment='Center'
 					TextColor='#96F4FC'
 				>@ui:cpt_help_avatar_species_sel</Text>
@@ -353,8 +353,8 @@
 					PackSize='a,f'
 					PalBgTint='line1'
 					RStyleDefault='/Styles.New.whiteOutline_palW.rs_default'
-					ScrollExtent='785,43'
-					Size='785,43'
+					ScrollExtent='628,43'
+					Size='628,43'
 					Visible='false'
 				>
 					<Page
@@ -366,21 +366,21 @@
 						PackSize='a,h'
 						PalBgTint='back1'
 						RStyleDefault='/Styles.New.pill_lrg.rs_default'
-						ScrollExtent='785,37'
-						Size='785,37'
+						ScrollExtent='628,37'
+						Size='628,37'
 					/>
 				</Page>
 			</Page>
 		</Page>
 		<Page
 			image_gender.style='imagestyle_male'
-			Location='837,8'
+			Location='671,6'
 			MinimumSize='252,442'
 			Name='pageSelection'
 			PackLocation='fpf,npn'
 			PackSize='p,p'
-			ScrollExtent='437,833'
-			Size='437,833'
+			ScrollExtent='349,624'
+			Size='349,624'
 		>
 			<Data
 				ImageStyle='imagestyle_male'
@@ -397,18 +397,18 @@
 				Name='info'
 				PackSize='a,a'
 				RStyleDefault='rs_default'
-				ScrollExtent='398,480'
-				Size='398,480'
+				ScrollExtent='310,271'
+				Size='310,271'
 			>
 				<Scrollbar
 					Control='text'
 					Enabled='false'
-					Location='384,6'
+					Location='296,6'
 					Name='scroll'
 					PackLocation='fff'
 					PackSize='f,a'
-					ScrollExtent='11,468'
-					Size='11,468'
+					ScrollExtent='11,259'
+					Size='11,259'
 					Style='/Styles.scrollbar.default.vHud4.style'
 				>
 				</Scrollbar>
@@ -423,8 +423,8 @@
 					Name='text'
 					PackSize='a,a'
 					PalText='text1'
-					ScrollExtent='374,469'
-					Size='374,469'
+					ScrollExtent='286,260'
+					Size='286,260'
 					TextColor='#96F4FC'
 					TextSelectable='false'
 					TextUnrollSpeed='600.00'
@@ -439,9 +439,9 @@
 					PackSize='a,a'
 					PalBgTint='line1'
 					RStyleDefault='/Styles.New.whiteOutline_palW.rs_default'
-					ScrollExtent='398,480'
+					ScrollExtent='310,271'
 					Selectable='true'
-					Size='398,480'
+					Size='310,271'
 				>
 					<Page
 						BackgroundColor='#FFFFFF'
@@ -453,8 +453,8 @@
 						PackSize='a,a'
 						PalBgTint='back1'
 						RStyleDefault='/Styles.New.whitebox_palW.rs_default'
-						ScrollExtent='384,462'
-						Size='384,462'
+						ScrollExtent='296,253'
+						Size='296,253'
 					/>
 					<Page
 						BackgroundColor='#FFFFFF'
@@ -466,35 +466,35 @@
 						PackSize='a,a'
 						PalBgTint='back1'
 						RStyleDefault='/Styles.New.fatFrameInside_palW.rs_default'
-						ScrollExtent='390,473'
-						Size='390,473'
+						ScrollExtent='302,264'
+						Size='302,264'
 					/>
 				</Page>
 			</Page>
 			<Page
 				BackgroundOpacity='1.00'
 				BackgroundTint='#1CFFFF'
-				Location='19,526'
+				Location='19,317'
 				Name='species'
 				PackLocation='nfn,fff'
 				PackSize='a,f'
 				PalBgTint='line1'
 				RStyleDefault='/Styles.New.whiteOutline_palW.rs_default'
-				ScrollExtent='398,224'
-				Size='398,224'
+				ScrollExtent='310,224'
+				Size='310,224'
 			>
 				<List
 					BackgroundColor='#000000'
 					BackgroundOpacity='0.00'
 					DataSource='/AvatarData.SpeciesSelection'
 					Location='4,6'
-					MinimumScrollExtent='391,213'
+					MinimumScrollExtent='303,213'
 					Name='list'
 					PackLocation='nfn,nfn'
 					PackSize='a,a'
-					ScrollExtent='391,216'
+					ScrollExtent='303,216'
 					SelectionAllowedMultiRow='false'
-					Size='391,216'
+					Size='303,216'
 					Style='/Styles.list.dark.style'
 				/>
 				<Scrollbar
@@ -502,7 +502,7 @@
 					BackgroundOpacity='1.00'
 					Control='list'
 					Enabled='false'
-					Location='373,20'
+					Location='285,20'
 					Name='scroll'
 					PackLocation='RightFixed,BottomFixed'
 					PackSize='fixed,proportional'
@@ -523,14 +523,14 @@
 				lastgender.tmpimagestyle='parent.lastgender.imagestyle'
 				lastgender.tmpismale='parent.lastgender.ismale'
 				lastgender.tmpstyle='/Styles.buttons.genderFemale.style'
-				Location='19,759'
+				Location='19,550'
 				Name='bottom'
 				PackLocation='nfn,fff'
 				PackSize='a,f'
 				PalBgTint='line1'
 				RStyleDefault='/Styles.New.whiteOutline.rs_default'
-				ScrollExtent='398,55'
-				Size='398,55'
+				ScrollExtent='310,55'
+				Size='310,55'
 			>
 				<Page
 					BackgroundTint='#1CFFFF'
@@ -549,7 +549,7 @@
 					<Text
 						CursorMark='12'
 						CursorPoint='12'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='xxx height here'
 						Location='5,27'
@@ -567,7 +567,7 @@
 					<Text
 						CursorMark='12'
 						CursorPoint='12'
-						Font='bold_12'
+						Font='bold_11'
 						GetsInput='true'
 						LocalText='xxx weight here'
 						Location='5,4'
@@ -660,23 +660,23 @@ parent.lastgender.imagestyle=parent.parent.parent.lastgender.tmpimagestyle
 					PackSize='a,f'
 					PalBgTint='line1'
 					RStyleDefault='/Styles.New.whiteOutline_palW.rs_default'
-					ScrollExtent='278,39'
-					Size='278,39'
+					ScrollExtent='190,39'
+					Size='190,39'
 				>
 					<Text
 						BackgroundColor='#FFFFFF'
 						BackgroundOpacity='0.40'
 						BackgroundTint='#03546B'
 						Font='bold_13'
-						Location='9,6'
+						Location='7,6'
 						Name='textName'
 						PackLocation='cfc,fff'
 						PackSize='p,f'
 						PalBgTint='back3'
 						PalText='text1'
 						RStyleDefault='/Styles.New.pill_lrg.rs_default'
-						ScrollExtent='263,27'
-						Size='263,27'
+						ScrollExtent='179,27'
+						Size='179,27'
 						TextAlignment='Center'
 						TextAlignmentVertical='Center'
 						TextColor='#96F4FC'
@@ -690,13 +690,13 @@ parent.lastgender.imagestyle=parent.parent.parent.lastgender.tmpimagestyle
 						PackSize='a,h'
 						PalBgTint='back1'
 						RStyleDefault='/Styles.New.pill_lrg.rs_default'
-						ScrollExtent='270,27'
-						Size='270,27'
+						ScrollExtent='182,27'
+						Size='182,27'
 					/>
 				</Page>
 			</Page>
 			<Image
-				Location='111,631'
+				Location='111,527'
 				Name='hinge'
 				PackLocation='nfn,cfc'
 				PackSize='f'
@@ -711,8 +711,8 @@ parent.lastgender.imagestyle=parent.parent.parent.lastgender.tmpimagestyle
 				Name='back'
 				PackLocation='nfn,nfn'
 				PackSize='a,a'
-				ScrollExtent='437,833'
-				Size='437,833'
+				ScrollExtent='349,624'
+				Size='349,624'
 			>
 				<Page
 					BackgroundColor='#FFFFFF'
@@ -725,8 +725,8 @@ parent.lastgender.imagestyle=parent.parent.parent.lastgender.tmpimagestyle
 					PackSize='a,a'
 					PalBgTint='back3'
 					RStyleDefault='/Styles.window.mfd.mfd5.rs_default'
-					ScrollExtent='402,779'
-					Size='402,779'
+					ScrollExtent='314,570'
+					Size='314,570'
 				/>
 				<Text
 					Font='bold_13'
@@ -739,8 +739,8 @@ parent.lastgender.imagestyle=parent.parent.parent.lastgender.tmpimagestyle
 					PackSize='h,f'
 					PalText='header'
 					RStyleDefault='rs_default'
-					ScrollExtent='302,19'
-					Size='302,19'
+					ScrollExtent='258,19'
+					Size='258,19'
 					TextAlignmentVertical='Center'
 					TextCapital='true'
 					TextColor='#97FFFF'
@@ -751,8 +751,8 @@ parent.lastgender.imagestyle=parent.parent.parent.lastgender.tmpimagestyle
 					PackLocation='nfn,nfn'
 					PackSize='a,a'
 					RStyleDefault='/Styles.New.fullFrame.rs_default'
-					ScrollExtent='437,833'
-					Size='437,833'
+					ScrollExtent='349,624'
+					Size='349,624'
 				/>
 				<Page
 					BackgroundColor='#FFFFFF'
@@ -764,8 +764,8 @@ parent.lastgender.imagestyle=parent.parent.parent.lastgender.tmpimagestyle
 					PackSize='a,a'
 					PalBgTint='line1'
 					RStyleDefault='/Styles.New.whiteOutline_palW.rs_default'
-					ScrollExtent='402,777'
-					Size='402,777'
+					ScrollExtent='314,568'
+					Size='314,568'
 				>
 					<Page
 						BackgroundColor='#FFFFFF'
@@ -778,8 +778,8 @@ parent.lastgender.imagestyle=parent.parent.parent.lastgender.tmpimagestyle
 						PackSize='a,a'
 						PalBgTint='back3'
 						RStyleDefault='/Styles.New.fatFrameInside_palW.rs_default'
-						ScrollExtent='395,773'
-						Size='395,773'
+						ScrollExtent='307,564'
+						Size='307,564'
 						Visible='false'
 					/>
 				</Page>
@@ -790,9 +790,9 @@ parent.lastgender.imagestyle=parent.parent.parent.lastgender.tmpimagestyle
 					PackLocation='nfn,nfn'
 					PackSize='a,a'
 					RStyleDefault='/Styles.New.fatFrameInside.rs_default'
-					ScrollExtent='414,807'
+					ScrollExtent='326,598'
 					Selectable='true'
-					Size='414,807'
+					Size='326,598'
 				/>
 				<Page
 					BackgroundOpacity='1.00'
@@ -803,8 +803,8 @@ parent.lastgender.imagestyle=parent.parent.parent.lastgender.tmpimagestyle
 					PackSize='a,a'
 					PalBgTint='back1'
 					RStyleDefault='/Styles.New.fullFrameIn.rs_default'
-					ScrollExtent='414,810'
-					Size='414,810'
+					ScrollExtent='326,601'
+					Size='326,601'
 				/>
 				<Page
 					BackgroundOpacity='1.00'
@@ -814,8 +814,8 @@ parent.lastgender.imagestyle=parent.parent.parent.lastgender.tmpimagestyle
 					PackLocation='nfn,nfn'
 					PackSize='a,a'
 					RStyleDefault='/Styles.New.fullFrame.rs_default'
-					ScrollExtent='417,819'
-					Size='417,819'
+					ScrollExtent='329,610'
+					Size='329,610'
 				/>
 			</Page>
 		</Page>
@@ -836,8 +836,8 @@ parent.lastgender.imagestyle=parent.parent.parent.lastgender.tmpimagestyle
 			Name='v'
 			PackSize='a,a'
 			scalemaxoverride='1.3'
-			ScrollExtent='1280,1024'
-			Size='1280,1024'
+			ScrollExtent='1024,768'
+			Size='1024,768'
 			VisualEditLock='true'
 		/>
 		<CuiWidget3dObjectListViewer
@@ -864,8 +864,8 @@ parent.lastgender.imagestyle=parent.parent.parent.lastgender.tmpimagestyle
 			PackSize='a,a'
 			RotateSpeed='0.5'
 			scalemaxoverride='1.3'
-			ScrollExtent='1280,1024'
-			Size='1280,1024'
+			ScrollExtent='1024,768'
+			Size='1024,768'
 			Visible='false'
 			VisualEditLock='true'
 		/>
@@ -890,8 +890,8 @@ parent.lastgender.imagestyle=parent.parent.parent.lastgender.tmpimagestyle
 			PackSize='a,a'
 			RotateSpeed='0'
 			scalemaxoverride='1.3'
-			ScrollExtent='1280,1024'
-			Size='1280,1024'
+			ScrollExtent='1024,768'
+			Size='1024,768'
 			Visible='false'
 			VisualEditLock='true'
 		/>

@@ -91,6 +91,7 @@
 #include <string>
 #include <ctime>
 #include <cstdio>
+#include <cstring>
 
 extern void externalCommandHandler(const char*);
 
@@ -143,13 +144,18 @@ int ClientMain(
 
 	InstallTimer rootInstallTimer("root");
 
-	char clientWindowName[128] = "SWG: Titan";
-
-#if PRODUCTION != 1
-	const char* customName = "SWG: Titan Development Client v1.0";
-	snprintf(clientWindowName, sizeof(clientWindowName), "%s", customName);
-	clientWindowName[sizeof(clientWindowName) - 1] = '\0';
-#endif
+	char clientWindowName[128];
+	// Format: MMDDYYYY-BRANCH-PROJECT (e.g. 02202025-Development-SwgTitan)
+	{
+		static const char* const monthNames[] = {"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+		char monthStr[4] = {0};
+		int month = 1, day = 1, year = 2025;
+		sscanf(__DATE__, "%3s %d %d", monthStr, &day, &year);
+		for (int i = 0; i < 12; ++i)
+			if (strcmp(monthStr, monthNames[i]) == 0) { month = i + 1; break; }
+		IGNORE_RETURN(snprintf(clientWindowName, sizeof(clientWindowName), "SWG: Titan (%02d%02d%04d-%s-Titan)", month, day, year, ApplicationVersion::getBranchVersion()));
+		clientWindowName[sizeof(clientWindowName) - 1] = '\0';
+	}
 
 
 	//-- foundation

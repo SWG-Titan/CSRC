@@ -100,7 +100,6 @@ namespace ConfigClientGameNamespace
 	float           ms_freeCameraSpeedFast;
 
 	bool            ms_useCustomInputMaps;
-	bool            ms_disableWorldSnapshot;
 	bool            ms_worldSnapshotIgnorePobChanges;
 	float           ms_worldSnapshotDetailLevelBias;
 
@@ -630,11 +629,6 @@ float ConfigClientGame::getCameraFieldOfView ()
 
 //-------------------------------------------------------------------
 
-bool ConfigClientGame::getDisableWorldSnapshot ()
-{
-	return ms_disableWorldSnapshot;
-}
-
 // ----------------------------------------------------------------------
 
 bool ConfigClientGame::getWorldSnapshotIgnorePobChanges()
@@ -1029,12 +1023,6 @@ void ConfigClientGame::install(void)
 	KEY_FLOAT  (freeCameraSpeedSlow,           7.0f);
 
 	KEY_BOOL   (useCustomInputMaps,            false);
-
-#if PRODUCTION
-	ms_disableWorldSnapshot = false;
-#else
-	KEY_BOOL   (disableWorldSnapshot,          true);
-#endif
 
 	KEY_BOOL   (worldSnapshotIgnorePobChanges,    false);
 	KEY_FLOAT (worldSnapshotDetailLevelBias, 0.f);

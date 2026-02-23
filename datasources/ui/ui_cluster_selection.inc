@@ -730,7 +730,7 @@
 					CellPadding='5,3'
 					ColumnSizeDataSource='colSizes'
 					DefaultTextColor='#96F4FC'
-					DefaultTextStyle='bold_12'
+					DefaultTextStyle='bold_11'
 					GridColorHorizontal='#1CFFFF'
 					GridColorVertical='#1CFFFF'
 					Location='5,24'

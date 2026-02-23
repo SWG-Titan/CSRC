@@ -30,6 +30,7 @@ class SwgCuiInventoryContainerDetails;
 class SwgCuiInventoryContainerIcons;
 class UIButton;
 class UIText;
+class UITextbox;
 class UITextStyle;
 class UIVolumePage;
 class VolumeContainer;
@@ -125,6 +126,7 @@ public:
 
 	bool                          OnMessage                    (UIWidget *context, const UIMessage & msg );
 	void                          OnButtonPressed              (UIWidget *context );
+	void                          OnTextboxChanged             (UIWidget *context );
 
 	void                          update                       (float deltaTimeSecs);
 
@@ -139,6 +141,9 @@ public:
 
 	void                          setFilter                    (const SwgCuiInventoryContainerFilter * filter);
 	void                          setContainerProvider         (SwgCuiContainerProvider * provider);
+
+	void                          setSearchFilter              (const Unicode::String & filter);
+	const Unicode::String &       getSearchFilter              () const;
 
 	UIVolumePage *                getVolumePage                ();
 
@@ -190,6 +195,10 @@ public:
 	void                          handleDropThrough            (UIWidget * const obj);
 
 	void                       openSelectedRadial();
+
+	void                       handleContextMenuExamine      (ClientObject & obj);
+	void                       handleContextMenuDrop        (const SwgCuiInventoryContainer::ObjectWatcherVector & objects);
+	void                       handleContextMenuDelete      (const SwgCuiInventoryContainer::ObjectWatcherVector & objects);
    
 protected:
 	virtual void               performActivate ();
@@ -270,6 +279,9 @@ private:
 	stdvector<NetworkId>::fwd              m_inventoryOrder;
 
 	bool                                   m_saveInventoryOrder;
+
+	Unicode::String                        m_searchFilter;
+	UITextbox *                            m_searchInput;
 };
 
 //----------------------------------------------------------------------

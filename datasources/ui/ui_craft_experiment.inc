@@ -711,6 +711,7 @@ parent.summary.visible=false'
 											Size='25,13'
 										>
 											<Button
+												Activated='true'
 												BackgroundColor='#FFFFFF'
 												Enabled='false'
 												Name='b'
@@ -733,6 +734,7 @@ parent.summary.visible=false'
 											Size='25,13'
 										>
 											<Button
+												Activated='true'
 												BackgroundColor='#FFFFFF'
 												Enabled='false'
 												Name='b'
@@ -1119,6 +1121,7 @@ parent.summary.visible=false'
 											Size='25,13'
 										>
 											<Button
+												Activated='true'
 												BackgroundColor='#FFFFFF'
 												Enabled='false'
 												Name='b'
@@ -1141,6 +1144,7 @@ parent.summary.visible=false'
 											Size='25,13'
 										>
 											<Button
+												Activated='true'
 												BackgroundColor='#FFFFFF'
 												Enabled='false'
 												Name='b'
@@ -1527,6 +1531,7 @@ parent.summary.visible=false'
 											Size='25,13'
 										>
 											<Button
+												Activated='true'
 												BackgroundColor='#FFFFFF'
 												Enabled='false'
 												Name='b'
@@ -1549,6 +1554,7 @@ parent.summary.visible=false'
 											Size='25,13'
 										>
 											<Button
+												Activated='true'
 												BackgroundColor='#FFFFFF'
 												Enabled='false'
 												Name='b'
@@ -1935,6 +1941,7 @@ parent.summary.visible=false'
 											Size='25,13'
 										>
 											<Button
+												Activated='true'
 												BackgroundColor='#FFFFFF'
 												Enabled='false'
 												Name='b'
@@ -1957,6 +1964,7 @@ parent.summary.visible=false'
 											Size='25,13'
 										>
 											<Button
+												Activated='true'
 												BackgroundColor='#FFFFFF'
 												Enabled='false'
 												Name='b'

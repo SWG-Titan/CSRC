@@ -5,7 +5,6 @@
 			compass.enabled='false'
 			DropToParent='true'
 			Location='870,1'
-			LockDiagonal='true'
 			MaximumSize='1600,1600'
 			MinimumSize='139,139'
 			Name='radar'

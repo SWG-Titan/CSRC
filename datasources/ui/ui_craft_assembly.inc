@@ -5867,7 +5867,7 @@ oldIconVisible=parent.details.visible'
 							Size='202,267'
 						>
 							<Text
-								Font='bold_19'
+								Font='bold_18'
 								LocalText='[@ui_craft:unload_into_inventory]'
 								Location='8,10'
 								Margin='2,2,2,2'
@@ -6190,7 +6190,7 @@ oldIconVisible=parent.details.visible'
 							Size='202,267'
 						>
 							<Text
-								Font='bold_19'
+								Font='bold_18'
 								LocalText='[@ui_craft:unload_into_inventory]'
 								Location='8,10'
 								Margin='2,2,2,2'

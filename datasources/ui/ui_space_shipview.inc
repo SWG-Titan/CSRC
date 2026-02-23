@@ -154,7 +154,7 @@
 							Size='468,19'
 						>
 							<Text
-								Font='bold_14'
+								Font='bold_15'
 								LocalText='XXX'
 								Margin='4,4,4,4'
 								MaximumSize='16384,24'
@@ -187,7 +187,7 @@
 								Size='457,249'
 							>
 								<Text
-									Font='bold_12'
+									Font='bold_11'
 									LocalText='xxx attrib 1:    info here
 xxx attrib 2:    info here
 xxx attrib 3:    info here
@@ -235,7 +235,7 @@ xxx attrib 8:    info here
 
 </Text>
 								<Text
-									Font='bold_12'
+									Font='bold_11'
 									LocalText='100%
 100%
 100%

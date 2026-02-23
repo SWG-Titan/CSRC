@@ -29,6 +29,8 @@
 #include "UIPage.h"
 #include "UIPopupMenu.h"
 #include "UIPopupMenustyle.h"
+#include "UIText.h"
+#include "UITextStyleManager.h"
 
 namespace SwgCuiExamineNamespace
 {
@@ -49,7 +51,8 @@ CuiMediator         ("SwgCuiExamine", page),
 UIEventCallback     (),
 m_info              (0),
 m_callback          (new MessageDispatch::Callback),
-m_watcher           (new ObjectWatcher)
+m_watcher           (new ObjectWatcher),
+m_captionText       (0)
 {
 	registerMediatorObject(getPage(), true);
 
@@ -61,6 +64,10 @@ m_watcher           (new ObjectWatcher)
 
 	m_info      = new SwgCuiInventoryInfo (*infoPage, false, true);
 	m_info->fetch ();
+
+	UIBaseObject * captionObj = page.GetObjectFromPath ("bg.caption.text", TUIText);
+	if (captionObj)
+		m_captionText = safe_cast<UIText *>(captionObj);
 }
 
 //----------------------------------------------------------------------
@@ -128,6 +135,8 @@ void SwgCuiExamine::update                        (float deltaTimeSecs)
 		closeNextFrame ();
 		return;
 	}
+
+	updateCaptionTextToFit ();
 
 	CreatureObject const * const creatureObject = CreatureObject::asCreatureObject(m_info->getInfoObject());
 	if (creatureObject && (creatureObject->getNetworkId() != Game::getPlayerNetworkId()) && !PlayerObject::isAdmin() && !creatureObject->getCoverVisibility() && !creatureObject->isPassiveRevealPlayerCharacter(Game::getPlayerNetworkId()))
@@ -240,5 +249,53 @@ void SwgCuiExamine::applyRotationToServer         (void)
 	GameNetwork::send(msg, true);
 
 }
+
+//----------------------------------------------------------------------
+
+void SwgCuiExamine::updateCaptionTextToFit (void)
+{
+	if (!m_captionText || !m_info)
+		return;
+
+	UIText * labelText = 0;
+	UIBaseObject * labelObj = getPage ().GetObjectFromPath ("info.comp.page.details.content.label", TUIText);
+	if (labelObj)
+		labelText = safe_cast<UIText *>(labelObj);
+
+	if (!labelText)
+		return;
+
+	Unicode::String labelContent;
+	labelText->GetLocalText (labelContent);
+
+	if (labelContent.empty ())
+		labelContent = Unicode::narrowToWide ("Examine");
+
+	m_captionText->SetLocalText (labelContent);
+	m_captionText->SetPreLocalized (true);
+	m_captionText->SetTruncateElipsis (true);
+
+	static const int fontSizes [] = { 13, 12, 11, 10, 9 };
+	static const int numSizes = sizeof (fontSizes) / sizeof (fontSizes [0]);
+
+	const long maxWidth = m_captionText->GetWidth () - 12;
+
+	for (int i = 0; i < numSizes; ++i)
+	{
+		char fontName [32];
+		snprintf (fontName, sizeof (fontName), "bold_%d", fontSizes [i]);
+
+		UITextStyle * const style = UITextStyleManager::GetInstance ()->GetFontForLogicalFont (fontName);
+		if (!style)
+			continue;
+
+		m_captionText->SetStyle (style);
+
+		const UISize & extent = m_captionText->GetTextExtent ();
+		if (extent.x <= maxWidth || i == numSizes - 1)
+			break;
+	}
+}
+
 
 //======================================================================

@@ -41,6 +41,8 @@ public:
 		const char *    localServerSrcPath;
 		const char *    localServerDataPath;
 		const char *    localServerCrcStringTable;
+		/** When set, buildout save/load uses this root instead of dsrc/data (local rebuild) */
+		const char *    buildoutsRoot;
 
 
 

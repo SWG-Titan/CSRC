@@ -45,6 +45,7 @@ public:
 	ActionHack*             m_console;
 	ActionHack*             m_gameWindow;
 	ActionHack*             m_regionsView;
+	ActionHack*             m_stackTool;
 	//lint -restore
 
 public:
@@ -61,6 +62,7 @@ private slots:
 	void onConsole          (bool b) const;
 	void onGameWindow       (bool b) const;
 	void onRegionsView      (bool b) const;
+	void onStackTool        (bool b) const;
 
 private:
 	//disabled

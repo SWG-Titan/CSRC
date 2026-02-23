@@ -87,8 +87,6 @@
 						ScrollbarWidth='10'
 						ScrollExtent='407,30'
 						selected='true'
-						SelectedIndex='1'
-						SelectedText='ddfguild'
 						Size='407,30'
 						TextboxMargin='0,1,0,0'
 						TextboxStyle='/Styles.textbox.default.Style_16'
@@ -125,7 +123,7 @@
 					></Textbox>
 					<Text
 						Enabled='false'
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='[@ui_pm:recipient_name]'
 						Location='5,4'
 						MaxLines='1'
@@ -140,7 +138,7 @@
 					>@ui_pm:recipient_name</Text>
 					<Text
 						Enabled='false'
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='[@ui_pm:subject]'
 						Location='5,58'
 						MaxLines='1'
@@ -394,7 +392,7 @@ LINE ELEVEN
 								CellSize='64,64'
 								DragAccepts='GameObject'
 								Location='5,22'
-								MinimumScrollExtent='4,134'
+								MinimumScrollExtent='70,134'
 								Name='volume'
 								OnHide='parent.visible=visible'
 								OnShow='parent.visible=visible'
@@ -408,7 +406,7 @@ LINE ELEVEN
 									BackgroundColor='#FFFFFF'
 									BackgroundTint='#008080'
 									Enabled='false'
-									Font='bold_12'
+									Font='bold_11'
 									LocalText='xxx
 LINE ONE
 LINE TWO
@@ -449,7 +447,7 @@ LINE ELEVEN
 									BackgroundColor='#FFFFFF'
 									BackgroundTint='#008080'
 									Enabled='false'
-									Font='bold_12'
+									Font='bold_11'
 									LocalText='xxx
 LINE ONE
 LINE TWO
@@ -488,7 +486,7 @@ LINE ELEVEN
 </Text>
 							</VolumePage>
 							<Text
-								Font='bold_12'
+								Font='bold_11'
 								LocalText='[@ui_pm:attachments]'
 								MinimumSize='0,19'
 								Name='label'
@@ -591,7 +589,7 @@ LINE ELEVEN
 					</Page>
 					<Text
 						Enabled='false'
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='[@ui_pm:text]'
 						Location='0,5'
 						MaxLines='1'
@@ -606,7 +604,7 @@ LINE ELEVEN
 					>@ui_pm:text</Text>
 					<Text
 						Enabled='false'
-						Font='bold_12'
+						Font='bold_11'
 						LocalText='[@ui_pm:text_max]'
 						Location='170,5'
 						MaxLines='1'

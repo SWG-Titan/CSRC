@@ -8,6 +8,7 @@
 #include "swgClientUserInterface/SwgCuiCommandParserUI.h"
 
 // ======================================================================
+#include "clientGame/ConfigClientGame.h"
 #include "clientGame/ClientSecureTradeManager.h"
 #include "clientGame/CreatureObject.h"
 #include "clientGame/Game.h"
@@ -118,13 +119,13 @@ namespace SwgCuiCommandParserUINamespace
 		const char * const radarSelect            = "radarSelect";
 		const char * const browser             = "browser";
 		const char * const url				   = "url";
-#if PRODUCTION == 0
 		const char * const debugPrint          = "debugPrint";
 		const char * const set                 = "set";
 		const char * const list                = "list";
 		const char * const activate            = "activate";
 		const char * const deactivate          = "deactivate";
 		const char * const reset               = "reset";
+		const char * const refresh              = "refresh";
 		const char * const locale_reset        = "locale_reset";
 		const char * const pixel_offset        = "pixel_offset";
 		const char * const hudServerOutput     = "hudServerOutput";
@@ -155,7 +156,6 @@ namespace SwgCuiCommandParserUINamespace
 #if DEBUG=0
 		const char * const debugBrowserOutput  = "mozillaBrowserOutput";
 #endif
-#endif
 	}
 
 	const CommandParser::CmdInfo cmds[] =
@@ -175,13 +175,13 @@ namespace SwgCuiCommandParserUINamespace
 		{CommandNames::radarSelect,            1, "[radar #]",   "Select the current reticle."},
 		//{CommandNames::browser,                0, "<url>",       "Opens a web browser. If no URL is specified, you will be sent to the SWG home page."},
 		//{CommandNames::url,                    1, "<URL>", "Passes the specified URL to the Web Browser."		},
-#if PRODUCTION == 0
 		{CommandNames::debugPrint,            1, "<1|0>",       "."},
 		{CommandNames::list,                  0, "",            "List all UI Pages."},
 		{CommandNames::set,                   2, "<property> <value>", "Set a UI object property."},
 		{CommandNames::activate,              1, "<page>",      "Activate UI Page."},
 		{CommandNames::deactivate,            1, "<page>",      "Deactivate UI Page."},
 		{CommandNames::reset,                 0, "",            "Reload UI from disk."},
+		{CommandNames::refresh,                0, "",            "Reinstall the UI system to reload UI changes on the fly."},
 		{CommandNames::locale_reset,          0, "",            "Reset all locale specific strings."},
 		{CommandNames::pixel_offset,          0, "[offset]",    "Set or get the pixel offset."},
 		{CommandNames::hudServerOutput,       0, "[1|0]",       "Get or set the HUD showing server messages."},
@@ -212,7 +212,6 @@ namespace SwgCuiCommandParserUINamespace
 		{CommandNames::debugStringIdColor,    0, "<ui color string>", "Set the color of the debug StringId string."},
 #if DEBUG=0
 		{CommandNames::debugBrowserOutput,    0, "", "Prints out debug information related to the Mozilla browser."		},
-#endif
 #endif
 		{"", 0, "", ""} // this must be last
 	};
@@ -583,13 +582,33 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 		return true;
 	}
 	*/
+	
+	//----------------------------------------------------------------------
+	// debugExamine / debugClipboardExamine: always available, gated by getCSR (titanAdmin)
+	//----------------------------------------------------------------------
 
-#if PRODUCTION == 0
+	else if (isCommand (argv [0],  CommandNames::debugExamine))
+	{
+		if (ConfigClientGame::getCSR())
+			CuiPreferences::setDebugExamine (argv [1][0] != '0');
+		return true;
+	}
 
+	else if (isCommand (argv [0], CommandNames::debugClipboardExamine))
+	{
+		if (ConfigClientGame::getCSR())
+			CuiPreferences::setDebugClipboardExamine (argv [1][0] != '0');
+		return true;
+	}
+
+	//-----------------------------------------------------------------
+	// Debug UI commands: always available, gated by getCSR (titanAdmin)
 	//-----------------------------------------------------------------
 
 	else if (isCommand (argv [0], CommandNames::list))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		result += Unicode::narrowToWide (
 			"UI Mediators:\n"
 			"id  name                  exists  status    path\n"
@@ -618,6 +637,8 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 
 	else if (isCommand (argv [0], CommandNames::set))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		UIBaseObject * const root = UIManager::gUIManager ().GetRootPage ();
 		if (root)
 		{
@@ -630,7 +651,8 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 
 	else if (isCommand (argv [0], CommandNames::activate))
 	{
-
+		if (!ConfigClientGame::getCSR())
+			return true;
 		const String_t & cmdNameStr = Unicode::narrowToWide ("ui activate");
 
 		if (argv.size () < 2)
@@ -655,6 +677,8 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 
 	else if (isCommand (argv [0], CommandNames::deactivate))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		const String_t & cmdNameStr = Unicode::narrowToWide ("ui deactivate");
 
 		if (argv.size () < 2)
@@ -682,8 +706,10 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 
 	//-----------------------------------------------------------------
 
-	else if (isCommand (argv [0],  CommandNames::reset))
+	else if (isCommand (argv [0],  CommandNames::reset) || isCommand (argv [0],  CommandNames::refresh))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		CuiManager::requestReset();
 		SwgCuiHudFactory::reset();
 		return true;
@@ -693,7 +719,8 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 	
 	else if (isCommand (argv [0],  CommandNames::locale_reset))
 	{
-
+		if (!ConfigClientGame::getCSR())
+			return true;
 		CuiManager::resetLocalizedStrings ();
 		result += Unicode::narrowToWide ("UI Locale reset.");
 		return true;
@@ -703,6 +730,8 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 
 	else if (isCommand (argv [0],  CommandNames::pixel_offset))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		if (argv.size () > 1)
 		{
 			real val = static_cast<real> (atof (Unicode::wideToNarrow (argv [1]).c_str ()));
@@ -721,6 +750,8 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 	// @todo replace this with the chat window tab functionality
 	else if (isCommand (argv [0],  CommandNames::hudServerOutput))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		SwgCuiHud * const hud = SwgCuiHudFactory::findMediatorForCurrentHud();
 		if (hud)
 		{
@@ -745,6 +776,8 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 
 	else if (isCommand (argv [0],  CommandNames::colorTest))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		const NetworkId id (Unicode::wideToNarrow (argv [1]));
 		TangibleObject * const tangible = dynamic_cast<TangibleObject *>(NetworkIdManager::getObjectById (id));
 		if (tangible)
@@ -760,6 +793,8 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 
 	else if (isCommand (argv [0],  CommandNames::hueObjectTest))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		const NetworkId id (Unicode::wideToNarrow (argv [1]));
 		const int maxIndex1 = atoi (Unicode::wideToNarrow (argv [2]).c_str ());
 		const int maxIndex2 = atoi (Unicode::wideToNarrow (argv [3]).c_str ());
@@ -775,6 +810,8 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 
 	else if (isCommand (argv [0],  CommandNames::allowTargetAnything))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		CuiPreferences::setAllowTargetAnything (argv [1][0] != '0');
 		return true;
 	}
@@ -783,6 +820,8 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 
 	else if (isCommand (argv [0],  CommandNames::setCollideAll))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		MeshAppearance::setCollideAgainstAllGeometry (argv [1][0] != '0');
 		return true;
 	}
@@ -791,6 +830,8 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 
 	else if (isCommand (argv [0],  CommandNames::testTrade))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		CreatureObject * const player = Game::getPlayerCreature ();
 		if (player)
 			ClientSecureTradeManager::onBeginTrade (player->getLookAtTarget ());
@@ -801,6 +842,8 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 
 	else if (isCommand (argv [0],  CommandNames::testSkillSystem))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		CuiSkillManager::testSkillSystem (argv [1][0] != '0');
 		return true;
 	}
@@ -809,30 +852,18 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 
 	else if (isCommand (argv [0],  CommandNames::consent))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		CuiConsentManager::askLocalConsent(CuiStringIds::ok.localize(), NULL);
 		return true;
 	}
 
 	//----------------------------------------------------------------------
 
-	else if (isCommand (argv [0],  CommandNames::debugExamine))
-	{
-		CuiPreferences::setDebugExamine (argv [1][0] != '0');
-		return true;
-	}
-
-	//----------------------------------------------------------------------
-
-	else if (isCommand (argv [0], CommandNames::debugClipboardExamine))
-	{
-		CuiPreferences::setDebugClipboardExamine (argv [1][0] != '0');
-		return true;
-	}
-	
-	//----------------------------------------------------------------------
-
 	else if (isCommand (argv [0], CommandNames::systemMessage))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		Unicode::String str;
 		CommandParser::reconstructString (argv, 1, argv.size (), true, str);
 		CuiSystemMessageManager::sendFakeSystemMessage (str);
@@ -843,6 +874,8 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 
 	else if (isCommand (argv [0], CommandNames::combatSpam))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		Unicode::String str;
 		CommandParser::reconstructString (argv, 6, argv.size (), true, str);
 
@@ -871,6 +904,8 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 
 	else if (isCommand (argv [0], CommandNames::testResourceIcon))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		const std::string & widgetPath = Unicode::wideToNarrow (argv [1]);
 		const bool          isType     = argv [2][0] != '0';
 		const std::string & resource   = Unicode::wideToNarrow (argv [3]);
@@ -896,6 +931,8 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 	
 	else if (isCommand( argv [0], CommandNames::debugPrint))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		if (argv[1][0] != '0')
 			CuiMediatorFactory::activate   (CuiMediatorTypes::DebugInfoPage);
 		else
@@ -909,6 +946,8 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 	
 	else if (isCommand (argv [0],  CommandNames::playUiEffect))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		if (argv.size() < 2)
 		{
 			result += Unicode::narrowToWide ("Invalid number of parameters.");
@@ -932,6 +971,8 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 
 	else if(isCommand (argv [0],  CommandNames::spaceConvoTest))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		CuiMediatorFactory::activateInWorkspace (CuiMediatorTypes::WS_SpaceConversation);
 		SwgCuiSpaceConversation * const convo = dynamic_cast<SwgCuiSpaceConversation *>(CuiMediatorFactory::getInWorkspace(CuiMediatorTypes::WS_SpaceConversation));
 		if(convo)
@@ -948,6 +989,8 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 	}
 	else if(isCommand(argv[0], CommandNames::dumpCommandsToHtml))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		std::string filePath = Unicode::wideToNarrow(argv[1]);
 		filePath += "\\";
 
@@ -970,6 +1013,8 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 	}
 	else if(isCommand(argv[0], CommandNames::dumpCollectionsImages))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		std::string filePath = Unicode::wideToNarrow(argv[1]);
 		filePath += "\\";
 
@@ -995,6 +1040,8 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 	}
 	else if(isCommand(argv[0], CommandNames::debugBuffs))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		if (Game::getSinglePlayer())
 		{
 			float const duration = static_cast<float>(atof(Unicode::wideToNarrow(argv[1]).c_str())); // atof returns a double.
@@ -1018,21 +1065,33 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 	}
 	else if(isCommand(argv[0], CommandNames::reloadPixelShader))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
+#if PRODUCTION == 0
 		ShaderImplementation::reloadPixelShader(Unicode::wideToNarrow(argv[1]).c_str());
+#endif
 		return true;
 	}
 	else if(isCommand(argv[0], CommandNames::reloadVertexShader))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
+#if PRODUCTION == 0
 		ShaderImplementation::reloadVertexShader(Unicode::wideToNarrow(argv[1]).c_str());
+#endif
 		return true;
 	}
 	else if(isCommand(argv[0], CommandNames::testProfession))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		CuiMediatorFactory::activateInWorkspace(CuiMediatorTypes::WS_ProfessionTemplateSelect);
 		return true;
 	}
 	else if(isCommand(argv[0], CommandNames::skinEdit))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		std::string const & command = Unicode::wideToNarrow(argv[1]);
 
 		if (command == "select") 
@@ -1057,6 +1116,8 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 
 	else if(isCommand(argv[0], CommandNames::testLootBox))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		Unicode::String str;
 		for(int i = 1; i < static_cast<int>(argv.size()); ++i)
 		{
@@ -1067,6 +1128,8 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 
 	else if(isCommand(argv[0], CommandNames::debugStringIds))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		bool enable = true;
 
 		if (argv.size() >= 2)
@@ -1080,6 +1143,8 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 
 	else if(isCommand(argv[0], CommandNames::debugStringIdColor))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		Unicode::String color(Unicode::narrowToWide(" \\#ff0000"));
 
 		if (argv.size() >= 2)
@@ -1093,13 +1158,13 @@ bool SwgCuiCommandParserUI::performParsing (const NetworkId & userId, const Stri
 #if DEBUG=0
 	else if(isCommand(argv[0], CommandNames::debugBrowserOutput))
 	{
+		if (!ConfigClientGame::getCSR())
+			return true;
 		SwgCuiWebBrowserManager::debugOutput();
 		return true;
 	}
 #endif
 
-
-#endif
 	return false;
 }
 
