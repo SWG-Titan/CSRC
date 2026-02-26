@@ -239,15 +239,14 @@ BOOL View3dView::OnEraseBkgnd(CDC* pDC)
 
 //-------------------------------------------------------------------
 
-void View3dView::OnDestroy() 
+void View3dView::OnDestroy()
 {
 	CView::OnDestroy();
+	IGNORE_RETURN(KillTimer(static_cast<int>(timer)));
 
-	IGNORE_RETURN (KillTimer (static_cast<int> (timer)));
-
-	// TODO: Add your message handler code here
-	delete camera;
-	camera = 0;
+	// REMOVE these:
+	// delete camera;
+	// camera = 0;
 }
 
 //-------------------------------------------------------------------

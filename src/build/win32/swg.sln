@@ -795,6 +795,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SwgContentBuilder", "..\..\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SwgContentSync", "..\..\game\shared\application\SwgContentSync\build\win32\SwgContentSync.vcxproj", "{FB9473A9-E72C-4AE9-97D5-89131D2D2324}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SwgFileControl", "..\..\game\shared\application\SwgFileControl\build\win32\SwgFileControl.vcxproj", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SwgConversationEditor", "..\..\game\server\application\SwgConversationEditor\build\win32\SwgConversationEditor.vcxproj", "{86E1C163-E59B-4408-AB2F-B93E2EB96BF1}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C595C10E-ADA8-429A-896A-8904A46737D3} = {C595C10E-ADA8-429A-896A-8904A46737D3}
@@ -1779,6 +1781,12 @@ Global
 		{FB9473A9-E72C-4AE9-97D5-89131D2D2324}.Optimized|Win32.Build.0 = Optimized|Win32
 		{FB9473A9-E72C-4AE9-97D5-89131D2D2324}.Release|Win32.ActiveCfg = Release|Win32
 		{FB9473A9-E72C-4AE9-97D5-89131D2D2324}.Release|Win32.Build.0 = Release|Win32
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Debug|Win32.Build.0 = Debug|Win32
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Optimized|Win32.ActiveCfg = Optimized|Win32
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Optimized|Win32.Build.0 = Optimized|Win32
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Release|Win32.ActiveCfg = Release|Win32
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Release|Win32.Build.0 = Release|Win32
 		{86E1C163-E59B-4408-AB2F-B93E2EB96BF1}.Debug|Win32.ActiveCfg = Debug|Win32
 		{86E1C163-E59B-4408-AB2F-B93E2EB96BF1}.Debug|Win32.Build.0 = Debug|Win32
 		{86E1C163-E59B-4408-AB2F-B93E2EB96BF1}.Optimized|Win32.ActiveCfg = Optimized|Win32

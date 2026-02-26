@@ -47,6 +47,7 @@ public:
 	ActionHack*             m_gameWindow;
 	ActionHack*             m_regionsView;
 	ActionHack*             m_stackTool;
+	ActionHack*             m_fileServerTree;
 	//lint -restore
 
 public:
@@ -65,6 +66,7 @@ private slots:
 	void onGameWindow       (bool b) const;
 	void onRegionsView      (bool b) const;
 	void onStackTool        (bool b) const;
+	void onFileServerTree   (bool b) const;
 
 private:
 	//disabled

@@ -62,12 +62,12 @@ void GameWindow::onGameExclusiveFocusChanged(bool b)
 	std::string msg;
 
 	if(!b)
-		msg = "Game Focus";
+		msg = "Titan Focus";
 	else
 		msg = "God Client Focus";
 
 	m_focusLabel->setText(msg.c_str());
-	setCaption((std::string("[") + msg + "] Game Window").c_str());
+	setCaption((std::string("[") + msg + "] Titan Window").c_str());
 }
 
 //-----------------------------------------------------------------
@@ -99,7 +99,7 @@ void GameWindow::onInteriorCameraFocusChanged (bool b)
 
 	if(!b)
 	{
-		msg = "Game Focus";
+		msg = "Titan Focus";
 		m_interiorCameraOn = false;
 	}
 	else
@@ -108,7 +108,7 @@ void GameWindow::onInteriorCameraFocusChanged (bool b)
 		m_interiorCameraOn = true;
 	}
 	m_focusLabel->setText(msg.c_str());
-	setCaption((std::string("[") + msg + "] Game Window").c_str());
+	setCaption((std::string("[") + msg + "] Titan Window").c_str());
 }
 
 //-----------------------------------------------------------------
@@ -116,7 +116,7 @@ void GameWindow::onInteriorCameraFocusChanged (bool b)
 void GameWindow::onCursorWorldPositionChanged(float positionX, float positionY, float positionZ)
 {
 	char buf [128];
-	sprintf(buf, "Position:(%4.2f, %4.2f, %4.2f)", positionX, positionY, positionZ);
+	sprintf(buf, "Position: (%4.2f, %4.2f, %4.2f)", positionX, positionY, positionZ);
 	m_positionLabel->setText(buf);
 }
 
@@ -126,7 +126,7 @@ void GameWindow::onBuildoutRegionChanged(const char * planet, const char * build
 {
 	UNREF(planet);
 	char buf [128];
-	sprintf(buf, "Buildout Region: %s", buildout);
+	sprintf(buf, "Buildout Area: %s", buildout);
 	m_buildoutRegionLabel->setText(buf);
 }
 

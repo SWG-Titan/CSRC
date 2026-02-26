@@ -106,7 +106,7 @@ inline Sphere::Sphere(const Vector &center, real radius)
 	m_center(center),
 	m_radius(radius)
 {
-	WARNING_STRICT_FATAL(m_radius < 0.0f, ("Sphere has negative radius!"));
+	//WARNING_STRICT_FATAL(m_radius < 0.0f, ("Sphere has negative radius!"));
 	if(m_radius < 0.0f)
 		radius = 0.0f;
 }

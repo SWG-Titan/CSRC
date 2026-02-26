@@ -39,7 +39,8 @@ AdvancedCopyPasteWidget::AdvancedCopyPasteWidget(QWidget* parent, char const* na
 {
 	QVBoxLayout* layout = new QVBoxLayout(this, 4, 4);
 
-	QGroupBox* group = new QGroupBox("Copy options", this);
+	QGroupBox* group = new QGroupBox("Advanced Copy/Paste Options", this);
+	layout->addSpacing(4);
 	QVBoxLayout* groupLayout = new QVBoxLayout(group, 4, 4);
 
 	m_copyTransform = new QCheckBox("Transform (position, rotation)", group);

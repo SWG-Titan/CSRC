@@ -6,16 +6,19 @@
       "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-4890-ABCD-EF1234567890}|SwgMapRasterizer.vcxproj|D:\\titan\\client\\src\\engine\\shared\\application\\SwgMapRasterizer\\src\\shared\\SwgMapRasterizer.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-4890-ABCD-EF1234567890}|SwgMapRasterizer.vcxproj|D:\\titan\\client\\src\\engine\\shared\\application\\SwgMapRasterizer\\src\\win32\\WinMain.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-4890-ABCD-EF1234567890}|SwgMapRasterizer.vcxproj|D:\\TITAN\\CLIENT\\SRC\\ENGINE\\SHARED\\LIBRARY\\SHAREDMATH\\INCLUDE\\PUBLIC\\SHAREDMATH\\PACKEDRGB.H||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-4890-ABCD-EF1234567890}|SwgMapRasterizer.vcxproj|D:\\titan\\client\\src\\engine\\shared\\application\\SwgMapRasterizer\\src\\shared\\SwgMapRasterizer.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-4890-ABCD-EF1234567890}|SwgMapRasterizer.vcxproj|D:\\titan\\client\\src\\engine\\shared\\application\\SwgMapRasterizer\\src\\win32\\FirstSwgMapRasterizer.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-4890-ABCD-EF1234567890}|SwgMapRasterizer.vcxproj|D:\\titan\\client\\src\\engine\\shared\\application\\SwgMapRasterizer\\src\\shared\\FirstSwgMapRasterizer.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-4890-ABCD-EF1234567890}|SwgMapRasterizer.vcxproj|D:\\titan\\client\\src\\engine\\shared\\application\\SwgMapRasterizer\\src\\win32\\WinMain.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-4890-ABCD-EF1234567890}|SwgMapRasterizer.vcxproj|D:\\TITAN\\CLIENT\\SRC\\ENGINE\\SHARED\\LIBRARY\\SHAREDMATH\\INCLUDE\\PUBLIC\\SHAREDMATH\\PACKEDRGB.H||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -25,8 +28,12 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 8,
           "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{e5c86464-96be-4d7c-9a8b-abcb3bbf5f92}"
@@ -36,20 +43,38 @@
               "Name": "ST:0:0:{d84ee353-0bef-5a41-a649-8f89aca5d84d}"
             },
             {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{6324226f-61b6-4f28-92ee-18d4b5fe1e48}"
+            },
+            {
               "$type": "Document",
               "DocumentIndex": 3,
+              "Title": "FirstSwgMapRasterizer.h",
+              "DocumentMoniker": "D:\\titan\\client\\src\\engine\\shared\\application\\SwgMapRasterizer\\src\\shared\\FirstSwgMapRasterizer.h",
+              "RelativeDocumentMoniker": "..\\..\\src\\shared\\FirstSwgMapRasterizer.h",
+              "ToolTip": "D:\\titan\\client\\src\\engine\\shared\\application\\SwgMapRasterizer\\src\\shared\\FirstSwgMapRasterizer.h",
+              "RelativeToolTip": "..\\..\\src\\shared\\FirstSwgMapRasterizer.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-02-25T17:00:35.027Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "SwgMapRasterizer.h",
               "DocumentMoniker": "D:\\titan\\client\\src\\engine\\shared\\application\\SwgMapRasterizer\\src\\shared\\SwgMapRasterizer.h",
               "RelativeDocumentMoniker": "..\\..\\src\\shared\\SwgMapRasterizer.h",
               "ToolTip": "D:\\titan\\client\\src\\engine\\shared\\application\\SwgMapRasterizer\\src\\shared\\SwgMapRasterizer.h",
               "RelativeToolTip": "..\\..\\src\\shared\\SwgMapRasterizer.h",
-              "ViewState": "AgIAAEgAAAAAAAAAAAAjwFIAAAAaAAAAAAAAAA==",
+              "ViewState": "AgIAACwAAAAAAAAAAAAjwD8AAAAEAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2026-02-06T22:09:08.877Z"
+              "WhenOpened": "2026-02-06T22:09:08.877Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 2,
               "Title": "FirstSwgMapRasterizer.cpp",
               "DocumentMoniker": "D:\\titan\\client\\src\\engine\\shared\\application\\SwgMapRasterizer\\src\\win32\\FirstSwgMapRasterizer.cpp",
               "RelativeDocumentMoniker": "..\\..\\src\\win32\\FirstSwgMapRasterizer.cpp",
@@ -57,11 +82,12 @@
               "RelativeToolTip": "..\\..\\src\\win32\\FirstSwgMapRasterizer.cpp",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2026-02-06T04:40:07.248Z"
+              "WhenOpened": "2026-02-06T04:40:07.248Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 5,
               "Title": "PackedRgb.h",
               "DocumentMoniker": "D:\\titan\\client\\src\\engine\\shared\\library\\sharedMath\\include\\public\\sharedMath\\PackedRgb.h",
               "RelativeDocumentMoniker": "..\\..\\..\\..\\library\\sharedMath\\include\\public\\sharedMath\\PackedRgb.h",
@@ -79,14 +105,14 @@
               "RelativeDocumentMoniker": "..\\..\\src\\shared\\SwgMapRasterizer.cpp",
               "ToolTip": "D:\\titan\\client\\src\\engine\\shared\\application\\SwgMapRasterizer\\src\\shared\\SwgMapRasterizer.cpp",
               "RelativeToolTip": "..\\..\\src\\shared\\SwgMapRasterizer.cpp",
-              "ViewState": "AgIAAI4AAAAAAAAAAAAAAJsAAAA0AAAAAAAAAA==",
+              "ViewState": "AgIAAJ4DAAAAAAAAAAAjwP8DAAAzAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2026-02-06T04:29:10.658Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 4,
               "Title": "WinMain.cpp",
               "DocumentMoniker": "D:\\titan\\client\\src\\engine\\shared\\application\\SwgMapRasterizer\\src\\win32\\WinMain.cpp",
               "RelativeDocumentMoniker": "..\\..\\src\\win32\\WinMain.cpp",

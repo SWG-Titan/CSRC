@@ -14,12 +14,17 @@
 #include "ActionHack.h"
 #include "ActionsEdit.h"
 #include "ActionsFile.h"
+#include "ActionsFileControl.h"
 #include "ActionsGame.h"
 #include "ActionsObjectTemplate.h"
 #include "ActionsScript.h"
 #include "ActionsTool.h"
 #include "ActionsView.h"
 #include "ActionsWindow.h"
+#include "BuildoutEditorWindow.h"
+#include "DatatableEditorWindow.h"
+#include "FileServerTreeWindow.h"
+#include "TemplateEditorWindow.h"
 #include "AdvancedCopyPasteWidget.h"
 #include "BookmarkBrowser.h"
 #include "BookmarkData.h"
@@ -97,11 +102,17 @@ MainFrame::MainFrame(QWidget *theParent, const char *theName)
   m_regionsViewDock(0),
 	m_favoritesWindowDock(0),
 	m_stackToolDock(0),
+	m_fileServerTreeDock(0),
+	m_fileServerTree(0),
+	m_templateEditor(0),
+	m_datatableEditor(0),
+	m_buildoutEditor(0),
 	m_settings(0),
   m_actionsGame(0),
   m_actionsEdit(0),
   m_actionsView(0),
   m_actionsFile(0),
+  m_actionsFileControl(0),
   m_actionsScript(0),
   m_actionsObjectTemplate(0),
   m_actionsTool(0),
@@ -224,6 +235,18 @@ MainFrame::MainFrame(QWidget *theParent, const char *theName)
 		m_stackToolDock->setCloseMode(QDockWindow::Always);
 		m_stackToolDock->hide();
 
+		m_fileServerTreeDock = new QDockWindow(QDockWindow::InDock, this, "File Server Tree");
+		m_fileServerTree = new FileServerTreeWindow(m_fileServerTreeDock, "FileServerTree Widget");
+		m_fileServerTreeDock->setWidget(m_fileServerTree);
+		m_fileServerTreeDock->setResizeEnabled(true);
+		QMainWindow::addDockWindow(m_fileServerTreeDock, Qt::Right);
+		m_fileServerTreeDock->setCloseMode(QDockWindow::Always);
+		m_fileServerTreeDock->hide();
+
+		m_templateEditor  = new TemplateEditorWindow(0, "TemplateEditor");
+		m_datatableEditor = new DatatableEditorWindow(0, "DatatableEditor");
+		m_buildoutEditor  = new BuildoutEditorWindow(0, "BuildoutEditor");
+
 		//don't show the dock window list on right click (VERY annoying for some windows like the region viewer)
 		setDockMenuEnabled (false);
 
@@ -231,6 +254,7 @@ MainFrame::MainFrame(QWidget *theParent, const char *theName)
 		m_actionsEdit           = &ActionsEdit::getInstance();
 		m_actionsView           = &ActionsView::getInstance();
 		m_actionsFile           = &ActionsFile::getInstance();
+		m_actionsFileControl    = &ActionsFileControl::getInstance();
 		m_actionsScript         = &ActionsScript::getInstance();
 		m_actionsObjectTemplate = &ActionsObjectTemplate::getInstance();
 		m_actionsTool           = &ActionsTool::getInstance();
@@ -334,6 +358,7 @@ MainFrame::MainFrame(QWidget *theParent, const char *theName)
 		IGNORE_RETURN(menuBar()->insertItem("&Game",           &m_menus.game.menu));
 		IGNORE_RETURN(menuBar()->insertItem("&Script",         &m_menus.script.menu));
 		IGNORE_RETURN(menuBar()->insertItem("&ObjectTemplate", &m_menus.objectTemplate.menu));
+		IGNORE_RETURN(menuBar()->insertItem("File&Control",    &m_menus.fileControl.menu));
 		IGNORE_RETURN(menuBar()->insertItem("&Tools",          &m_menus.tool.menu));
 		IGNORE_RETURN(menuBar()->insertItem("&Window",         &m_menus.window.menu));
 		IGNORE_RETURN(menuBar()->insertItem("&Help",           &m_menus.help.menu));
@@ -455,6 +480,27 @@ MainFrame::MainFrame(QWidget *theParent, const char *theName)
 			IGNORE_RETURN(m_actionsTool->m_sendSystemMessage->addTo               (&m_menus.tool.menu));
 		}
 
+		//-- FileControl menu stuff
+		{
+			IGNORE_RETURN(m_actionsFileControl->m_openFileServerTree->addTo (&m_menus.fileControl.menu));
+			IGNORE_RETURN(m_actionsFileControl->m_openTemplateEditor->addTo (&m_menus.fileControl.menu));
+			IGNORE_RETURN(m_actionsFileControl->m_openDatatableEditor->addTo(&m_menus.fileControl.menu));
+			IGNORE_RETURN(m_actionsFileControl->m_openBuildoutEditor->addTo (&m_menus.fileControl.menu));
+
+			IGNORE_RETURN(m_menus.fileControl.menu.insertSeparator());
+
+			IGNORE_RETURN(m_actionsFileControl->m_sendAsset->addTo         (&m_menus.fileControl.menu));
+			IGNORE_RETURN(m_actionsFileControl->m_retrieveAsset->addTo     (&m_menus.fileControl.menu));
+			IGNORE_RETURN(m_actionsFileControl->m_reloadAsset->addTo       (&m_menus.fileControl.menu));
+			IGNORE_RETURN(m_actionsFileControl->m_verifyAsset->addTo       (&m_menus.fileControl.menu));
+
+			IGNORE_RETURN(m_menus.fileControl.menu.insertSeparator());
+
+			IGNORE_RETURN(m_actionsFileControl->m_broadcastUpdate->addTo   (&m_menus.fileControl.menu));
+			IGNORE_RETURN(m_actionsFileControl->m_updateDbTemplates->addTo (&m_menus.fileControl.menu));
+			IGNORE_RETURN(m_actionsFileControl->m_flush->addTo             (&m_menus.fileControl.menu));
+		}
+
 		//-- Window menu stuff
 		{
 			IGNORE_RETURN(m_actionsWindow->m_treeBrowser->addTo      (&m_menus.window.menu));
@@ -468,6 +514,10 @@ MainFrame::MainFrame(QWidget *theParent, const char *theName)
 			IGNORE_RETURN(m_actionsWindow->m_gameWindow->addTo       (&m_menus.window.menu));
 			IGNORE_RETURN(m_actionsWindow->m_regionsView->addTo      (&m_menus.window.menu));
 			IGNORE_RETURN(m_actionsWindow->m_stackTool->addTo        (&m_menus.window.menu));
+
+			IGNORE_RETURN(m_menus.window.menu.insertSeparator());
+
+			IGNORE_RETURN(m_actionsWindow->m_fileServerTree->addTo   (&m_menus.window.menu));
 		}
 
 		//-- Script menu stuff
@@ -573,12 +623,23 @@ MainFrame::~MainFrame()
 	m_favoritesWindow       = 0;
 	m_favoritesWindowDock   = 0;
 	m_regionsViewDock       = 0;
+	m_fileServerTreeDock    = 0;
+	m_fileServerTree       = 0;
 	m_actionsGame           = 0;
 	m_actionsEdit           = 0;
 	m_actionsView           = 0;
 	m_actionsFile           = 0;
+	m_actionsFileControl    = 0;
 	m_actionsScript         = 0;
 	m_actionsObjectTemplate = 0;
+
+	delete m_templateEditor;
+	m_templateEditor        = 0;
+	delete m_datatableEditor;
+	m_datatableEditor       = 0;
+	delete m_buildoutEditor;
+	m_buildoutEditor        = 0;
+
 	m_settings              = 0;
 } //lint !e1740 member pointers not freed in destructor, this is because Qt "owns" them and deals with it
 

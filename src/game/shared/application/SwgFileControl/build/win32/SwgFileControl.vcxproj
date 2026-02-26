@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Optimized|Win32">
+      <Configuration>Optimized</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectName>SwgFileControl</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Optimized|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Optimized|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>..\..\..\..\..\..\compile\win32\$(ProjectName)\$(Configuration)\</OutDir>
+    <IntDir>..\..\..\..\..\..\compile\win32\$(ProjectName)\$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Optimized|Win32'">
+    <OutDir>..\..\..\..\..\..\compile\win32\$(ProjectName)\$(Configuration)\</OutDir>
+    <IntDir>..\..\..\..\..\..\compile\win32\$(ProjectName)\$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>..\..\..\..\..\..\compile\win32\$(ProjectName)\$(Configuration)\</OutDir>
+    <IntDir>..\..\..\..\..\..\compile\win32\$(ProjectName)\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)_r</TargetName>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>..\..\src\shared;..\..\..\..\..\..\engine\shared\library\sharedCommandParser\include\public;..\..\..\..\..\..\engine\shared\library\sharedCompression\include\public;..\..\..\..\..\..\engine\shared\library\sharedDebug\include\public;..\..\..\..\..\..\engine\shared\library\sharedFile\include\public;..\..\..\..\..\..\engine\shared\library\sharedFoundation\include\public;..\..\..\..\..\..\engine\shared\library\sharedFoundationTypes\include\public;..\..\..\..\..\..\engine\shared\library\sharedIoWin\include\public;..\..\..\..\..\..\engine\shared\library\sharedLog\include\public;..\..\..\..\..\..\engine\shared\library\sharedMath\include\public;..\..\..\..\..\..\engine\shared\library\sharedMemoryManager\include\public;..\..\..\..\..\..\engine\shared\library\sharedMessageDispatch\include\public;..\..\..\..\..\..\engine\shared\library\sharedNetwork\include\public;..\..\..\..\..\..\engine\shared\library\sharedNetworkMessages\include\public;..\..\..\..\..\..\engine\shared\library\sharedSynchronization\include\public;..\..\..\..\..\..\engine\shared\library\sharedThread\include\public;..\..\..\..\..\..\engine\shared\library\sharedUtility\include\public;..\..\..\..\..\..\external\3rd\library\stlport453\stlport;..\..\..\..\..\..\external\ours\library\archive\include;..\..\..\..\..\..\external\ours\library\fileInterface\include\public;..\..\..\..\..\..\external\ours\library\unicode\include;..\..\..\..\..\..\external\ours\library\unicodeArchive\include\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_MBCS;DEBUG_LEVEL=2;_CRT_SECURE_NO_DEPRECATE=1;_USE_32BIT_TIME_T=1;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeaderFile>FirstSwgFileControl.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(OutDir)</AssemblerListingLocation>
+      <ObjectFileName>$(OutDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_d.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <UseFullPaths>true</UseFullPaths>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>archive.lib;crypto.lib;fileInterface.lib;sharedCommandParser.lib;sharedCompression.lib;sharedDebug.lib;sharedFile.lib;sharedFoundation.lib;sharedLog.lib;sharedMath.lib;sharedMemoryManager.lib;sharedMessageDispatch.lib;sharedNetwork.lib;sharedNetworkMessages.lib;sharedRandom.lib;sharedSynchronization.lib;sharedThread.lib;sharedUtility.lib;unicode.lib;unicodeArchive.lib;udplibrary.lib;zlib.lib;ws2_32.lib;winmm.lib;mswsock.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(ProjectName)_d.exe</OutputFile>
+      <AdditionalLibraryDirectories>..\..\..\..\..\..\..\src\compile\win32\archive\Debug;..\..\..\..\..\..\..\src\compile\win32\crypto\Debug;..\..\..\..\..\..\..\src\compile\win32\fileInterface\Debug;..\..\..\..\..\..\..\src\compile\win32\sharedCommandParser\Debug;..\..\..\..\..\..\..\src\compile\win32\sharedCompression\Debug;..\..\..\..\..\..\..\src\compile\win32\sharedDebug\Debug;..\..\..\..\..\..\..\src\compile\win32\sharedFile\Debug;..\..\..\..\..\..\..\src\compile\win32\sharedFoundation\Debug;..\..\..\..\..\..\..\src\compile\win32\sharedLog\Debug;..\..\..\..\..\..\..\src\compile\win32\sharedMath\Debug;..\..\..\..\..\..\..\src\compile\win32\sharedMemoryManager\Debug;..\..\..\..\..\..\..\src\compile\win32\sharedMessageDispatch\Debug;..\..\..\..\..\..\..\src\compile\win32\sharedNetwork\Debug;..\..\..\..\..\..\..\src\compile\win32\sharedNetworkMessages\Debug;..\..\..\..\..\..\..\src\compile\win32\sharedRandom\Debug;..\..\..\..\..\..\..\src\compile\win32\sharedSynchronization\Debug;..\..\..\..\..\..\..\src\compile\win32\sharedThread\Debug;..\..\..\..\..\..\..\src\compile\win32\sharedUtility\Debug;..\..\..\..\..\..\..\src\compile\win32\udplibrary\Debug;..\..\..\..\..\..\..\src\compile\win32\unicode\Debug;..\..\..\..\..\..\..\src\compile\win32\unicodeArchive\Debug;..\..\..\..\..\..\..\src\compile\win32\zlib\Debug;..\..\..\..\..\..\..\src\external\3rd\library\stlport453\lib\win32;..\..\..\..\..\..\..\src\external\3rd\library\zlib\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;msvcrt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(ProjectName)_d.pdb</ProgramDatabaseFile>
+      <SubSystem>Console</SubSystem>
+      <AdditionalOptions>/SAFESEH:NO %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Optimized|Win32'">
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <AdditionalIncludeDirectories>..\..\src\shared;..\..\..\..\..\..\engine\shared\library\sharedCommandParser\include\public;..\..\..\..\..\..\engine\shared\library\sharedCompression\include\public;..\..\..\..\..\..\engine\shared\library\sharedDebug\include\public;..\..\..\..\..\..\engine\shared\library\sharedFile\include\public;..\..\..\..\..\..\engine\shared\library\sharedFoundation\include\public;..\..\..\..\..\..\engine\shared\library\sharedFoundationTypes\include\public;..\..\..\..\..\..\engine\shared\library\sharedIoWin\include\public;..\..\..\..\..\..\engine\shared\library\sharedLog\include\public;..\..\..\..\..\..\engine\shared\library\sharedMath\include\public;..\..\..\..\..\..\engine\shared\library\sharedMemoryManager\include\public;..\..\..\..\..\..\engine\shared\library\sharedMessageDispatch\include\public;..\..\..\..\..\..\engine\shared\library\sharedNetwork\include\public;..\..\..\..\..\..\engine\shared\library\sharedNetworkMessages\include\public;..\..\..\..\..\..\engine\shared\library\sharedSynchronization\include\public;..\..\..\..\..\..\engine\shared\library\sharedThread\include\public;..\..\..\..\..\..\engine\shared\library\sharedUtility\include\public;..\..\..\..\..\..\external\3rd\library\stlport453\stlport;..\..\..\..\..\..\external\ours\library\archive\include;..\..\..\..\..\..\external\ours\library\fileInterface\include\public;..\..\..\..\..\..\external\ours\library\unicode\include;..\..\..\..\..\..\external\ours\library\unicodeArchive\include\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_MBCS;DEBUG_LEVEL=1;_CRT_SECURE_NO_DEPRECATE=1;_USE_32BIT_TIME_T=1;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeaderFile>FirstSwgFileControl.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(OutDir)</AssemblerListingLocation>
+      <ObjectFileName>$(OutDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_o.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <UseFullPaths>true</UseFullPaths>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>archive.lib;crypto.lib;fileInterface.lib;sharedCommandParser.lib;sharedCompression.lib;sharedDebug.lib;sharedFile.lib;sharedFoundation.lib;sharedLog.lib;sharedMath.lib;sharedMemoryManager.lib;sharedMessageDispatch.lib;sharedNetwork.lib;sharedNetworkMessages.lib;sharedRandom.lib;sharedSynchronization.lib;sharedThread.lib;sharedUtility.lib;unicode.lib;unicodeArchive.lib;udplibrary.lib;zlib.lib;ws2_32.lib;winmm.lib;mswsock.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(ProjectName)_o.exe</OutputFile>
+      <AdditionalLibraryDirectories>..\..\..\..\..\..\..\src\compile\win32\archive\Optimized;..\..\..\..\..\..\..\src\compile\win32\crypto\Optimized;..\..\..\..\..\..\..\src\compile\win32\fileInterface\Optimized;..\..\..\..\..\..\..\src\compile\win32\sharedCommandParser\Optimized;..\..\..\..\..\..\..\src\compile\win32\sharedCompression\Optimized;..\..\..\..\..\..\..\src\compile\win32\sharedDebug\Optimized;..\..\..\..\..\..\..\src\compile\win32\sharedFile\Optimized;..\..\..\..\..\..\..\src\compile\win32\sharedFoundation\Optimized;..\..\..\..\..\..\..\src\compile\win32\sharedLog\Optimized;..\..\..\..\..\..\..\src\compile\win32\sharedMath\Optimized;..\..\..\..\..\..\..\src\compile\win32\sharedMemoryManager\Optimized;..\..\..\..\..\..\..\src\compile\win32\sharedMessageDispatch\Optimized;..\..\..\..\..\..\..\src\compile\win32\sharedNetwork\Optimized;..\..\..\..\..\..\..\src\compile\win32\sharedNetworkMessages\Optimized;..\..\..\..\..\..\..\src\compile\win32\sharedRandom\Optimized;..\..\..\..\..\..\..\src\compile\win32\sharedSynchronization\Optimized;..\..\..\..\..\..\..\src\compile\win32\sharedThread\Optimized;..\..\..\..\..\..\..\src\compile\win32\sharedUtility\Optimized;..\..\..\..\..\..\..\src\compile\win32\udplibrary\Optimized;..\..\..\..\..\..\..\src\compile\win32\unicode\Optimized;..\..\..\..\..\..\..\src\compile\win32\unicodeArchive\Optimized;..\..\..\..\..\..\..\src\compile\win32\zlib\Optimized;..\..\..\..\..\..\..\src\external\3rd\library\stlport453\lib\win32;..\..\..\..\..\..\..\src\external\3rd\library\zlib\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;msvcrt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(ProjectName)_o.pdb</ProgramDatabaseFile>
+      <SubSystem>Console</SubSystem>
+      <AdditionalOptions>/SAFESEH:NO %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>..\..\src\shared;..\..\..\..\..\..\engine\shared\library\sharedCommandParser\include\public;..\..\..\..\..\..\engine\shared\library\sharedCompression\include\public;..\..\..\..\..\..\engine\shared\library\sharedDebug\include\public;..\..\..\..\..\..\engine\shared\library\sharedFile\include\public;..\..\..\..\..\..\engine\shared\library\sharedFoundation\include\public;..\..\..\..\..\..\engine\shared\library\sharedFoundationTypes\include\public;..\..\..\..\..\..\engine\shared\library\sharedIoWin\include\public;..\..\..\..\..\..\engine\shared\library\sharedLog\include\public;..\..\..\..\..\..\engine\shared\library\sharedMath\include\public;..\..\..\..\..\..\engine\shared\library\sharedMemoryManager\include\public;..\..\..\..\..\..\engine\shared\library\sharedMessageDispatch\include\public;..\..\..\..\..\..\engine\shared\library\sharedNetwork\include\public;..\..\..\..\..\..\engine\shared\library\sharedNetworkMessages\include\public;..\..\..\..\..\..\engine\shared\library\sharedSynchronization\include\public;..\..\..\..\..\..\engine\shared\library\sharedThread\include\public;..\..\..\..\..\..\engine\shared\library\sharedUtility\include\public;..\..\..\..\..\..\external\3rd\library\stlport453\stlport;..\..\..\..\..\..\external\ours\library\archive\include;..\..\..\..\..\..\external\ours\library\fileInterface\include\public;..\..\..\..\..\..\external\ours\library\unicode\include;..\..\..\..\..\..\external\ours\library\unicodeArchive\include\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_MBCS;DEBUG_LEVEL=0;_CRT_SECURE_NO_DEPRECATE=1;_USE_32BIT_TIME_T=1;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeaderFile>FirstSwgFileControl.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(OutDir)</AssemblerListingLocation>
+      <ObjectFileName>$(OutDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_r.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <UseFullPaths>true</UseFullPaths>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>archive.lib;crypto.lib;fileInterface.lib;sharedCommandParser.lib;sharedCompression.lib;sharedDebug.lib;sharedFile.lib;sharedFoundation.lib;sharedLog.lib;sharedMath.lib;sharedMemoryManager.lib;sharedMessageDispatch.lib;sharedNetwork.lib;sharedNetworkMessages.lib;sharedRandom.lib;sharedSynchronization.lib;sharedThread.lib;sharedUtility.lib;unicode.lib;unicodeArchive.lib;udplibrary.lib;zlib.lib;ws2_32.lib;winmm.lib;mswsock.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(ProjectName)_r.exe</OutputFile>
+      <AdditionalLibraryDirectories>..\..\..\..\..\..\..\src\compile\win32\archive\Release;..\..\..\..\..\..\..\src\compile\win32\crypto\Release;..\..\..\..\..\..\..\src\compile\win32\fileInterface\Release;..\..\..\..\..\..\..\src\compile\win32\sharedCommandParser\Release;..\..\..\..\..\..\..\src\compile\win32\sharedCompression\Release;..\..\..\..\..\..\..\src\compile\win32\sharedDebug\Release;..\..\..\..\..\..\..\src\compile\win32\sharedFile\Release;..\..\..\..\..\..\..\src\compile\win32\sharedFoundation\Release;..\..\..\..\..\..\..\src\compile\win32\sharedLog\Release;..\..\..\..\..\..\..\src\compile\win32\sharedMath\Release;..\..\..\..\..\..\..\src\compile\win32\sharedMemoryManager\Release;..\..\..\..\..\..\..\src\compile\win32\sharedMessageDispatch\Release;..\..\..\..\..\..\..\src\compile\win32\sharedNetwork\Release;..\..\..\..\..\..\..\src\compile\win32\sharedNetworkMessages\Release;..\..\..\..\..\..\..\src\compile\win32\sharedRandom\Release;..\..\..\..\..\..\..\src\compile\win32\sharedSynchronization\Release;..\..\..\..\..\..\..\src\compile\win32\sharedThread\Release;..\..\..\..\..\..\..\src\compile\win32\sharedUtility\Release;..\..\..\..\..\..\..\src\compile\win32\udplibrary\Release;..\..\..\..\..\..\..\src\compile\win32\unicode\Release;..\..\..\..\..\..\..\src\compile\win32\unicodeArchive\Release;..\..\..\..\..\..\..\src\compile\win32\zlib\Release;..\..\..\..\..\..\..\src\external\3rd\library\stlport453\lib\win32;..\..\..\..\..\..\..\src\external\3rd\library\zlib\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>libc;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(ProjectName)_r.pdb</ProgramDatabaseFile>
+      <SubSystem>Console</SubSystem>
+      <AdditionalOptions>/SAFESEH:NO %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\shared\ConfigFileControl.cpp" />
+    <ClCompile Include="..\..\src\shared\FileControlClient.cpp" />
+    <ClCompile Include="..\..\src\shared\FileControlConnection.cpp" />
+    <ClCompile Include="..\..\src\shared\FileControlQueue.cpp" />
+    <ClCompile Include="..\..\src\shared\FileControlServer.cpp" />
+    <ClCompile Include="..\..\src\shared\FirstSwgFileControl.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Optimized|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\src\shared\FileControlReloadHandler.cpp" />
+    <ClCompile Include="..\..\src\shared\HotReloadManager.cpp" />
+    <ClCompile Include="..\..\src\shared\SwgFileControl.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\shared\ConfigFileControl.h" />
+    <ClInclude Include="..\..\src\shared\FileControlClient.h" />
+    <ClInclude Include="..\..\src\shared\FileControlConnection.h" />
+    <ClInclude Include="..\..\src\shared\FileControlQueue.h" />
+    <ClInclude Include="..\..\src\shared\FileControlReloadHandler.h" />
+    <ClInclude Include="..\..\src\shared\FileControlServer.h" />
+    <ClInclude Include="..\..\src\shared\FirstSwgFileControl.h" />
+    <ClInclude Include="..\..\src\shared\HotReloadManager.h" />
+    <ClInclude Include="..\..\src\shared\SwgFileControl.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

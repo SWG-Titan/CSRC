@@ -17,13 +17,33 @@ namespace
 	StringMap ms_stringMap;
 
 	typedef std::map<CString, CString> DataMap;
+
 	DataMap ms_uncompressedMusicMap;
 	DataMap ms_uncompressedSampleMap;
-	DataMap ms_compressedTextureMap;
-	DataMap ms_compressedAnimationMap;
-	DataMap ms_compressedMeshSkeletalMap;
-	DataMap ms_compressedMeshStaticMap;
-	DataMap ms_compressedOtherMap;
+
+	DataMap ms_textureMap;
+	DataMap ms_animationMap;
+	DataMap ms_meshSkeletalMap;
+	DataMap ms_meshStaticMap;
+
+	DataMap ms_videoMap;
+
+	DataMap ms_shaderMap;
+	DataMap ms_effectMap;
+
+	DataMap ms_datatableMap;
+	DataMap ms_iffMap;
+	DataMap ms_gameDataMap;
+
+	DataMap ms_configMap;
+	DataMap ms_scriptMap;
+	DataMap ms_webMap;
+	DataMap ms_textMap;
+
+	DataMap ms_binaryMap;
+	DataMap ms_archiveMap;
+
+	DataMap ms_otherMap;   // catch-all
 
 	struct Bucket
 	{
@@ -43,6 +63,12 @@ namespace
 			m_dataMap (dataMap)
 		{
 		}
+	};
+
+	struct ExtensionEntry
+	{
+		const char* extension;
+		DataMap* map;
 	};
 
 	typedef std::vector<Bucket> TreeFileList;
@@ -101,6 +127,22 @@ static void parseCommonCfg (const CString& name)
 	}
 }
 
+static bool hasExtensionI(const CString& filename, const CString& extension)
+{
+	const int fileLen = filename.GetLength();
+	const int extLen = extension.GetLength();
+
+	if (extLen == 0)
+		return true; // catch-all bucket
+
+	if (fileLen < extLen)
+		return false;
+
+	CString tail = filename.Right(extLen);
+
+	return tail == extension;
+}
+
 //===================================================================
 
 static void generateFiles (const CString& explicitDirectory, const CString& entryDirectory)
@@ -127,6 +169,7 @@ static void generateFiles (const CString& explicitDirectory, const CString& entr
 
 			CString entryName;
 			entryName.Format ("%s%s%s", entryDirectory, (entryLength > 1 && entryDirectory [entryLength-1] != '/' ? "/" : ""), finder.GetFileName ());
+			entryName.MakeLower();
 
 			if (finder.IsDirectory ())
 			{
@@ -140,10 +183,10 @@ static void generateFiles (const CString& explicitDirectory, const CString& entr
 					bool found = i == ms_treeFileList.size () - 1;
 					if (!found)
 					{
-						if (ms_treeFileList [i].m_ext)
-							found = entryName.Find (ms_treeFileList [i].m_key) != -1;
+						if (ms_treeFileList[i].m_ext)
+							found = hasExtensionI(entryName, ms_treeFileList[i].m_key);
 						else
-							found = _strnicmp (entryName, ms_treeFileList [i].m_key, ms_treeFileList [i].m_keySize) == 0;
+							found = _strnicmp(entryName, ms_treeFileList[i].m_key, ms_treeFileList[i].m_keySize) == 0;
 					}
 
 					if (found)
@@ -182,6 +225,109 @@ static void writeRsp (const DataMap& dataMap, const CString& name)
 	}
 }
 
+static ExtensionEntry s_extensionTable[] =
+{
+	// Audio
+	{".mp3", &ms_uncompressedMusicMap},
+	{".wav", &ms_uncompressedSampleMap},
+	{".snd", &ms_uncompressedSampleMap},
+	{".sfk", &ms_uncompressedSampleMap},
+	{".sfp", &ms_uncompressedSampleMap},
+
+	// Textures / Images
+	{".dds", &ms_textureMap},
+	{".tga", &ms_textureMap},
+	{".png", &ms_textureMap},
+	{".gif", &ms_textureMap},
+	{".xcf", &ms_textureMap},
+	{".pal", &ms_textureMap},
+
+	// Animation
+	{".ans", &ms_animationMap},
+
+	// Mesh
+	{".mgn", &ms_meshSkeletalMap},
+	{".msh", &ms_meshStaticMap},
+	{".lod", &ms_meshStaticMap},
+	{".lmg", &ms_meshStaticMap},
+	{".m3d", &ms_meshStaticMap},
+
+	// Video
+	{".bik", &ms_videoMap},
+
+	// Shader / Effects
+	{".ash", &ms_shaderMap},
+	{".asi", &ms_shaderMap},
+	{".psh", &ms_shaderMap},
+	{".vsh", &ms_shaderMap},
+	{".eft", &ms_effectMap},
+	{".ffe", &ms_effectMap},
+
+	// Datatables
+	{".tab", &ms_datatableMap},
+	{".cdf", &ms_datatableMap},
+	{".cef", &ms_datatableMap},
+	{".tcf", &ms_datatableMap},
+
+	// IFF
+	{".iff", &ms_iffMap},
+
+	// Game Data
+	{".stf", &ms_gameDataMap},
+	{".qst", &ms_gameDataMap},
+	{".sat", &ms_gameDataMap},
+	{".skt", &ms_gameDataMap},
+	{".sht", &ms_gameDataMap},
+	{".spr", &ms_gameDataMap},
+	{".ssa", &ms_gameDataMap},
+	{".swh", &ms_gameDataMap},
+	{".trn", &ms_gameDataMap},
+	{".trt", &ms_gameDataMap},
+	{".pst", &ms_gameDataMap},
+	{".prt", &ms_gameDataMap},
+	{".pob", &ms_gameDataMap},
+	{".pln", &ms_gameDataMap},
+	{".flt", &ms_gameDataMap},
+	{".flr", &ms_gameDataMap},
+	{".lat", &ms_gameDataMap},
+	{".lay", &ms_gameDataMap},
+	{".ltn", &ms_gameDataMap},
+	{".lsb", &ms_gameDataMap},
+	{".ilf", &ms_gameDataMap},
+	{".mif", &ms_gameDataMap},
+	{".mkr", &ms_gameDataMap},
+
+	// Config
+	{".cfg", &ms_configMap},
+	{".ini", &ms_configMap},
+	{".properties", &ms_configMap},
+	{".manifest", &ms_configMap},
+
+	// Scripts
+	{".js", &ms_scriptMap},
+	{".inc", &ms_scriptMap},
+	{".ws", &ms_scriptMap},
+	{".xpt", &ms_scriptMap},
+
+	// Web
+	{".html", &ms_webMap},
+	{".css", &ms_webMap},
+	{".dtd", &ms_webMap},
+
+	// Text
+	{".txt", &ms_textMap},
+	{".log", &ms_textMap},
+
+	// Binary
+	{".dll", &ms_binaryMap},
+	{".jar", &ms_binaryMap},
+
+	// Archive
+	{".rar", &ms_archiveMap},
+	{".patch", &ms_archiveMap},
+	{".lnk", &ms_archiveMap},
+};
+
 //===================================================================
 
 void main (int argc, char* argv [])
@@ -195,13 +341,17 @@ void main (int argc, char* argv [])
 
 	parseCommonCfg (argv [1]);
 
-	ms_treeFileList.push_back (Bucket (true, ".mp3", &ms_uncompressedMusicMap));
-	ms_treeFileList.push_back (Bucket (true, ".wav", &ms_uncompressedSampleMap));
-	ms_treeFileList.push_back (Bucket (true, ".dds", &ms_compressedTextureMap));
-	ms_treeFileList.push_back (Bucket (true, ".ans", &ms_compressedAnimationMap));
-	ms_treeFileList.push_back (Bucket (true, ".mgn", &ms_compressedMeshSkeletalMap));
-	ms_treeFileList.push_back (Bucket (true, ".msh", &ms_compressedMeshStaticMap));
-	ms_treeFileList.push_back (Bucket (true, "", &ms_compressedOtherMap));
+	const size_t count = sizeof(s_extensionTable) / sizeof(ExtensionEntry);
+
+	for (size_t i = 0; i < count; ++i)
+	{
+		ms_treeFileList.push_back(
+			Bucket(true, s_extensionTable[i].extension, s_extensionTable[i].map)
+		);
+	}
+
+	// Catch-all MUST be last
+	ms_treeFileList.push_back(Bucket(true, "", &ms_otherMap));
 	
 	{
 		for (StringMap::reverse_iterator i = ms_stringMap.rbegin (); i != ms_stringMap.rend (); ++i)
@@ -211,13 +361,23 @@ void main (int argc, char* argv [])
 		}
 	}
 
-	writeRsp (ms_uncompressedMusicMap, "data_uncompressed_music.rsp");
-	writeRsp (ms_uncompressedSampleMap, "data_uncompressed_sample.rsp");
-	writeRsp (ms_compressedTextureMap, "data_compressed_texture.rsp");
-	writeRsp (ms_compressedAnimationMap, "data_compressed_animation.rsp");
-	writeRsp (ms_compressedMeshStaticMap, "data_compressed_mesh_static.rsp");
-	writeRsp (ms_compressedMeshSkeletalMap, "data_compressed_mesh_skeletal.rsp");
-	writeRsp (ms_compressedOtherMap, "data_compressed_other.rsp");
+	writeRsp(ms_textureMap, "data_texture.rsp");
+	writeRsp(ms_animationMap, "data_animation.rsp");
+	writeRsp(ms_meshStaticMap, "data_mesh_static.rsp");
+	writeRsp(ms_meshSkeletalMap, "data_mesh_skeletal.rsp");
+	writeRsp(ms_videoMap, "data_video.rsp");
+	writeRsp(ms_shaderMap, "data_shader.rsp");
+	writeRsp(ms_effectMap, "data_effect.rsp");
+	writeRsp(ms_datatableMap, "data_datatable.rsp");
+	writeRsp(ms_iffMap, "data_iff.rsp");
+	writeRsp(ms_gameDataMap, "data_gamedata.rsp");
+	writeRsp(ms_configMap, "data_config.rsp");
+	writeRsp(ms_scriptMap, "data_script.rsp");
+	writeRsp(ms_webMap, "data_web.rsp");
+	writeRsp(ms_textMap, "data_text.rsp");
+	writeRsp(ms_binaryMap, "data_binary.rsp");
+	writeRsp(ms_archiveMap, "data_archive.rsp");
+	writeRsp(ms_otherMap, "data_other.rsp");
 }
 
 //===================================================================

@@ -166,7 +166,7 @@ void BuildoutAreaSupport::getBuildoutAreaList(std::string const &sceneName, std:
 			IGNORE_RETURN(snprintf(buf, sizeof(buf)-1, "%g %g %g %g", (*i).rect.x0, (*i).rect.y0, (*i).rect.x1, (*i).rect.y1));
 			buf[sizeof(buf)-1] = '\0';
 			areaLocations.push_back(std::string(buf));
-			areaStatuses.push_back("Missing");
+			areaStatuses.push_back("In Repo");
 		}
 	}
 

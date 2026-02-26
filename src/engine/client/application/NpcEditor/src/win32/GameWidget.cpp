@@ -330,7 +330,7 @@ void GameWidget::setAppearance(const char * filename)
 
 void GameWidget::setAvatar(const char * filename)
 {
-	setModel("object/base_model.iff");
+	setModel("human_male.tpf");
 	setAppearance(filename);
 }
 

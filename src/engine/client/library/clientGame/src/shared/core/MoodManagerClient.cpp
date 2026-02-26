@@ -155,7 +155,7 @@ void MoodManagerClient::install ()
 					}
 				}
 				else
-					WARNING_STRICT_FATAL (true, ("MoodManagerClient '%s' specifies invalid mood type '%s'", MOOD_TABLE_NAME.c_str (), name.c_str ()));
+					DEBUG_FATAL (true, ("MoodManagerClient '%s' specifies invalid mood type '%s'", MOOD_TABLE_NAME.c_str (), name.c_str ()));
 			}
 		}
 

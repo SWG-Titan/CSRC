@@ -171,7 +171,7 @@ ActionsObjectTemplate::~ActionsObjectTemplate()
 //-----------------------------------------------------------------------
 
 /**
- * Open an arbitrary file in the user's editor.  Editor is set in [GocClient] editor
+ * Open an arbitrary file in the user's editor.  Editor is set in [GodClient] editor
  *
  */
 void ActionsObjectTemplate::doEditFile(const std::string& filename) const

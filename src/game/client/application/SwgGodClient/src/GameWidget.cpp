@@ -86,7 +86,9 @@
 //GodClient local includes
 #include "ActionHack.h"
 #include "ActionsEdit.h"
+#include "ActionsFileControl.h"
 #include "ActionsGame.h"
+#include "ActionsObjectTemplate.h"
 #include "ActionsScript.h"
 #include "ActionsView.h"
 #include "ActionsWindow.h"
@@ -714,7 +716,8 @@ void GameWidget::keyPressEvent(QKeyEvent*keyEvent)
 			std::ostringstream oss;
 			oss << objectCount;
 			const std::string msg = "Objects persisted by selection: " + oss.str();
-			IGNORE_RETURN(QMessageBox::information(&MainFrame::getInstance(), "Information", msg.c_str()));
+			const std::string finalMsg = msg + "\nNote: If you are trying to persist objects for a buildout area, please save the buildout area instead by right-clicking on the buildout area and selecting 'Save Buildout Area'.";
+			IGNORE_RETURN(QMessageBox::information(&MainFrame::getInstance(), "Persistance", finalMsg.c_str()));
 			return;
 
 
@@ -1476,9 +1479,12 @@ void GameWidget::contextMenuEvent(QContextMenuEvent* evt)
 				if(form)
 				{
 					IGNORE_RETURN(ea.editFormData->addTo(m_pop));
-					IGNORE_RETURN(m_pop->insertSeparator());
 				}
 			}
+
+			IGNORE_RETURN(ActionsObjectTemplate::getInstance().m_serverEdit->addTo(m_pop));
+			IGNORE_RETURN(ActionsFileControl::getInstance().m_openTemplateEditor->addTo(m_pop));
+			IGNORE_RETURN(m_pop->insertSeparator());
 		}
 	}
 

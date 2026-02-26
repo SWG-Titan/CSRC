@@ -19,14 +19,18 @@ class ActionsGame;
 class ActionsEdit;
 class ActionsView;
 class ActionsFile;
+class ActionsFileControl;
 class ActionsObjectTemplate;
 class ActionsScript;
 class ActionsTool;
 class ActionsWindow;
 class AdvancedCopyPasteWidget;
 class BookmarkBrowser;
+class BuildoutEditorWindow;
 class ConsoleWindow;
+class DatatableEditorWindow;
 class FavoritesWindow;
+class FileServerTreeWindow;
 class FilterWindow;
 class GameWindow;
 class GroupObjectWindow;
@@ -34,6 +38,7 @@ class MainToolBar;
 class RegionBrowser;
 class ObjectEditor;
 class StackerTool;
+class TemplateEditorWindow;
 class QDockWidget;
 class QSettings;
 class QWorkspace;
@@ -51,6 +56,7 @@ class MainFrame: public QMainWindow
 	//we want window actions to directly show or hide these member windows
 	friend ActionsWindow;
 	friend ActionsTool;
+	friend ActionsFileControl;
 
 public:
 
@@ -134,6 +140,10 @@ private:
 		{
 		} tool;
 
+		struct FileControl : public Base
+		{
+		} fileControl;
+
 		struct Window : public Base
 		{
 		} window;
@@ -167,6 +177,12 @@ private:
 	QDockWindow*       m_regionsViewDock;
 	QDockWindow*       m_favoritesWindowDock;
 	QDockWindow*       m_stackToolDock;
+	QDockWindow*       m_fileServerTreeDock;
+
+	FileServerTreeWindow*    m_fileServerTree;
+	TemplateEditorWindow*    m_templateEditor;
+	DatatableEditorWindow*   m_datatableEditor;
+	BuildoutEditorWindow*    m_buildoutEditor;
 
 	QSettings*         m_settings;
 
@@ -174,6 +190,7 @@ private:
 	ActionsEdit*           m_actionsEdit;
 	ActionsView*           m_actionsView;
 	ActionsFile*           m_actionsFile;
+	ActionsFileControl*    m_actionsFileControl;
 	ActionsScript*         m_actionsScript;
 	ActionsObjectTemplate* m_actionsObjectTemplate;
 	ActionsTool*           m_actionsTool;

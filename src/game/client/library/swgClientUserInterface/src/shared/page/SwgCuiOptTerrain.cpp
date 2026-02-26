@@ -26,10 +26,10 @@ SwgCuiOptBase ("SwgCuiOptTerrain", page)
 	UICheckbox * checkbox = 0;
 
 	getCodeDataObject (TUISliderbar, slider, "sliderTerrainThresholdHigh");
-	registerSlider (*slider, TerrainObject::setHighLevelOfDetailThreshold, TerrainObject::getHighLevelOfDetailThreshold, ConfigClientTerrain::getHighLevelOfDetailThreshold, 1.f, ClientProceduralTerrainAppearance::getMaximumThresholdHigh (), 30.0f);
+	registerSlider (*slider, TerrainObject::setHighLevelOfDetailThreshold, TerrainObject::getHighLevelOfDetailThreshold, ConfigClientTerrain::getHighLevelOfDetailThreshold, 1.f, ClientProceduralTerrainAppearance::getMaximumThresholdHigh (), 50.0f);
 
 	getCodeDataObject (TUISliderbar, slider, "sliderTerrainThreshold");
-	registerSlider (*slider, TerrainObject::setLevelOfDetailThreshold, TerrainObject::getLevelOfDetailThreshold, ConfigClientTerrain::getThreshold, 1.f, ClientProceduralTerrainAppearance::getMaximumThreshold (), 8.0f);
+	registerSlider (*slider, TerrainObject::setLevelOfDetailThreshold, TerrainObject::getLevelOfDetailThreshold, ConfigClientTerrain::getThreshold, 1.f, ClientProceduralTerrainAppearance::getMaximumThreshold (), 12.0f);
 
 	getCodeDataObject (TUICheckbox, checkbox, "checkFloraFarRadial");
 	registerCheckbox (*checkbox, ClientProceduralTerrainAppearance::setDynamicFarFloraEnabled, ClientProceduralTerrainAppearance::getDynamicFarFloraEnabled, ConfigClientTerrain::getDynamicFarFloraEnabled);

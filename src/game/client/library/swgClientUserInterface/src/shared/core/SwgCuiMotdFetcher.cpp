@@ -183,6 +183,16 @@ namespace SwgCuiMotdFetcherNamespace
 		s_motdText = extractJsonString(jsonResponse, "text");
 		s_motdImage = extractJsonString(jsonResponse, "image");
 
+		//remove .dds extension from image if present since the loading code expects it without extension
+		if (!s_motdImage.empty())
+		{
+			size_t ddsPos = s_motdImage.rfind(".dds");
+			if (ddsPos != std::string::npos && ddsPos == s_motdImage.length() - 4)
+			{
+				s_motdImage = s_motdImage.substr(0, ddsPos);
+			}
+		}
+
 		if (!s_motdTitle.empty() || !s_motdText.empty())
 		{
 			s_hasMotd = true;

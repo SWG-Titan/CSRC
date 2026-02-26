@@ -3489,7 +3489,7 @@ namespace
 
 		// Fallback for scaled objects: appearance collide may fail when extent/geometry
 		// is in a different space. Use appearance sphere (which accounts for scale).
-		Vector rayDir = worldEnd - worldStart;
+		/*Vector rayDir = worldEnd - worldStart;
 		if (!rayDir.normalize())
 			return;
 		Ray3d const ray(worldStart, rayDir);
@@ -3503,7 +3503,7 @@ namespace
 				minimumDistanceSquared = distSquared;
 				minimumObject          = &object;
 			}
-		}
+		}*/
 	}
 }
 
