@@ -3,12 +3,10 @@
 // FileServerTreeWindow.h
 // copyright 2024 Sony Online Entertainment
 //
-// Lazy-loading folder tree for the FileControl server with a details
-// pane.  Only the immediate children of a folder are fetched when the
-// user expands it, preventing overload on large asset trees.
-//
-// Network operations run on a background thread so the UI stays
-// responsive.
+// Lazy-loading folder tree that enumerates the local filesystem for
+// tree structure and uses the FileControl server only for file
+// operations (send/retrieve/verify).  Subdirectories are loaded
+// on-demand when expanded, keeping network and UI load minimal.
 //
 // ======================================================================
 
@@ -29,6 +27,7 @@ class QPushButton;
 class QLabel;
 class QLineEdit;
 class QSplitter;
+class QTimer;
 
 // ======================================================================
 
@@ -57,20 +56,9 @@ public:
 
 	enum CustomEventType
 	{
-		CE_LISTING_DONE  = 10001,
 		CE_SEND_DONE     = 10002,
 		CE_RETRIEVE_DONE = 10003,
 		CE_VERIFY_DONE   = 10004
-	};
-
-	struct ListingResult
-	{
-		std::string                dirPath;
-		bool                       ok;
-		std::vector<std::string>   files;
-		std::vector<unsigned long> sizes;
-		QListViewItem *            parentItem;
-		bool                       isTopLevel;
 	};
 
 	struct SendResult
@@ -106,6 +94,7 @@ public slots:
 	void onScopeChanged();
 	void onSelectionChanged(QListViewItem * item);
 	void onItemExpanded(QListViewItem * item);
+	void onBatchInsertTimer();
 
 protected:
 	virtual void customEvent(QCustomEvent * event);
@@ -119,8 +108,30 @@ private:
 	bool isDirectory(const std::string & name) const;
 	void clearDetailsPane();
 	void updateButtonStates();
-	void applyListingResult(ListingResult * result);
 	void setBusy(bool busy);
+
+	std::string resolveLocalDir(const std::string & scopePath) const;
+	void populateFromLocal(QListViewItem * parentItem, const std::string & scopePath);
+
+	struct PendingBatch
+	{
+		struct Entry
+		{
+			std::string name;
+			bool        isDir;
+
+			bool operator<(const Entry & rhs) const
+			{
+				if (isDir != rhs.isDir)
+					return isDir;
+				return name < rhs.name;
+			}
+		};
+		QListViewItem *        parentItem;
+		std::string            scopePath;
+		std::vector<Entry>     entries;
+		size_t                 nextIndex;
+	};
 
 	QSplitter *   m_splitter;
 	QListView *   m_treeView;
@@ -141,6 +152,9 @@ private:
 	std::string   m_rootScope;
 	std::map<std::string, bool> m_expandedDirs;
 	bool          m_busy;
+
+	QTimer *      m_batchTimer;
+	PendingBatch  m_pendingBatch;
 };
 
 // ======================================================================

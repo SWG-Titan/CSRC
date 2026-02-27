@@ -16,6 +16,7 @@
 #include "ActionHack.h"
 #include "BookmarkBrowser.h"
 #include "FavoritesWindow.h"
+#include "FileServerTreeWindow.h"
 #include "FilterWindow.h"
 #include "GameWindow.h"
 #include "GodClientData.h"
@@ -234,10 +235,26 @@ void ActionsWindow::onStackTool(bool b) const
 
 void ActionsWindow::onFileServerTree(bool b) const
 {
-	if(b)
-		MainFrame::getInstance().m_fileServerTreeDock->show();
+	MainFrame & mf = MainFrame::getInstance();
+	if (!mf.m_fileServerTreeDock)
+		return;
+
+	if (b)
+	{
+		if (!mf.m_fileServerTree)
+		{
+			mf.m_fileServerTree = new FileServerTreeWindow(mf.m_fileServerTreeDock, "FileServerTree Widget");
+			if (!mf.m_fileServerTree)
+				return;
+			mf.m_fileServerTreeDock->setWidget(mf.m_fileServerTree);
+			mf.m_fileServerTree->show();
+		}
+		mf.m_fileServerTreeDock->show();
+	}
 	else
-		MainFrame::getInstance().m_fileServerTreeDock->hide();
+	{
+		mf.m_fileServerTreeDock->hide();
+	}
 }
 
 //----------------------------------------------------------------------

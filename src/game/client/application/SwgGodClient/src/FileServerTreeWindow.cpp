@@ -23,41 +23,23 @@
 #include <qmessagebox.h>
 #include <qpushbutton.h>
 #include <qsplitter.h>
+#include <qtimer.h>
 
 #include <sys/stat.h>
 #include <process.h>
+#include <windows.h>
+
+#include <algorithm>
 
 // ======================================================================
 
 static const char * const PLACEHOLDER_TEXT = "...loading...";
+static const size_t       BATCH_SIZE       = 200;
+static const int          BATCH_INTERVAL   = 10;
 
 // ======================================================================
-// Thread helpers
+// Thread helpers (server operations only — send/retrieve/verify)
 // ======================================================================
-
-struct ListingThreadArgs
-{
-	FileServerTreeWindow *                    window;
-	FileServerTreeWindow::ListingResult *     result;
-};
-
-static unsigned __stdcall listingThreadFunc(void * arg)
-{
-	ListingThreadArgs * a = static_cast<ListingThreadArgs *>(arg);
-	FileServerTreeWindow::ListingResult * r = a->result;
-
-	std::vector<unsigned long> crcs;
-	r->ok = FileControlClient::requestDirectoryListing(r->dirPath, r->files, r->sizes, crcs);
-
-	QCustomEvent * ev = new QCustomEvent(FileServerTreeWindow::CE_LISTING_DONE);
-	ev->setData(r);
-	QApplication::postEvent(a->window, ev);
-
-	delete a;
-	return 0;
-}
-
-// ----------------------------------------------------------------------
 
 struct SendThreadArgs
 {
@@ -144,15 +126,19 @@ FileServerTreeWindow::FileServerTreeWindow(QWidget * parent, const char * name)
   m_refreshButton(0),
   m_scopeEdit(0),
   m_statusLabel(0),
-  m_rootScope("dsrc/"),
+  m_rootScope("data/"),
   m_expandedDirs(),
-  m_busy(false)
+  m_busy(false),
+  m_batchTimer(0)
 {
+	m_pendingBatch.parentItem = 0;
+	m_pendingBatch.nextIndex = 0;
+
 	QVBoxLayout * mainLayout = new QVBoxLayout(this, 4, 4);
 
 	QHBoxLayout * scopeLayout = new QHBoxLayout(0, 0, 4);
 	QLabel * scopeLabel = new QLabel("Scope:", this);
-	m_scopeEdit = new QLineEdit("dsrc/", this);
+	m_scopeEdit = new QLineEdit("data/", this);
 	m_refreshButton = new QPushButton("Refresh", this);
 	scopeLayout->addWidget(scopeLabel);
 	scopeLayout->addWidget(m_scopeEdit, 1);
@@ -203,6 +189,8 @@ FileServerTreeWindow::FileServerTreeWindow(QWidget * parent, const char * name)
 	m_retrieveButton->setEnabled(false);
 	m_infoButton->setEnabled(false);
 
+	m_batchTimer = new QTimer(this);
+
 	IGNORE_RETURN(connect(m_refreshButton,  SIGNAL(clicked()), this, SLOT(onRefresh())));
 	IGNORE_RETURN(connect(m_sendButton,     SIGNAL(clicked()), this, SLOT(onSend())));
 	IGNORE_RETURN(connect(m_retrieveButton, SIGNAL(clicked()), this, SLOT(onRetrieve())));
@@ -210,12 +198,15 @@ FileServerTreeWindow::FileServerTreeWindow(QWidget * parent, const char * name)
 	IGNORE_RETURN(connect(m_scopeEdit,      SIGNAL(returnPressed()), this, SLOT(onScopeChanged())));
 	IGNORE_RETURN(connect(m_treeView,       SIGNAL(selectionChanged(QListViewItem *)), this, SLOT(onSelectionChanged(QListViewItem *))));
 	IGNORE_RETURN(connect(m_treeView,       SIGNAL(expanded(QListViewItem *)), this, SLOT(onItemExpanded(QListViewItem *))));
+	IGNORE_RETURN(connect(m_batchTimer,     SIGNAL(timeout()), this, SLOT(onBatchInsertTimer())));
 }
 
 // ----------------------------------------------------------------------
 
 FileServerTreeWindow::~FileServerTreeWindow()
 {
+	if (m_batchTimer)
+		m_batchTimer->stop();
 }
 
 // ----------------------------------------------------------------------
@@ -228,8 +219,25 @@ void FileServerTreeWindow::setRootScope(const std::string & rootPath)
 }
 
 // ======================================================================
-// Lazy-loading helpers
+// Local filesystem helpers
 // ======================================================================
+
+std::string FileServerTreeWindow::resolveLocalDir(const std::string & scopePath) const
+{
+	std::string candidate = scopePath;
+	DWORD attr = GetFileAttributesA(candidate.c_str());
+	if (attr != INVALID_FILE_ATTRIBUTES && (attr & FILE_ATTRIBUTE_DIRECTORY))
+		return candidate;
+
+	candidate = "../../" + scopePath;
+	attr = GetFileAttributesA(candidate.c_str());
+	if (attr != INVALID_FILE_ATTRIBUTES && (attr & FILE_ATTRIBUTE_DIRECTORY))
+		return candidate;
+
+	return scopePath;
+}
+
+// ----------------------------------------------------------------------
 
 bool FileServerTreeWindow::isDirectory(const std::string & name) const
 {
@@ -276,7 +284,130 @@ void FileServerTreeWindow::setBusy(bool busy)
 }
 
 // ======================================================================
-// Tree population (async)
+// Local filesystem enumeration (shallow, depth-1)
+// ======================================================================
+
+void FileServerTreeWindow::populateFromLocal(QListViewItem * parentItem, const std::string & scopePath)
+{
+	std::string localDir = resolveLocalDir(scopePath);
+
+	std::string searchPattern = localDir;
+	if (!searchPattern.empty() && searchPattern[searchPattern.size() - 1] != '/' && searchPattern[searchPattern.size() - 1] != '\\')
+		searchPattern += '/';
+	searchPattern += '*';
+
+	for (size_t i = 0; i < searchPattern.size(); ++i)
+	{
+		if (searchPattern[i] == '/')
+			searchPattern[i] = '\\';
+	}
+
+	WIN32_FIND_DATAA fd;
+	HANDLE hFind = FindFirstFileA(searchPattern.c_str(), &fd);
+	if (hFind == INVALID_HANDLE_VALUE)
+	{
+		m_statusLabel->setText(QString("Cannot open: %1").arg(scopePath.c_str()));
+		setBusy(false);
+		return;
+	}
+
+	m_pendingBatch.entries.clear();
+	m_pendingBatch.nextIndex = 0;
+	m_pendingBatch.parentItem = parentItem;
+	m_pendingBatch.scopePath = scopePath;
+
+	do
+	{
+		const char * name = fd.cFileName;
+		if (name[0] == '.' && (name[1] == '\0' || (name[1] == '.' && name[2] == '\0')))
+			continue;
+
+		PendingBatch::Entry entry;
+		entry.name = name;
+		entry.isDir = (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+		if (entry.isDir)
+			entry.name += '/';
+
+		m_pendingBatch.entries.push_back(entry);
+	}
+	while (FindNextFileA(hFind, &fd));
+
+	FindClose(hFind);
+
+	std::sort(m_pendingBatch.entries.begin(), m_pendingBatch.entries.end());
+
+	if (m_pendingBatch.entries.empty())
+	{
+		m_statusLabel->setText(QString("Empty: %1").arg(scopePath.c_str()));
+		setBusy(false);
+		return;
+	}
+
+	setBusy(true);
+	m_statusLabel->setText(QString("Loading %1 (%2 entries)...")
+		.arg(scopePath.c_str())
+		.arg(static_cast<int>(m_pendingBatch.entries.size())));
+
+	onBatchInsertTimer();
+}
+
+// ----------------------------------------------------------------------
+
+void FileServerTreeWindow::onBatchInsertTimer()
+{
+	if (m_pendingBatch.nextIndex >= m_pendingBatch.entries.size())
+	{
+		m_batchTimer->stop();
+		m_statusLabel->setText(QString("Loaded %1  (%2 entries)")
+			.arg(m_pendingBatch.scopePath.c_str())
+			.arg(static_cast<int>(m_pendingBatch.entries.size())));
+		setBusy(false);
+		return;
+	}
+
+	size_t end = m_pendingBatch.nextIndex + BATCH_SIZE;
+	if (end > m_pendingBatch.entries.size())
+		end = m_pendingBatch.entries.size();
+
+	for (size_t i = m_pendingBatch.nextIndex; i < end; ++i)
+	{
+		const PendingBatch::Entry & entry = m_pendingBatch.entries[i];
+
+		QListViewItem * item = 0;
+		if (m_pendingBatch.parentItem)
+			item = new QListViewItem(m_pendingBatch.parentItem, entry.name.c_str());
+		else
+			item = new QListViewItem(m_treeView, entry.name.c_str());
+
+		if (entry.isDir)
+		{
+			item->setOpen(false);
+			addPlaceholder(item);
+		}
+	}
+
+	m_pendingBatch.nextIndex = end;
+
+	if (m_pendingBatch.nextIndex < m_pendingBatch.entries.size())
+	{
+		m_statusLabel->setText(QString("Loading %1 ... (%2/%3)")
+			.arg(m_pendingBatch.scopePath.c_str())
+			.arg(static_cast<int>(m_pendingBatch.nextIndex))
+			.arg(static_cast<int>(m_pendingBatch.entries.size())));
+		m_batchTimer->start(BATCH_INTERVAL, true);
+	}
+	else
+	{
+		m_batchTimer->stop();
+		m_statusLabel->setText(QString("Loaded %1  (%2 entries)")
+			.arg(m_pendingBatch.scopePath.c_str())
+			.arg(static_cast<int>(m_pendingBatch.entries.size())));
+		setBusy(false);
+	}
+}
+
+// ======================================================================
+// Tree population
 // ======================================================================
 
 void FileServerTreeWindow::refreshTree()
@@ -284,92 +415,14 @@ void FileServerTreeWindow::refreshTree()
 	if (!m_treeView)
 		return;
 
+	if (m_batchTimer)
+		m_batchTimer->stop();
+
 	m_treeView->clear();
 	m_expandedDirs.clear();
 	clearDetailsPane();
 
-	setBusy(true);
-	m_statusLabel->setText("Connecting...");
-
-	ListingResult * result = new ListingResult;
-	result->dirPath    = m_rootScope;
-	result->ok         = false;
-	result->parentItem = 0;
-	result->isTopLevel = true;
-
-	ListingThreadArgs * args = new ListingThreadArgs;
-	args->window = this;
-	args->result = result;
-
-	_beginthreadex(0, 0, listingThreadFunc, args, 0, 0);
-}
-
-// ----------------------------------------------------------------------
-
-void FileServerTreeWindow::applyListingResult(ListingResult * result)
-{
-	if (!result)
-		return;
-
-	if (!result->ok || result->files.empty())
-	{
-		if (result->isTopLevel)
-			m_statusLabel->setText("No files returned (is server running?).");
-		else
-			m_statusLabel->setText(QString("Empty: %1").arg(result->dirPath.c_str()));
-		setBusy(false);
-		delete result;
-		return;
-	}
-
-	const std::string & prefix = result->dirPath;
-	std::map<std::string, unsigned long> childMap;
-
-	for (size_t i = 0; i < result->files.size(); ++i)
-	{
-		const std::string & fullPath = result->files[i];
-
-		std::string relative = fullPath;
-		if (relative.find(prefix) == 0)
-			relative = relative.substr(prefix.size());
-
-		std::string::size_type slashPos = relative.find('/');
-		if (slashPos != std::string::npos)
-		{
-			std::string dirName = relative.substr(0, slashPos);
-			childMap[dirName + "/"] = 0;
-		}
-		else if (!relative.empty())
-		{
-			unsigned long sz = (i < result->sizes.size()) ? result->sizes[i] : 0;
-			childMap[relative] = sz;
-		}
-	}
-
-	for (std::map<std::string, unsigned long>::const_iterator it = childMap.begin(); it != childMap.end(); ++it)
-	{
-		const std::string & childName = it->first;
-
-		QListViewItem * item = 0;
-		if (result->parentItem)
-			item = new QListViewItem(result->parentItem, childName.c_str());
-		else
-			item = new QListViewItem(m_treeView, childName.c_str());
-
-		bool isDir = (childName.size() > 0 && childName[childName.size() - 1] == '/');
-		if (isDir)
-		{
-			item->setOpen(false);
-			addPlaceholder(item);
-		}
-	}
-
-	m_statusLabel->setText(QString("Loaded %1  (%2 entries)")
-		.arg(prefix.c_str())
-		.arg(static_cast<int>(childMap.size())));
-
-	setBusy(false);
-	delete result;
+	populateFromLocal(0, m_rootScope);
 }
 
 // ======================================================================
@@ -438,13 +491,6 @@ void FileServerTreeWindow::customEvent(QCustomEvent * event)
 
 	switch (event->type())
 	{
-	case CE_LISTING_DONE:
-		{
-			ListingResult * r = static_cast<ListingResult *>(event->data());
-			applyListingResult(r);
-		}
-		break;
-
 	case CE_SEND_DONE:
 		{
 			SendResult * r = static_cast<SendResult *>(event->data());
@@ -631,20 +677,7 @@ void FileServerTreeWindow::onItemExpanded(QListViewItem * item)
 		child = next;
 	}
 
-	setBusy(true);
-	m_statusLabel->setText(QString("Loading %1 ...").arg(fullDir.c_str()));
-
-	ListingResult * result = new ListingResult;
-	result->dirPath    = fullDir;
-	result->ok         = false;
-	result->parentItem = item;
-	result->isTopLevel = false;
-
-	ListingThreadArgs * args = new ListingThreadArgs;
-	args->window = this;
-	args->result = result;
-
-	_beginthreadex(0, 0, listingThreadFunc, args, 0, 0);
+	populateFromLocal(item, fullDir);
 }
 
 // ----------------------------------------------------------------------

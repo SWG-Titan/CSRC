@@ -236,14 +236,14 @@ MainFrame::MainFrame(QWidget *theParent, const char *theName)
 		m_stackToolDock->hide();
 
 		m_fileServerTreeDock = new QDockWindow(QDockWindow::InDock, this, "File Server Tree");
-		m_fileServerTree = new FileServerTreeWindow(m_fileServerTreeDock, "FileServerTree Widget");
-		m_fileServerTreeDock->setWidget(m_fileServerTree);
+		m_fileServerTreeDock->setWidget(new QWidget(m_fileServerTreeDock));
 		m_fileServerTreeDock->setResizeEnabled(true);
 		QMainWindow::addDockWindow(m_fileServerTreeDock, Qt::Right);
 		m_fileServerTreeDock->setCloseMode(QDockWindow::Always);
 		m_fileServerTreeDock->hide();
+		m_fileServerTree = 0;
 
-		m_templateEditor  = new TemplateEditorWindow(0, "TemplateEditor");
+		m_templateEditor  = 0;
 		m_datatableEditor = new DatatableEditorWindow(0, "DatatableEditor");
 		m_buildoutEditor  = new BuildoutEditorWindow(0, "BuildoutManager");
 

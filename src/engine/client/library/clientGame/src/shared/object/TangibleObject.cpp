@@ -146,10 +146,17 @@ namespace TangibleObjectNamespace
 			fetchedBytes(0),
 			nonAdminPictureOnlyActive(false),
 			nameOverridden(false),
-			appliedDisplayMode(),
+			appliedDisplayMode(MPDM_cube),
+			appliedDisplayModeStr(),
 			scrollH(0.0f),
 			scrollV(0.0f),
+			appliedScrollH(0.0f),
+			appliedScrollV(0.0f),
 			isPaintingTemplate(false),
+			isPaintingTemplateResolved(false),
+			appliedPictureOnly(false),
+			dirty(true),
+			settled(false),
 			gifFrames(),
 			gifFrameDelays(),
 			gifCurrentFrame(0),
@@ -170,10 +177,17 @@ namespace TangibleObjectNamespace
 		bool nonAdminPictureOnlyActive;
 		bool nameOverridden;
 		Unicode::String originalObjectName;
-		std::string appliedDisplayMode;
+		MagicPaintingDisplayMode appliedDisplayMode;
+		std::string appliedDisplayModeStr;
 		float scrollH;
 		float scrollV;
+		float appliedScrollH;
+		float appliedScrollV;
 		bool isPaintingTemplate;
+		bool isPaintingTemplateResolved;
+		bool appliedPictureOnly;
+		bool dirty;
+		bool settled;
 		std::vector<Texture const *> gifFrames;
 		std::vector<float> gifFrameDelays;
 		int gifCurrentFrame;
@@ -808,9 +822,6 @@ namespace TangibleObjectNamespace
 		factory->Release();
 		return !frames.empty();
 	}
-
-	typedef std::map<std::string, Texture const *> TextureCacheMap;
-	TextureCacheMap ms_textureCache;
 
 	RemoteImageRuntimeData & getRemoteImageRuntimeData(TangibleObject const * tangibleObject)
 	{
@@ -1561,6 +1572,12 @@ void TangibleObject::remoteTextureUrlModified(const std::string & value)
 	UNREF(value);
 	if (!isInWorld())
 		return;
+	RemoteImageRuntimeDataMap::iterator it = ms_remoteImageRuntimeDataMap.find(this);
+	if (it != ms_remoteImageRuntimeDataMap.end())
+	{
+		it->second.dirty = true;
+		it->second.settled = false;
+	}
 	scheduleForAlter();
 }
 
@@ -1571,6 +1588,12 @@ void TangibleObject::remoteTextureModeModified(const std::string & value)
 	UNREF(value);
 	if (!isInWorld())
 		return;
+	RemoteImageRuntimeDataMap::iterator it = ms_remoteImageRuntimeDataMap.find(this);
+	if (it != ms_remoteImageRuntimeDataMap.end())
+	{
+		it->second.dirty = true;
+		it->second.settled = false;
+	}
 	scheduleForAlter();
 }
 
@@ -1581,6 +1604,12 @@ void TangibleObject::remoteTextureDisplayModeModified(const std::string & value)
 	UNREF(value);
 	if (!isInWorld())
 		return;
+	RemoteImageRuntimeDataMap::iterator it = ms_remoteImageRuntimeDataMap.find(this);
+	if (it != ms_remoteImageRuntimeDataMap.end())
+	{
+		it->second.dirty = true;
+		it->second.settled = false;
+	}
 	scheduleForAlter();
 }
 
@@ -1591,6 +1620,12 @@ void TangibleObject::remoteTextureScrollHModified(const std::string & value)
 	UNREF(value);
 	if (!isInWorld())
 		return;
+	RemoteImageRuntimeDataMap::iterator it = ms_remoteImageRuntimeDataMap.find(this);
+	if (it != ms_remoteImageRuntimeDataMap.end())
+	{
+		it->second.dirty = true;
+		it->second.settled = false;
+	}
 	scheduleForAlter();
 }
 
@@ -1601,6 +1636,12 @@ void TangibleObject::remoteTextureScrollVModified(const std::string & value)
 	UNREF(value);
 	if (!isInWorld())
 		return;
+	RemoteImageRuntimeDataMap::iterator it = ms_remoteImageRuntimeDataMap.find(this);
+	if (it != ms_remoteImageRuntimeDataMap.end())
+	{
+		it->second.dirty = true;
+		it->second.settled = false;
+	}
 	scheduleForAlter();
 }
 
@@ -1608,92 +1649,120 @@ void TangibleObject::remoteTextureScrollVModified(const std::string & value)
 
 void TangibleObject::updateRemoteImageTexture()
 {
-	std::string const remoteTextureUrl = m_remoteTextureUrl.get();
-	std::string const remoteTextureMode = m_remoteTextureMode.get();
-	std::string const remoteDisplayModeStr = m_remoteTextureDisplayMode.get();
-	std::string const remoteScrollHStr = m_remoteTextureScrollH.get();
-	std::string const remoteScrollVStr = m_remoteTextureScrollV.get();
-
-	bool const pictureOnlyMode = (!remoteTextureMode.empty() && (_stricmp(remoteTextureMode.c_str(), "DEFAULT") != 0));
-	MagicPaintingDisplayMode const displayMode = parseDisplayMode(remoteDisplayModeStr);
-	float const scrollH = remoteScrollHStr.empty() ? 0.0f : static_cast<float>(atof(remoteScrollHStr.c_str()));
-	float const scrollV = remoteScrollVStr.empty() ? 0.0f : static_cast<float>(atof(remoteScrollVStr.c_str()));
-
-	if (!hasCondition(C_magicPaintingUrl) || !isInWorld() || remoteTextureUrl.empty() || !isHttpUrl(remoteTextureUrl))
+	if (!hasCondition(C_magicPaintingUrl) || !isInWorld())
 	{
 		RemoteImageRuntimeDataMap::iterator runtimeIt = ms_remoteImageRuntimeDataMap.find(this);
-		if (runtimeIt == ms_remoteImageRuntimeDataMap.end())
-			return;
-
-		RemoteImageRuntimeData & existingRuntimeData = runtimeIt->second;
-		LONG const existingState = InterlockedCompareExchange(&existingRuntimeData.fetchState, RIFS_idle, RIFS_idle);
-		bool const hasActiveRuntimeData =
-			(existingRuntimeData.texture != 0) ||
-			(existingRuntimeData.overlayObject != 0) ||
-			(existingRuntimeData.overlayBackObject != 0) ||
-			(existingRuntimeData.fetchThread != 0) ||
-			(existingRuntimeData.fetchedBytes != 0) ||
-			(existingState != RIFS_idle) ||
-			!existingRuntimeData.appliedUrl.empty() ||
-			!existingRuntimeData.requestedUrl.empty() ||
-			existingRuntimeData.nonAdminPictureOnlyActive ||
-			existingRuntimeData.nameOverridden ||
-			!existingRuntimeData.gifFrames.empty();
-
-		if (!hasActiveRuntimeData)
-			return;
-
-		clearRemoteImageTexture();
+		if (runtimeIt != ms_remoteImageRuntimeDataMap.end())
+			clearRemoteImageTexture();
 		return;
 	}
 
 	RemoteImageRuntimeData & runtimeData = getRemoteImageRuntimeData(this);
+
+	LONG const fetchState = InterlockedCompareExchange(&runtimeData.fetchState, RIFS_idle, RIFS_idle);
+	bool const fetchInProgress = (fetchState == RIFS_fetching);
+	bool const fetchReady = (fetchState == RIFS_ready);
+
+	if (runtimeData.settled && !runtimeData.dirty && !fetchInProgress && !fetchReady)
+		return;
+
+	std::string const & remoteTextureUrl = m_remoteTextureUrl.get();
+	if (remoteTextureUrl.empty() || !isHttpUrl(remoteTextureUrl))
+	{
+		if (runtimeData.texture || runtimeData.overlayObject || runtimeData.overlayBackObject)
+			clearRemoteImageTexture();
+		return;
+	}
+
 	closeFinishedFetchThread(runtimeData);
 
-	runtimeData.isPaintingTemplate = templateNameContainsPainting(getObjectTemplateName());
+	if (!runtimeData.isPaintingTemplateResolved)
+	{
+		runtimeData.isPaintingTemplate = templateNameContainsPainting(getObjectTemplateName());
+		runtimeData.isPaintingTemplateResolved = true;
+	}
 
 	bool const urlChanged = (runtimeData.appliedUrl != remoteTextureUrl);
-	bool const displayModeChanged = (runtimeData.appliedDisplayMode != remoteDisplayModeStr);
 
-	applyPictureOnlyPresentation(*this, runtimeData, pictureOnlyMode);
-	ensureRemoteImageOverlayObjects(*this, runtimeData, displayMode, displayModeChanged);
+	if (runtimeData.dirty)
+	{
+		std::string const & remoteTextureMode = m_remoteTextureMode.get();
+		std::string const & remoteDisplayModeStr = m_remoteTextureDisplayMode.get();
+		std::string const & remoteScrollHStr = m_remoteTextureScrollH.get();
+		std::string const & remoteScrollVStr = m_remoteTextureScrollV.get();
+
+		bool const pictureOnlyMode = (!remoteTextureMode.empty() && (_stricmp(remoteTextureMode.c_str(), "DEFAULT") != 0));
+		MagicPaintingDisplayMode const displayMode = parseDisplayMode(remoteDisplayModeStr);
+		float const scrollH = remoteScrollHStr.empty() ? 0.0f : static_cast<float>(atof(remoteScrollHStr.c_str()));
+		float const scrollV = remoteScrollVStr.empty() ? 0.0f : static_cast<float>(atof(remoteScrollVStr.c_str()));
+
+		bool const displayModeChanged = (runtimeData.appliedDisplayMode != displayMode) || (runtimeData.appliedDisplayModeStr != remoteDisplayModeStr);
+		bool const pictureOnlyChanged = (runtimeData.appliedPictureOnly != pictureOnlyMode);
+		bool const scrollChanged = (runtimeData.appliedScrollH != scrollH) || (runtimeData.appliedScrollV != scrollV);
+
+		if (pictureOnlyChanged)
+		{
+			applyPictureOnlyPresentation(*this, runtimeData, pictureOnlyMode);
+			runtimeData.appliedPictureOnly = pictureOnlyMode;
+		}
+
+		if (displayModeChanged)
+		{
+			ensureRemoteImageOverlayObjects(*this, runtimeData, displayMode, true);
+			runtimeData.appliedDisplayMode = displayMode;
+			runtimeData.appliedDisplayModeStr = remoteDisplayModeStr;
+
+			if (runtimeData.texture)
+			{
+				Appearance * const appearance = getAppearance();
+				applyCachedRuntimeTextureToSurfaces(runtimeData, appearance);
+			}
+		}
+		else if (!runtimeData.overlayObject && !runtimeData.isPaintingTemplate)
+		{
+			ensureRemoteImageOverlayObjects(*this, runtimeData, displayMode, false);
+		}
+
+		if (scrollChanged && runtimeData.texture)
+		{
+			runtimeData.appliedScrollH = scrollH;
+			runtimeData.appliedScrollV = scrollV;
+			runtimeData.scrollH = scrollH;
+			runtimeData.scrollV = scrollV;
+			if (runtimeData.isPaintingTemplate)
+			{
+				applyTextureScrollToAppearance(getAppearance(), scrollH, scrollV);
+			}
+			else
+			{
+				if (runtimeData.overlayObject && runtimeData.overlayObject->getAppearance())
+					applyTextureScrollToAppearance(runtimeData.overlayObject->getAppearance(), scrollH, scrollV);
+				if (runtimeData.overlayBackObject && runtimeData.overlayBackObject->getAppearance())
+					applyTextureScrollToAppearance(runtimeData.overlayBackObject->getAppearance(), scrollH, scrollV);
+			}
+		}
+
+		runtimeData.dirty = false;
+
+		if (runtimeData.texture && !urlChanged && !fetchInProgress && !fetchReady)
+		{
+			runtimeData.settled = true;
+			if (runtimeData.isGif)
+				scheduleForAlter();
+			return;
+		}
+	}
 
 	if (!runtimeData.isPaintingTemplate && !runtimeData.overlayObject)
 		return;
 
-	Appearance * const appearance = getAppearance();
-
-	if (runtimeData.texture && !urlChanged)
-	{
-		if (displayModeChanged)
-		{
-			runtimeData.appliedDisplayMode = remoteDisplayModeStr;
-			applyCachedRuntimeTextureToSurfaces(runtimeData, appearance);
-		}
-
-		runtimeData.scrollH = scrollH;
-		runtimeData.scrollV = scrollV;
-		if (runtimeData.isPaintingTemplate)
-		{
-			applyTextureScrollToAppearance(appearance, scrollH, scrollV);
-		}
-		else
-		{
-			if (runtimeData.overlayObject && runtimeData.overlayObject->getAppearance())
-				applyTextureScrollToAppearance(runtimeData.overlayObject->getAppearance(), scrollH, scrollV);
-			if (runtimeData.overlayBackObject && runtimeData.overlayBackObject->getAppearance())
-				applyTextureScrollToAppearance(runtimeData.overlayBackObject->getAppearance(), scrollH, scrollV);
-		}
-		return;
-	}
-
-	LONG const state = InterlockedCompareExchange(&runtimeData.fetchState, RIFS_idle, RIFS_idle);
-	if ((state == RIFS_idle || state == RIFS_failed) && (runtimeData.requestedUrl != remoteTextureUrl))
+	if ((fetchState == RIFS_idle || fetchState == RIFS_failed) && urlChanged)
 	{
 		clearFetchedBytes(runtimeData);
 		clearGifFrames(runtimeData);
 		runtimeData.requestedUrl = remoteTextureUrl;
 		runtimeData.appliedUrl.clear();
+		runtimeData.settled = false;
 		InterlockedExchange(&runtimeData.fetchState, RIFS_fetching);
 
 		RemoteImageFetchThreadData * const threadData = new RemoteImageFetchThreadData(&runtimeData, remoteTextureUrl);
@@ -1708,9 +1777,16 @@ void TangibleObject::updateRemoteImageTexture()
 		return;
 	}
 
-	if (state != RIFS_ready)
+	if (!fetchReady)
 	{
-		scheduleForAlter();
+		if (fetchInProgress)
+			scheduleForAlter();
+		else if (runtimeData.texture && !urlChanged)
+		{
+			runtimeData.settled = true;
+			if (runtimeData.isGif)
+				scheduleForAlter();
+		}
 		return;
 	}
 
@@ -1775,26 +1851,30 @@ void TangibleObject::updateRemoteImageTexture()
 		runtimeData.isGif = false;
 	}
 
+	Appearance * const appearance = getAppearance();
 	applyCachedRuntimeTextureToSurfaces(runtimeData, appearance);
 
-	runtimeData.scrollH = scrollH;
-	runtimeData.scrollV = scrollV;
-	if (runtimeData.isPaintingTemplate)
+	if (runtimeData.scrollH != 0.0f || runtimeData.scrollV != 0.0f)
 	{
-		applyTextureScrollToAppearance(appearance, scrollH, scrollV);
+		if (runtimeData.isPaintingTemplate)
+		{
+			applyTextureScrollToAppearance(appearance, runtimeData.scrollH, runtimeData.scrollV);
+		}
+		else
+		{
+			if (runtimeData.overlayObject && runtimeData.overlayObject->getAppearance())
+				applyTextureScrollToAppearance(runtimeData.overlayObject->getAppearance(), runtimeData.scrollH, runtimeData.scrollV);
+			if (runtimeData.overlayBackObject && runtimeData.overlayBackObject->getAppearance())
+				applyTextureScrollToAppearance(runtimeData.overlayBackObject->getAppearance(), runtimeData.scrollH, runtimeData.scrollV);
+		}
 	}
-	else
-	{
-		if (runtimeData.overlayObject && runtimeData.overlayObject->getAppearance())
-			applyTextureScrollToAppearance(runtimeData.overlayObject->getAppearance(), scrollH, scrollV);
-		if (runtimeData.overlayBackObject && runtimeData.overlayBackObject->getAppearance())
-			applyTextureScrollToAppearance(runtimeData.overlayBackObject->getAppearance(), scrollH, scrollV);
-	}
+	runtimeData.appliedScrollH = runtimeData.scrollH;
+	runtimeData.appliedScrollV = runtimeData.scrollV;
 
 	runtimeData.appliedUrl = remoteTextureUrl;
-	runtimeData.appliedDisplayMode = remoteDisplayModeStr;
 	InterlockedExchange(&runtimeData.fetchState, RIFS_idle);
 
+	runtimeData.settled = !runtimeData.isGif;
 	if (runtimeData.isGif)
 		scheduleForAlter();
 }
@@ -1831,7 +1911,10 @@ void TangibleObject::clearRemoteImageTexture()
 		InterlockedExchange(&runtimeData.fetchState, RIFS_idle);
 	runtimeData.requestedUrl.clear();
 	runtimeData.appliedUrl.clear();
-	runtimeData.appliedDisplayMode.clear();
+	runtimeData.appliedDisplayMode = MPDM_cube;
+	runtimeData.appliedDisplayModeStr.clear();
+	runtimeData.settled = false;
+	runtimeData.dirty = true;
 	ms_remoteImageRuntimeDataMap.erase(runtimeIt);
 }
 
@@ -1877,8 +1960,27 @@ void TangibleObject::updateGifAnimation(float elapsedTime)
 	runtimeData.texture = frameTexture;
 	runtimeData.texture->fetch();
 
-	Appearance * const appearance = getAppearance();
-	applyCachedRuntimeTextureToSurfaces(runtimeData, appearance);
+	if (runtimeData.isPaintingTemplate)
+	{
+		Appearance * const ownerApp = getAppearance();
+		if (ownerApp)
+			ownerApp->setTexture(TAG_MAIN, *frameTexture);
+	}
+	else
+	{
+		if (runtimeData.overlayObject)
+		{
+			Appearance * const app = runtimeData.overlayObject->getAppearance();
+			if (app)
+				app->setTexture(TAG_MAIN, *frameTexture);
+		}
+		if (runtimeData.overlayBackObject)
+		{
+			Appearance * const app = runtimeData.overlayBackObject->getAppearance();
+			if (app)
+				app->setTexture(TAG_MAIN, *frameTexture);
+		}
+	}
 
 	scheduleForAlter();
 }

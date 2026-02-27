@@ -484,10 +484,7 @@ void StaticShader::setTextureScroll(const Tag tag, const StaticShaderTemplate::T
 {
 	DEBUG_FATAL(m_shared, ("Trying to change a shared static shader"));
 	if (!m_textureScrollMap)
-	{
-		WARNING(true, ("Shader has no texture scrolls to set"));
 		return;
-	}
 
 	if (m_textureScrollMap == getStaticShaderTemplate().m_textureScrollMap)
 		m_textureScrollMap = new StaticShaderTemplate::TextureScrollMap(*getStaticShaderTemplate().m_textureScrollMap);

@@ -325,13 +325,20 @@ void ActionsFileControl::onFlush()
 void ActionsFileControl::onOpenFileServerTree()
 {
 	MainFrame & mf = MainFrame::getInstance();
-	if (mf.m_fileServerTreeDock)
+	if (!mf.m_fileServerTreeDock)
+		return;
+
+	if (!mf.m_fileServerTree)
 	{
-		mf.m_fileServerTreeDock->show();
-		if (mf.m_fileServerTree)
-			mf.m_fileServerTree->refreshTree();
+		mf.m_fileServerTree = new FileServerTreeWindow(mf.m_fileServerTreeDock, "FileServerTree Widget");
+		if (!mf.m_fileServerTree)
+			return;
+		mf.m_fileServerTreeDock->setWidget(mf.m_fileServerTree);
+		mf.m_fileServerTree->show();
 	}
-	mf.textToConsole("FileControl: Opening File Server Tree");
+
+	mf.m_fileServerTreeDock->show();
+	mf.textToConsole("FileControl: File Server Tree opened. Click Refresh to load.");
 }
 
 // ----------------------------------------------------------------------
@@ -366,8 +373,16 @@ std::string ActionsFileControl::convertCompiledPathToSource(const std::string & 
 void ActionsFileControl::onOpenTemplateEditor()
 {
 	MainFrame & mf = MainFrame::getInstance();
+
 	if (!mf.m_templateEditor)
-		return;
+	{
+		mf.m_templateEditor = new TemplateEditorWindow(0, "TemplateEditor");
+		if (!mf.m_templateEditor)
+		{
+			mf.textToConsole("FileControl: Failed to create Template Editor.");
+			return;
+		}
+	}
 
 	if (!m_selectedPath.empty())
 	{
@@ -381,6 +396,7 @@ void ActionsFileControl::onOpenTemplateEditor()
 	}
 
 	mf.m_templateEditor->show();
+	mf.m_templateEditor->raise();
 }
 
 // ----------------------------------------------------------------------

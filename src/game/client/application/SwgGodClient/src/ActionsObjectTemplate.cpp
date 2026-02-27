@@ -20,6 +20,7 @@
 #include "IconLoader.h"
 #include "MainFrame.h"
 #include "ServerCommander.h"
+#include "TemplateEditorWindow.h"
 #include "Unicode.h"
 
 #include <qmessagebox.h>
@@ -293,14 +294,15 @@ void ActionsObjectTemplate::onServerView() const
 	if (m_selectedServerPath.empty() || !m_isServerFile)
 		return;
 
-	std::string dummy;
-	std::string local;
-
-	const std::string path = getServerObjectTemplateTpfFilePath();
-
-	std::string result;
-
-	doEditFile(local);
+	MainFrame & mf = MainFrame::getInstance();
+	if (!mf.m_templateEditor)
+		mf.m_templateEditor = new TemplateEditorWindow(0, "TemplateEditor");
+	if (mf.m_templateEditor)
+	{
+		mf.m_templateEditor->loadTemplate(m_selectedServerPath);
+		mf.m_templateEditor->show();
+		mf.m_templateEditor->raise();
+	}
 }
 
 //-----------------------------------------------------------------------
@@ -314,12 +316,15 @@ void ActionsObjectTemplate::onServerEdit()
 	if (m_selectedServerPath.empty() || !m_isServerFile)
 		return;
 
-	std::string dummy;
-	std::string local;
-	std::string result;
-
-	m_serverRefresh->doActivate();
-	doEditFile(local);
+	MainFrame & mf = MainFrame::getInstance();
+	if (!mf.m_templateEditor)
+		mf.m_templateEditor = new TemplateEditorWindow(0, "TemplateEditor");
+	if (mf.m_templateEditor)
+	{
+		mf.m_templateEditor->loadTemplate(m_selectedServerPath);
+		mf.m_templateEditor->show();
+		mf.m_templateEditor->raise();
+	}
 }
 
 //-----------------------------------------------------------------------
@@ -495,13 +500,15 @@ void ActionsObjectTemplate::onClientView() const
 	if (m_selectedClientPath.empty() || !m_isClientFile)
 		return;
 
-	std::string dummy;
-	std::string local;
-	std::string result;
-
-	const std::string path = getClientObjectTemplateTpfFilePath();
-
-	doEditFile(local);
+	MainFrame & mf = MainFrame::getInstance();
+	if (!mf.m_templateEditor)
+		mf.m_templateEditor = new TemplateEditorWindow(0, "TemplateEditor");
+	if (mf.m_templateEditor)
+	{
+		mf.m_templateEditor->loadTemplate(m_selectedClientPath);
+		mf.m_templateEditor->show();
+		mf.m_templateEditor->raise();
+	}
 }
 
 //-----------------------------------------------------------------------
@@ -515,12 +522,15 @@ void ActionsObjectTemplate::onClientEdit()
 	if (m_selectedClientPath.empty() || !m_isClientFile)
 		return;
 
-	std::string dummy;
-	std::string local;
-	std::string result;
-
-	m_clientRefresh->doActivate();
-	doEditFile(local);
+	MainFrame & mf = MainFrame::getInstance();
+	if (!mf.m_templateEditor)
+		mf.m_templateEditor = new TemplateEditorWindow(0, "TemplateEditor");
+	if (mf.m_templateEditor)
+	{
+		mf.m_templateEditor->loadTemplate(m_selectedClientPath);
+		mf.m_templateEditor->show();
+		mf.m_templateEditor->raise();
+	}
 }
 
 //-----------------------------------------------------------------------

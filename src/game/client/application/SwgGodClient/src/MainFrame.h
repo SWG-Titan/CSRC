@@ -57,6 +57,7 @@ class MainFrame: public QMainWindow
 	friend ActionsWindow;
 	friend ActionsTool;
 	friend ActionsFileControl;
+	friend ActionsObjectTemplate;
 
 public:
 
