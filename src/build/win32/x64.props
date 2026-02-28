@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  x64.props - Shared property sheet for x64 platform configurations.
+  Import this into any vcxproj to add x64 platform support alongside Win32.
+  
+  Usage: Add to PropertySheets import group for x64 configurations:
+    <Import Project="$(SolutionDir)x64.props" />
+  
+  This overrides output directories, preprocessor defines, and removes
+  x86-specific settings (STLport, _USE_32BIT_TIME_T) for x64 builds.
+-->
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup Label="Configuration" Condition="'$(Platform)'=='x64'">
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Platform)'=='x64'">
+    <OutDir>..\..\..\..\..\..\compile\x64\$(ProjectName)\$(Configuration)\</OutDir>
+    <IntDir>..\..\..\..\..\..\compile\x64\$(ProjectName)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+
+  <ItemDefinitionGroup Condition="'$(Platform)'=='x64'">
+    <ClCompile>
+      <!-- Remove _USE_32BIT_TIME_T for x64 (time_t is natively 64-bit) -->
+      <PreprocessorDefinitions>WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <!-- Suppress pointer truncation warnings during migration -->
+      <DisableSpecificWarnings>4311;4312;4302;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+    <Lib>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Lib>
+  </ItemDefinitionGroup>
+
+</Project>
