@@ -1446,6 +1446,17 @@ namespace VideoStreamNamespace
 			ownerAppearance->setTexture(TAG_MAIN, *runtimeData.texture);
 	}
 
+	void applyVideoAspectScale(TangibleObject & owner)
+	{
+		std::string const & aspect = owner.getRemoteStreamAspect();
+		Vector scale(Vector::xyz111);
+
+		if (aspect == "16:9")
+			scale.y = 0.75f;
+
+		owner.setScale(scale);
+	}
+
 } // namespace VideoStreamNamespace
 
 using namespace VideoStreamNamespace;
@@ -1593,6 +1604,7 @@ m_remoteTextureScrollV   (),
 m_remoteStreamUrl        (),
 m_remoteStreamTimestamp  (),
 m_remoteStreamLoop       (),
+m_remoteStreamAspect     (),
 m_remoteEmitterParentId  (),
 m_damageTaken            (),
 m_maxHitPoints           (),
@@ -1630,6 +1642,7 @@ m_effectsMap()
 	m_remoteStreamUrl.setSourceObject(this);
 	m_remoteStreamTimestamp.setSourceObject(this);
 	m_remoteStreamLoop.setSourceObject(this);
+	m_remoteStreamAspect.setSourceObject(this);
 	m_remoteEmitterParentId.setSourceObject(this);
 	m_damageTaken.setSourceObject    (this);
 	m_condition.setSourceObject      (this);
@@ -1658,6 +1671,7 @@ m_effectsMap()
 	addSharedVariable_np(m_remoteStreamUrl);
 	addSharedVariable_np(m_remoteStreamTimestamp);
 	addSharedVariable_np(m_remoteStreamLoop);
+	addSharedVariable_np(m_remoteStreamAspect);
 	addSharedVariable_np(m_remoteEmitterParentId);
 
 	m_effectsMap.setOnErase(this, &TangibleObject::OnObjectEffectErased);
@@ -2732,6 +2746,8 @@ void TangibleObject::updateRemoteVideoStream()
 		}
 		runtimeData.appliedTimestamp = requestedTimestamp;
 
+		applyVideoAspectScale(*this);
+
 		DEBUG_REPORT_LOG(true, ("[Titan] VideoStream: Playing %s\n", playUrl.c_str()));
 	}
 
@@ -2783,6 +2799,8 @@ void TangibleObject::clearRemoteVideoStream()
 	runtimeData.settled = false;
 	runtimeData.dirty = true;
 
+	setScale(Vector::xyz111);
+
 	ms_videoStreamRuntimeDataMap.erase(runtimeIt);
 }
 
@@ -2798,6 +2816,14 @@ void TangibleObject::remoteStreamLoopModified(const std::string & value)
 		it->second.settled = false;
 	}
 	scheduleForAlter();
+}
+
+//----------------------------------------------------------------------
+
+void TangibleObject::remoteStreamAspectModified(const std::string & value)
+{
+	UNREF(value);
+	applyVideoAspectScale(*this);
 }
 
 //----------------------------------------------------------------------
