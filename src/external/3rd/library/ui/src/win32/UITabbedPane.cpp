@@ -959,7 +959,7 @@ long UITabbedPane::GetTabFromPoint(const UIPoint & point) const
 {
 	if (mTabObject) 
 	{
-		_asm nop;
+		__noop;
 	}
 
 	UIWidget * const widget = GetWidgetFromPoint(point, false);

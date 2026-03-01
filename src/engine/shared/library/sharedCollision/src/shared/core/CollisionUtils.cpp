@@ -424,9 +424,7 @@ inline void faster_normalize( Vector & V )
 {
 	float t = (V.x * V.x) + (V.y * V.y) + (V.z * V.z);
 
-	__asm fld t;
-	__asm fsqrt;
-	__asm fstp t;
+	t = sqrtf(t);
 
 	t = 1.0f / t;
 

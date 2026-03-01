@@ -39,16 +39,9 @@ public:
             return( true );
         }
 
-        volatile unsigned int* p_i_lock = &m_iLock;
-        __asm 
-        {
-            mov esi,[p_i_lock]
-            lock bts dword ptr [esi], 0
-            jnc Locked
-        }
-        return( false );
-        
-        Locked:
+        if (_interlockedbittestandset(reinterpret_cast<volatile long *>(&m_iLock), 0))
+            return( false );
+
         m_uThreadID = uCallingThread;
         m_uLockCount = 1;
         return( true );    

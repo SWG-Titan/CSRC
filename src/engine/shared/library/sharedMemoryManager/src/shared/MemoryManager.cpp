@@ -402,7 +402,7 @@ inline Block const * Block::getNext() const
 
 inline void Block::setNext(Block *next)
 {
-	DEBUG_FATAL(next && reinterpret_cast<int>(next) - reinterpret_cast<int>(this) < cms_blockSize, ("too small"));
+	DEBUG_FATAL(next && reinterpret_cast<intptr_t>(next) - reinterpret_cast<intptr_t>(this) < cms_blockSize, ("too small"));
 	m_next = next;
 }
 
@@ -1750,15 +1750,15 @@ void MemoryManagerNamespace::report(AllocatedBlock const * block, bool leak)
 	char      libName[256];
 	char      fileName[256];
 	int       line = 0;
-	int const memory = reinterpret_cast<int>(reinterpret_cast<byte const *>(block) + cms_allocatedBlockSize + cms_guardBandSize);
+	uintptr_t const memory = reinterpret_cast<uintptr_t>(reinterpret_cast<byte const *>(block) + cms_allocatedBlockSize + cms_guardBandSize);
 
 	if (ms_allowNameLookup && DebugHelp::lookupAddress(owner, libName, fileName, sizeof(fileName), line))
 	{
-		sprintf(buffer, "%s(%d) : %08X memory %s, %d bytes\n", fileName, line, memory, leak ? "leak" : "allocation", static_cast<int>(requestedSize));
+		sprintf(buffer, "%s(%d) : %08llX memory %s, %d bytes\n", fileName, line, static_cast<unsigned long long>(memory), leak ? "leak" : "allocation", static_cast<int>(requestedSize));
 	}
 	else
 	{
-		sprintf(buffer, "unknown(0x%08X) : %08X memory %s, %d bytes\n", static_cast<unsigned int>(owner), memory, leak ? "leak" : "allocation", static_cast<int>(requestedSize));
+		sprintf(buffer, "unknown(0x%08llX) : %08llX memory %s, %d bytes\n", static_cast<unsigned long long>(owner), static_cast<unsigned long long>(memory), leak ? "leak" : "allocation", static_cast<int>(requestedSize));
 	}
 
 	(*LogMessage)(buffer);

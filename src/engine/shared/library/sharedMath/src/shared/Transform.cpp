@@ -272,119 +272,38 @@ static void xf_matrix_3x4(float *out, const float *left, const float *right)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #if TRY_FOR_SSE
-__declspec(naked) void sse_xf_matrix_3x4(float *out, const float *left, const float *right)
+#include <xmmintrin.h>
+
+static inline __m128 sse_transform_row(const float *leftRow, __m128 rRow0, __m128 rRow1, __m128 rRow2)
 {
-	UNREF(left);
-	UNREF(right);
-	UNREF(out);
-	__asm {
-		push eax
-		push ebx
-		add  esp, -48
+	__m128 s0 = _mm_set1_ps(leftRow[0]);
+	__m128 s1 = _mm_set1_ps(leftRow[1]);
+	__m128 s2 = _mm_set1_ps(leftRow[2]);
 
-		// [esp + 60] == out
-		// [esp + 64] == left
-		// [esp + 68] == right
-		mov  eax, [esp + 64] // left
-		mov  ebx, [esp + 68] // right
+	__m128 result = _mm_mul_ps(rRow0, s0);
+	result = _mm_add_ps(result, _mm_mul_ps(rRow1, s1));
+	result = _mm_add_ps(result, _mm_mul_ps(rRow2, s2));
 
-		movups	xmm0, [ebx +  0]	// right: row0
-		movups	xmm1, [ebx + 16]	// right: row1
-		movups	xmm2, [ebx + 32]	// right: row2
+	__m128 translation = _mm_set_ps(0.0f, 0.0f, leftRow[3], 0.0f);
+	translation = _mm_shuffle_ps(translation, translation, _MM_SHUFFLE(0, 0, 1, 0));
+	result = _mm_add_ps(result, translation);
 
-		// 16-byte align data pointer
-		lea	ebx, [esp+15]
-		and	ebx, -16
+	return result;
+}
 
-		///////////////////////////////////////////////////
-		movaps	xmm3, xmm0			// right: row0
-		movss		xmm4, [eax + 0]   // left[0][0]
-		shufps	xmm4, xmm4, 0
-		mulps		xmm3, xmm4
+void sse_xf_matrix_3x4(float *out, const float *left, const float *right)
+{
+	__m128 rRow0 = _mm_loadu_ps(right + 0);
+	__m128 rRow1 = _mm_loadu_ps(right + 4);
+	__m128 rRow2 = _mm_loadu_ps(right + 8);
 
-		movaps	xmm5, xmm1			// right: row1
-		movss		xmm6, [eax + 4]	// left[0][1]
-		shufps	xmm6, xmm6, 0
-		mulps		xmm5, xmm6
+	__m128 outRow0 = sse_transform_row(left + 0, rRow0, rRow1, rRow2);
+	__m128 outRow1 = sse_transform_row(left + 4, rRow0, rRow1, rRow2);
+	__m128 outRow2 = sse_transform_row(left + 8, rRow0, rRow1, rRow2);
 
-		addps		xmm5, xmm3
-
-		movaps	xmm3, xmm2			// right: row2
-		movss		xmm4, [eax + 8]   // left[0][2]
-		shufps	xmm4, xmm4, 0
-		mulps		xmm3, xmm4
-
-		addps		xmm5, xmm3
-
-		movss		xmm7, [eax + 12] // left[0][3]
-		shufps   xmm7, xmm7,  0x15 //0001 0101
-		addps		xmm5, xmm7
-
-		movaps	[ebx], xmm5
-		///////////////////////////////////////////////////
-		movaps	xmm3, xmm0			// right: row0
-		movss		xmm4, [eax + 16]  // left[1][0]
-		shufps	xmm4, xmm4, 0
-		mulps		xmm3, xmm4
-
-		movaps	xmm5, xmm1			// right: row1
-		movss		xmm6, [eax + 20]	// left[1][1]
-		shufps	xmm6, xmm6, 0
-		mulps		xmm5, xmm6
-
-		addps		xmm5, xmm3
-
-		movaps	xmm3, xmm2			// right: row2
-		movss		xmm4, [eax + 24]   // left[1][2]
-		shufps	xmm4, xmm4, 0
-		mulps		xmm3, xmm4
-
-		addps		xmm5, xmm3
-
-		movss		xmm7, [eax + 28] // left[1][3]
-		shufps   xmm7, xmm7,  0x15 //0001 0101
-		addps		xmm5, xmm7
-
-		movaps	[ebx+16], xmm5
-		///////////////////////////////////////////////////
-		movaps	xmm3, xmm0			// right: row0
-		movss		xmm4, [eax + 32]  // left[2][0]
-		shufps	xmm4, xmm4, 0
-		mulps		xmm3, xmm4
-
-		movaps	xmm5, xmm1			// right: row1
-		movss		xmm6, [eax + 36]	// left[2][1]
-		shufps	xmm6, xmm6, 0
-		mulps		xmm5, xmm6
-
-		addps		xmm5, xmm3
-
-		movaps	xmm3, xmm2			// right: row2
-		movss		xmm4, [eax + 40]   // left[2][2]
-		shufps	xmm4, xmm4, 0
-		mulps		xmm3, xmm4
-
-		addps		xmm5, xmm3
-
-		movss		xmm7, [eax + 44] // left[2][3]
-		shufps   xmm7, xmm7,  0x15 //0001 0101
-		addps		xmm5, xmm7
-
-		mov		eax, [esp+60]
-
-		movups	[eax+32], xmm5
-		///////////////////////////////////////////////////
-
-		movaps   xmm1, [ebx+ 0]
-		movaps   xmm2, [ebx+16]
-		movups   [eax+0 ], xmm1
-		movups   [eax+16], xmm2
-
-		mov	ebx, [esp + 48]
-		mov	eax, [esp + 52]
-		add   esp, 56
-		ret
-	}
+	_mm_storeu_ps(out + 0, outRow0);
+	_mm_storeu_ps(out + 4, outRow1);
+	_mm_storeu_ps(out + 8, outRow2);
 }
 #endif
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

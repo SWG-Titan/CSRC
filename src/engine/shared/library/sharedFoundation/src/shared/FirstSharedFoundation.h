@@ -75,6 +75,9 @@ const float REAL_MAX = FLT_MAX;
 #include "../../../../../../engine/shared/library/sharedFoundation/include/public/sharedFoundation/Binary.h"
 #include "../../../../../../engine/shared/library/sharedFoundation/include/public/sharedFoundation/Fatal.h"
 #include "../../../../../../engine/shared/library/sharedFoundation/include/public/sharedFoundation/StlForwardDeclaration.h"
+#ifdef _M_X64
+#include "../../../../../../engine/shared/library/sharedFoundation/src/shared/hash_compat.h"
+#endif
 #include "../../../../../../engine/shared/library/sharedFoundation/include/public/sharedFoundation/Misc.h"
 #include "../../../../../../engine/shared/library/sharedDebug/include/public/sharedDebug/RemoteDebug.h"
 #include "../../../../../../engine/shared/library/sharedDebug/include/public/sharedDebug/Report.h"

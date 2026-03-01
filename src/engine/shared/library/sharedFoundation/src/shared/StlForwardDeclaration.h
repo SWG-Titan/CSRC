@@ -31,6 +31,96 @@
 // ======================================================================
 
 
+#ifdef _M_X64
+// x64 builds use the MSVC standard library (no STLport)
+#include <string>
+#include <vector>
+#include <deque>
+#include <list>
+#include <queue>
+#include <stack>
+#include <map>
+#include <set>
+#include <bitset>
+#include <unordered_map>
+#include <unordered_set>
+#include <functional>
+#include <memory>
+
+namespace std
+{
+	typedef basic_string<char, char_traits<char>, allocator<char> >                     string;
+}
+
+template <class _Tp, class _Alloc = std::allocator<_Tp> > struct stddeque
+{
+	typedef std::deque<_Tp, _Alloc> fwd;
+};
+
+template <class _Tp, class _Alloc = std::allocator<_Tp> > struct stdlist
+{
+	typedef std::list<_Tp, _Alloc> fwd;
+};
+
+template <class _Key, class _Tp, class _Compare = std::less<_Key>, class _Alloc = std::allocator< std::pair <const _Key, _Tp> > > struct stdmap
+{
+	typedef std::map<_Key, _Tp, _Compare, _Alloc> fwd;
+};
+
+template <class _Key, class _Tp, class _HashFcn = std::hash<_Key>, class _Compare = std::equal_to<_Key>, class _Alloc = std::allocator< std::pair <const _Key, _Tp> > > struct stdhash_map
+{
+	typedef std::unordered_map<_Key, _Tp, _HashFcn, _Compare, _Alloc> fwd;
+};
+
+template <class _Key, class _Tp, class _Compare = std::less<_Key>, class _Alloc = std::allocator< std::pair <const _Key, _Tp> > > struct stdmultimap
+{
+	typedef std::multimap<_Key, _Tp, _Compare, _Alloc> fwd;
+};
+
+template <class _Key, class _Compare = std::less<_Key>, class _Alloc = std::allocator<_Key> > struct stdset
+{
+	typedef std::set<_Key, _Compare, _Alloc> fwd;
+};
+
+template <class _Key, class _HashFcn = std::hash<_Key>, class _Compare = std::equal_to<_Key>, class _Alloc = std::allocator<_Key> > struct stdhash_set
+{
+	typedef std::unordered_set<_Key, _HashFcn, _Compare, _Alloc> fwd;
+};
+
+template <class _Key, class _Compare = std::less<_Key>, class _Alloc = std::allocator<_Key> > struct stdmultiset
+{
+	typedef std::multiset<_Key, _Compare, _Alloc> fwd;
+};
+
+template <class _Tp, class _Alloc = std::allocator<_Tp> > struct stdvector
+{
+	typedef std::vector<_Tp, _Alloc> fwd;
+};
+
+template <class _Tp, class _Container = FORWARD_TYPENAME stdvector<_Tp>::fwd, class _Compare = std::less<typename _Container::value_type> > struct stdpriority_queue
+{
+	typedef std::priority_queue<_Tp, _Container, _Compare> fwd;
+};
+
+template <class _Tp, class _Sequence = FORWARD_TYPENAME stddeque<_Tp>::fwd > struct stdqueue
+{
+	typedef std::queue<_Tp, _Sequence> fwd;
+};
+
+template <class _Tp, class _Sequence = FORWARD_TYPENAME stddeque<_Tp>::fwd > struct stdstack
+{
+	typedef std::stack<_Tp, _Sequence> fwd;
+};
+
+namespace Unicode
+{
+	typedef unsigned short unicode_char_t;
+	typedef std::basic_string<unicode_char_t, std::char_traits<unicode_char_t>, std::allocator<unicode_char_t> > String;
+}
+
+#else
+// x86 builds use STLport 4.5.3
+
 namespace std
 {
 	template <class _Tp>                                                                struct less;
@@ -123,6 +213,8 @@ namespace Unicode
 	typedef unsigned short unicode_char_t;
 	typedef std::basic_string<unicode_char_t, std::char_traits<unicode_char_t>, std::allocator<unicode_char_t> > String;
 }
+
+#endif
 
 // ======================================================================
 

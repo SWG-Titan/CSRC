@@ -12,6 +12,7 @@
 #include "sharedFoundation/ConfigSharedFoundation.h"
 
 #include <xmmintrin.h>
+#include <float.h>
 
 // ======================================================================
 
@@ -139,7 +140,13 @@ WORD FloatingPointUnit::getControlWord(void)
 {
 	WORD controlWord = 0;
 
+#ifdef _M_X64
+	unsigned int cw = 0;
+	_controlfp_s(&cw, 0, 0);
+	controlWord = static_cast<WORD>(cw);
+#else
 	__asm fnstcw controlWord;
+#endif
 	return controlWord;
 }
 
@@ -148,7 +155,12 @@ WORD FloatingPointUnit::getControlWord(void)
 void FloatingPointUnit::setControlWord(WORD controlWord)
 {
 	UNREF(controlWord);
+#ifdef _M_X64
+	unsigned int cw = 0;
+	_controlfp_s(&cw, static_cast<unsigned int>(controlWord), MCW_EM | MCW_PC | MCW_RC | MCW_IC);
+#else
 	__asm fldcw controlWord;
+#endif
 }
 
 // ----------------------------------------------------------------------

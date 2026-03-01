@@ -495,10 +495,26 @@ void DebugHelp::getCallStack(uint32 *callStack, int sizeOfCallStack)
 	Zero(context);
 	context.ContextFlags = CONTEXT_FULL;
 
-	// GetThreadContext returns invalid data when called from within the same thread
-	//if (!GetThreadContext(GetCurrentThread(), &context))
-	//	return;
+#ifdef _M_X64
+	RtlCaptureContext(&context);
 
+	STACKFRAME64 stackFrame;
+	Zero(stackFrame);
+	stackFrame.AddrPC.Mode      = AddrModeFlat;
+	stackFrame.AddrPC.Offset    = context.Rip;
+	stackFrame.AddrStack.Offset = context.Rsp;
+	stackFrame.AddrStack.Mode   = AddrModeFlat;
+	stackFrame.AddrFrame.Offset = context.Rbp;
+	stackFrame.AddrFrame.Mode   = AddrModeFlat;
+
+	for (int i = 0; i < sizeOfCallStack; ++i, ++callStack)
+	{
+		if (stackWalk64(IMAGE_FILE_MACHINE_AMD64, process, GetCurrentThread(), &stackFrame, &context, NULL, functionTableAccess, getModuleBase, NULL))
+		{
+			*callStack = static_cast<uint32>(stackFrame.AddrPC.Offset);
+		}
+	}
+#else
 	EnterCriticalSection(&criticalSection);
 	__asm
 	{
@@ -528,6 +544,7 @@ void DebugHelp::getCallStack(uint32 *callStack, int sizeOfCallStack)
 			*callStack = DWORD(Offset);
 		}
 	}
+#endif
 }
 
 // ----------------------------------------------------------------------

@@ -11,6 +11,8 @@
 #include "shareddebug/DebugFlags.h"
 #include "sharedFoundation/WindowsWrapper.h"
 
+#include <intrin.h>
+
 // ======================================================================
 
 namespace ProfilerTimerNamespace
@@ -26,13 +28,9 @@ using namespace ProfilerTimerNamespace;
 
 // ======================================================================
 
-static __int64 __declspec(naked) __stdcall readTimeStampCounter()
+static __int64 readTimeStampCounter()
 {
-    __asm
-		{
-        rdtsc;
-        ret;
-    }
+	return static_cast<__int64>(__rdtsc());
 }
 
 // ======================================================================

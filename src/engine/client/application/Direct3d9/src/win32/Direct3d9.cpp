@@ -1773,7 +1773,7 @@ void Direct3d9Namespace::updateWindowSettings()
 			rect.bottom = ms_height;
 
 			DWORD const windowStyle = ms_borderlessWindow ? windowStyleFullscreen : windowStyleWindowed;
-			SetWindowLong(ms_window, GWL_STYLE, windowStyle);
+			SetWindowLongPtr(ms_window, GWL_STYLE, static_cast<LONG_PTR>(windowStyle));
 
 			// adjust it to include the windows crap around the client area
 			const BOOL result1 = AdjustWindowRect(&rect, windowStyle, FALSE);
@@ -1805,7 +1805,7 @@ void Direct3d9Namespace::updateWindowSettings()
 		}
 		else
 		{
-			SetWindowLong(ms_window, GWL_STYLE, windowStyleFullscreen);
+			SetWindowLongPtr(ms_window, GWL_STYLE, static_cast<LONG_PTR>(windowStyleFullscreen));
 
 			HMONITOR monitor = ms_direct3d->GetAdapterMonitor(ms_adapter);
 			MONITORINFO monitorInfo;
