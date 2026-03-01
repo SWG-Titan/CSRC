@@ -7110,8 +7110,9 @@ locationY = parent.sizeY - sizeY'
 				</Page>
 			</Page>
 		</Page>
-		<include>ui_scripted_object_viewer.inc</include>
-		<include>ui_whack_a_mole.inc</include>
+	<include>ui_scripted_object_viewer.inc</include>
+	<include>ui_whack_a_mole.inc</include>
+	<include>ui_scripted_videoplayer.inc</include>
 		<Page
 			Location='120,109'
 			MinimumSize='319,357'
