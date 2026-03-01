@@ -325,26 +325,24 @@ const std::vector<Vector>* CellObject::getRadarPortalEdges () const
 
 void CellObject::setCellLightColor(float r, float g, float b, float brightness)
 {
-	const VectorArgb color(1.0f, r * brightness, g * brightness, b * brightness);
-
 	for (std::vector<Light *>::iterator it = m_cellLights.begin(); it != m_cellLights.end(); ++it)
 	{
 		Light * const light = *it;
 		if (light)
 		{
-			if (light->getType() == Light::T_ambient)
-			{
-				light->setDiffuseColor(color);
-			}
-			else
-			{
-				if (light->hasDiffuseColor())
-					light->setDiffuseColor(color);
-				if (light->hasSpecularColor())
-					light->setSpecularColor(color);
-			}
+			light->removeFromWorld();
+			delete light;
 		}
 	}
+	m_cellLights.clear();
+
+	const VectorArgb color(1.0f, r * brightness, g * brightness, b * brightness);
+
+	Light * const ambientLight = new Light(Light::T_ambient, color);
+	ambientLight->setAffectsShadersWithPrecalculatedVertexLighting(true);
+	ambientLight->setAffectsShadersWithoutPrecalculatedVertexLighting(true);
+	ambientLight->attachToObject_p(this, true);
+	m_cellLights.push_back(ambientLight);
 }
 
 //-----------------------------------------------------------------------
