@@ -105,6 +105,7 @@ public:
 		struct RemoteStreamTimestamp;
 		struct RemoteStreamLoop;
 		struct RemoteStreamAspect;
+		struct RemoteStreamStartTime;
 		struct RemoteEmitterParentId;
 		struct DamageTaken
 		{
@@ -240,6 +241,7 @@ private:
 		typedef DefaultCallback<Messages::RemoteStreamTimestamp, std::string> RemoteStreamTimestamp;
 		typedef DefaultCallback<Messages::RemoteStreamLoop, std::string>     RemoteStreamLoop;
 		typedef DefaultCallback<Messages::RemoteStreamAspect, std::string>   RemoteStreamAspect;
+		typedef DefaultCallback<Messages::RemoteStreamStartTime, std::string> RemoteStreamStartTime;
 		typedef DefaultCallback<Messages::RemoteEmitterParentId, std::string> RemoteEmitterParentId;
 		typedef DefaultCallback<Messages::ConditionModified, int>           ConditionModified;
 		typedef DefaultCallback<Messages::MaxHitPointsModified, int>        MaxHitPointsModified;
@@ -255,6 +257,7 @@ private:
 	friend Callbacks::RemoteStreamTimestamp;
 	friend Callbacks::RemoteStreamLoop;
 	friend Callbacks::RemoteStreamAspect;
+	friend Callbacks::RemoteStreamStartTime;
 	friend Callbacks::RemoteEmitterParentId;
 	friend Callbacks::ConditionModified;
 	friend Callbacks::MaxHitPointsModified;
@@ -279,6 +282,7 @@ private:
 	void                          remoteStreamTimestampModified(const std::string & value);
 	void                          remoteStreamLoopModified(const std::string & value);
 	void                          remoteStreamAspectModified(const std::string & value);
+	void                          remoteStreamStartTimeModified(const std::string & value);
 	void                          remoteEmitterParentIdModified(const std::string & value);
 	void                          updateRemoteVideoStream();
 	void                          clearRemoteVideoStream();
@@ -316,6 +320,7 @@ private:
 	Archive::AutoDeltaVariableCallback<std::string, Callbacks::RemoteStreamTimestamp, TangibleObject> m_remoteStreamTimestamp;
 	Archive::AutoDeltaVariableCallback<std::string, Callbacks::RemoteStreamLoop, TangibleObject> m_remoteStreamLoop;
 	Archive::AutoDeltaVariableCallback<std::string, Callbacks::RemoteStreamAspect, TangibleObject> m_remoteStreamAspect;
+	Archive::AutoDeltaVariableCallback<std::string, Callbacks::RemoteStreamStartTime, TangibleObject> m_remoteStreamStartTime;
 	Archive::AutoDeltaVariableCallback<std::string, Callbacks::RemoteEmitterParentId, TangibleObject> m_remoteEmitterParentId;
 	Archive::AutoDeltaVariableCallback<int,         Callbacks::DamageTaken, TangibleObject>    m_damageTaken;
 	Archive::AutoDeltaVariableCallback<int, Callbacks::MaxHitPointsModified, TangibleObject>   m_maxHitPoints;
@@ -448,6 +453,15 @@ inline void TangibleObject::Callbacks::RemoteStreamAspect::modified(TangibleObje
 	UNREF(oldValue);
 	UNREF(isLocal);
 	target.remoteStreamAspectModified(value);
+}
+
+//----------------------------------------------------------------------
+
+inline void TangibleObject::Callbacks::RemoteStreamStartTime::modified(TangibleObject & target, const std::string & oldValue, const std::string & value, bool isLocal) const
+{
+	UNREF(oldValue);
+	UNREF(isLocal);
+	target.remoteStreamStartTimeModified(value);
 }
 
 //----------------------------------------------------------------------

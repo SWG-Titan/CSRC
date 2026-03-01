@@ -1341,6 +1341,7 @@ namespace VideoStreamNamespace
 	{
 		if (data.mediaPlayer && ms_vlcApi.loaded)
 		{
+			ms_vlcApi.pAudioSetVolume(data.mediaPlayer, 0);
 			ms_vlcApi.pMediaPlayerStop(data.mediaPlayer);
 			ms_vlcApi.pMediaPlayerRelease(data.mediaPlayer);
 			data.mediaPlayer = 0;
@@ -1605,6 +1606,7 @@ m_remoteStreamUrl        (),
 m_remoteStreamTimestamp  (),
 m_remoteStreamLoop       (),
 m_remoteStreamAspect     (),
+m_remoteStreamStartTime  (),
 m_remoteEmitterParentId  (),
 m_damageTaken            (),
 m_maxHitPoints           (),
@@ -1643,6 +1645,7 @@ m_effectsMap()
 	m_remoteStreamTimestamp.setSourceObject(this);
 	m_remoteStreamLoop.setSourceObject(this);
 	m_remoteStreamAspect.setSourceObject(this);
+	m_remoteStreamStartTime.setSourceObject(this);
 	m_remoteEmitterParentId.setSourceObject(this);
 	m_damageTaken.setSourceObject    (this);
 	m_condition.setSourceObject      (this);
@@ -1672,6 +1675,7 @@ m_effectsMap()
 	addSharedVariable_np(m_remoteStreamTimestamp);
 	addSharedVariable_np(m_remoteStreamLoop);
 	addSharedVariable_np(m_remoteStreamAspect);
+	addSharedVariable_np(m_remoteStreamStartTime);
 	addSharedVariable_np(m_remoteEmitterParentId);
 
 	m_effectsMap.setOnErase(this, &TangibleObject::OnObjectEffectErased);
@@ -2740,15 +2744,29 @@ void TangibleObject::updateRemoteVideoStream()
 		ms_vlcApi.pAudioSetVolume(runtimeData.mediaPlayer, 0);
 		ms_vlcApi.pMediaPlayerPlay(runtimeData.mediaPlayer);
 
-		if (requestedTimestamp > 0)
+		int seekSeconds = requestedTimestamp;
+		std::string const & startTimeStr = m_remoteStreamStartTime.get();
+		if (!startTimeStr.empty())
 		{
-			ms_vlcApi.pMediaPlayerSetTime(runtimeData.mediaPlayer, static_cast<libvlc_time_t>(requestedTimestamp) * 1000);
+			int const startEpoch = atoi(startTimeStr.c_str());
+			if (startEpoch > 0)
+			{
+				int const nowEpoch = static_cast<int>(time(0));
+				int const elapsed = nowEpoch - startEpoch;
+				if (elapsed > 0)
+					seekSeconds = elapsed;
+			}
 		}
-		runtimeData.appliedTimestamp = requestedTimestamp;
+
+		if (seekSeconds > 0)
+		{
+			ms_vlcApi.pMediaPlayerSetTime(runtimeData.mediaPlayer, static_cast<libvlc_time_t>(seekSeconds) * 1000);
+		}
+		runtimeData.appliedTimestamp = seekSeconds;
 
 		applyVideoAspectScale(*this);
 
-		DEBUG_REPORT_LOG(true, ("[Titan] VideoStream: Playing %s\n", playUrl.c_str()));
+		DEBUG_REPORT_LOG(true, ("[Titan] VideoStream: Playing %s (seek=%ds)\n", playUrl.c_str(), seekSeconds));
 	}
 
 	runtimeData.settled = true;
@@ -2799,8 +2817,6 @@ void TangibleObject::clearRemoteVideoStream()
 	runtimeData.settled = false;
 	runtimeData.dirty = true;
 
-	setScale(Vector::xyz111);
-
 	ms_videoStreamRuntimeDataMap.erase(runtimeIt);
 }
 
@@ -2824,6 +2840,20 @@ void TangibleObject::remoteStreamAspectModified(const std::string & value)
 {
 	UNREF(value);
 	applyVideoAspectScale(*this);
+}
+
+//----------------------------------------------------------------------
+
+void TangibleObject::remoteStreamStartTimeModified(const std::string & value)
+{
+	UNREF(value);
+	VideoStreamRuntimeDataMap::iterator it = ms_videoStreamRuntimeDataMap.find(this);
+	if (it != ms_videoStreamRuntimeDataMap.end())
+	{
+		it->second.dirty = true;
+		it->second.settled = false;
+	}
+	scheduleForAlter();
 }
 
 //----------------------------------------------------------------------
