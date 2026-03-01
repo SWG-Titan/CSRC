@@ -71,7 +71,7 @@ void CuiDataDrivenPageVideoPlayer::update(float deltaTimeSecs)
 	if (m_tracking && m_slider && m_lblTime)
 	{
 		Object * const obj = NetworkIdManager::getObjectById(m_videoObjectId);
-		TangibleObject const * const tangible = obj ? obj->asTangibleObject() : NULL;
+		TangibleObject const * const tangible = TangibleObject::asTangibleObject(obj);
 
 		int64_t timeMs = 0;
 		int64_t lengthMs = 0;
