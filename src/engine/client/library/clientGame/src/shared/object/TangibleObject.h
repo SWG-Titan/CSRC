@@ -157,6 +157,8 @@ public:
 	bool                hasCondition                      (int condition) const;
 	std::string const & getRemoteStreamAspect             () const;
 
+	static bool         getVideoPlaybackInfo              (TangibleObject const * obj, __int64 & outTimeMs, __int64 & outLengthMs);
+
 	bool isInCombat() const;
 	void setIsInCombat(bool inCombat);
 

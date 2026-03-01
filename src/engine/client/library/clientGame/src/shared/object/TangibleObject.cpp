@@ -107,6 +107,8 @@ typedef void                    (*pfn_libvlc_media_add_option)(libvlc_media_t *p
 typedef int                     (*pfn_libvlc_audio_set_volume)(libvlc_media_player_t *p_mi, int i_volume);
 typedef void                    (*pfn_libvlc_audio_set_callbacks)(libvlc_media_player_t *mp, libvlc_audio_play_cb play, libvlc_audio_pause_cb pause, libvlc_audio_resume_cb resume, libvlc_audio_flush_cb flush, libvlc_audio_drain_cb drain, void *opaque);
 typedef void                    (*pfn_libvlc_audio_set_format)(libvlc_media_player_t *mp, const char *format, unsigned rate, unsigned channels);
+typedef libvlc_time_t           (*pfn_libvlc_media_player_get_time)(libvlc_media_player_t *p_mi);
+typedef libvlc_time_t           (*pfn_libvlc_media_player_get_length)(libvlc_media_player_t *p_mi);
 
 // ======================================================================
 
@@ -1002,6 +1004,8 @@ namespace VideoStreamNamespace
 		pfn_libvlc_audio_set_volume      pAudioSetVolume;
 		pfn_libvlc_audio_set_callbacks   pAudioSetCallbacks;
 		pfn_libvlc_audio_set_format      pAudioSetFormat;
+		pfn_libvlc_media_player_get_time   pMediaPlayerGetTime;
+		pfn_libvlc_media_player_get_length pMediaPlayerGetLength;
 		libvlc_instance_t *              vlcInstance;
 		bool                             loaded;
 		bool                             loadAttempted;
@@ -1044,6 +1048,8 @@ namespace VideoStreamNamespace
 		LOAD_VLC_FUNC(audio_set_volume, AudioSetVolume);
 		LOAD_VLC_FUNC(audio_set_callbacks, AudioSetCallbacks);
 		LOAD_VLC_FUNC(audio_set_format, AudioSetFormat);
+		LOAD_VLC_FUNC(media_player_get_time, MediaPlayerGetTime);
+		LOAD_VLC_FUNC(media_player_get_length, MediaPlayerGetLength);
 
 		#undef LOAD_VLC_FUNC
 
@@ -1461,6 +1467,30 @@ namespace VideoStreamNamespace
 } // namespace VideoStreamNamespace
 
 using namespace VideoStreamNamespace;
+
+bool TangibleObject::getVideoPlaybackInfo(TangibleObject const * obj, __int64 & outTimeMs, __int64 & outLengthMs)
+{
+	outTimeMs = 0;
+	outLengthMs = 0;
+
+	if (!obj)
+		return false;
+
+	if (!ms_vlcApi.loaded || !ms_vlcApi.pMediaPlayerGetTime || !ms_vlcApi.pMediaPlayerGetLength)
+		return false;
+
+	VideoStreamRuntimeDataMap::const_iterator it = ms_videoStreamRuntimeDataMap.find(obj);
+	if (it == ms_videoStreamRuntimeDataMap.end())
+		return false;
+
+	VideoStreamRuntimeData const & rd = it->second;
+	if (!rd.mediaPlayer)
+		return false;
+
+	outTimeMs = ms_vlcApi.pMediaPlayerGetTime(rd.mediaPlayer);
+	outLengthMs = ms_vlcApi.pMediaPlayerGetLength(rd.mediaPlayer);
+	return (outTimeMs >= 0 && outLengthMs > 0);
+}
 
 // ======================================================================
 // class TangibleObject: public static member functions

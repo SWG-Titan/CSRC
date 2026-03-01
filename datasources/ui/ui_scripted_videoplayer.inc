@@ -1,9 +1,9 @@
 	<Page
 		Location='302,194'
-		MinimumSize='420,380'
+		MinimumSize='420,450'
 		Name='videoPlayer'
-		ScrollExtent='420,380'
-		Size='420,380'
+		ScrollExtent='420,450'
+		Size='420,450'
 		UserMovable='true'
 		UserResizable='false'
 		Visible='false'
@@ -20,8 +20,8 @@
 			PackLocation='nfn,nfn'
 			PackSize='a,a'
 			Padding='Both'
-			ScrollExtent='390,290'
-			Size='390,290'
+			ScrollExtent='390,360'
+			Size='390,360'
 			Spacing='6'
 			SpacingType='Constant'
 		>
@@ -162,44 +162,56 @@
 					Name='btnPlay'
 					PackLocation='nfn,cfc'
 					PackSize='p,f'
-					ScrollExtent='80,22'
-					Size='80,22'
+					ScrollExtent='60,22'
+					Size='60,22'
 					Style='/Styles.New.buttons.hud.style'
 					TextColor='#000000'
 				>Play</Button>
 
 				<Button
+					LocalText='Pause'
+					Location='78,10'
+					Name='btnPause'
+					PackLocation='nfn,cfc'
+					PackSize='p,f'
+					ScrollExtent='60,22'
+					Size='60,22'
+					Style='/Styles.New.buttons.hud.style'
+					TextColor='#000000'
+				>Pause</Button>
+
+				<Button
 					LocalText='Stop'
-					Location='100,10'
+					Location='146,10'
 					Name='btnStop'
 					PackLocation='nfn,cfc'
 					PackSize='p,f'
-					ScrollExtent='80,22'
-					Size='80,22'
+					ScrollExtent='60,22'
+					Size='60,22'
 					Style='/Styles.New.buttons.hud.style'
 					TextColor='#000000'
 				>Stop</Button>
 
 				<Button
 					LocalText='Loop: Off'
-					Location='190,10'
+					Location='214,10'
 					Name='btnLoop'
 					PackLocation='nfn,cfc'
 					PackSize='p,f'
-					ScrollExtent='90,22'
-					Size='90,22'
+					ScrollExtent='80,22'
+					Size='80,22'
 					Style='/Styles.New.buttons.hud.style'
 					TextColor='#000000'
 				>Loop: Off</Button>
 
 				<Button
 					LocalText='Aspect: 4:3'
-					Location='290,10'
+					Location='302,10'
 					Name='btnAspect'
 					PackLocation='nfn,cfc'
 					PackSize='p,f'
-					ScrollExtent='90,22'
-					Size='90,22'
+					ScrollExtent='80,22'
+					Size='80,22'
 					Style='/Styles.New.buttons.hud.style'
 					TextColor='#000000'
 				>Aspect: 4:3</Button>
@@ -217,6 +229,62 @@
 					RStyleDefault='/Styles.New.whitebox_palW.rs_default'
 					ScrollExtent='382,32'
 					Size='382,32'
+				/>
+			</Page>
+
+			<!-- Seek Slider and Time Display -->
+			<Page
+				BackgroundOpacity='1.00'
+				BackgroundTint='#1CFFFF'
+				MinimumSize='0,50'
+				Name='sliderSection'
+				PackSize='a,f'
+				PalBgTint='line1'
+				RStyleDefault='/Styles.New.whiteOutline.rs_default'
+				ScrollExtent='390,50'
+				Size='390,50'
+			>
+				<Sliderbar
+					Location='10,6'
+					Name='slider'
+					PackLocation='nfn,nfn'
+					PackSize='a,p'
+					ScrollExtent='370,28'
+					Size='370,28'
+					Style='/Styles.New.Slider.default.calib.style_test'
+					LowerLimit='0'
+					UpperLimit='100'
+					Value='0'
+				>
+				</Sliderbar>
+
+				<Text
+					Enabled='false'
+					Font='bold_10'
+					LocalText='00:00:00 / 00:00:00'
+					Location='10,32'
+					Name='lblTime'
+					PackLocation='nfn,nfn'
+					PalText='text1'
+					ScrollExtent='370,14'
+					Size='370,14'
+					TextColor='#96F4FC'
+					TextAlignmentHorizontal='Center'
+				>00:00:00 / 00:00:00</Text>
+
+				<Page
+					BackgroundColor='#FFFFFF'
+					BackgroundOpacity='0.50'
+					BackgroundTint='#00D6FB'
+					Enabled='false'
+					Location='4,4'
+					Name='box'
+					PackLocation='nfn,nfn'
+					PackSize='a,a'
+					PalBgTint='back1'
+					RStyleDefault='/Styles.New.whitebox_palW.rs_default'
+					ScrollExtent='382,42'
+					Size='382,42'
 				/>
 			</Page>
 
@@ -331,7 +399,7 @@
 		<Button
 			IsCancelButton='true'
 			LocalText='Close'
-			Location='325,348'
+			Location='325,418'
 			MinimumSize='0,24'
 			Name='btnClose'
 			PackLocation='fff,fff'
@@ -347,8 +415,8 @@
 			Name='bg'
 			PackLocation='nfn,nfn'
 			PackSize='a,a'
-			ScrollExtent='420,380'
-			Size='420,380'
+			ScrollExtent='420,450'
+			Size='420,450'
 		>
 			<!-- Close X Button -->
 			<Page
@@ -411,9 +479,9 @@
 				PackSize='a,a'
 				PalBgTint='baselight'
 				RStyleDefault='/Styles.New.thin_in.rs_default'
-				ScrollExtent='419,380'
+				ScrollExtent='419,450'
 				Selectable='true'
-				Size='419,380'
+				Size='419,450'
 			>
 				<!-- Title Bar Background -->
 				<Page
@@ -429,7 +497,7 @@
 				<!-- Bottom Bar Background -->
 				<Page
 					BackgroundOpacity='1.00'
-					Location='0,357'
+					Location='0,427'
 					Name='bottom'
 					PackLocation='nfn,fff'
 					PackSize='a,f'
@@ -449,9 +517,9 @@
 				PackSize='a,a'
 				PalBgTint='back1'
 				RStyleDefault='/Styles.New.thin_in.rs_default'
-				ScrollExtent='420,372'
+				ScrollExtent='420,442'
 				Selectable='true'
-				Size='420,372'
+				Size='420,442'
 			/>
 			<!-- Glow Background -->
 			<Page
@@ -463,9 +531,9 @@
 				PackSize='a,a'
 				PalBgTint='back1'
 				RStyleDefault='/Styles.space.spaceglow.rs_default'
-				ScrollExtent='420,380'
+				ScrollExtent='420,450'
 				Selectable='true'
-				Size='420,380'
+				Size='420,450'
 			/>
 		</Page>
 	</Page>
