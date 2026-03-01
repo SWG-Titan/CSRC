@@ -85,6 +85,11 @@ typedef __int64 libvlc_time_t;
 typedef void (*libvlc_video_lock_cb)(void *opaque, void **planes);
 typedef void (*libvlc_video_unlock_cb)(void *opaque, void *picture, void *const *planes);
 typedef void (*libvlc_video_display_cb)(void *opaque, void *picture);
+typedef void (*libvlc_audio_play_cb)(void *data, const void *samples, unsigned count, __int64 pts);
+typedef void (*libvlc_audio_pause_cb)(void *data, __int64 pts);
+typedef void (*libvlc_audio_resume_cb)(void *data, __int64 pts);
+typedef void (*libvlc_audio_flush_cb)(void *data, __int64 pts);
+typedef void (*libvlc_audio_drain_cb)(void *data);
 
 typedef libvlc_instance_t *     (*pfn_libvlc_new)(int argc, const char *const *argv);
 typedef void                    (*pfn_libvlc_release)(libvlc_instance_t *p_instance);
@@ -100,6 +105,8 @@ typedef void                    (*pfn_libvlc_video_set_callbacks)(libvlc_media_p
 typedef void                    (*pfn_libvlc_video_set_format)(libvlc_media_player_t *mp, const char *chroma, unsigned width, unsigned height, unsigned pitch);
 typedef void                    (*pfn_libvlc_media_add_option)(libvlc_media_t *p_md, const char *psz_options);
 typedef int                     (*pfn_libvlc_audio_set_volume)(libvlc_media_player_t *p_mi, int i_volume);
+typedef void                    (*pfn_libvlc_audio_set_callbacks)(libvlc_media_player_t *mp, libvlc_audio_play_cb play, libvlc_audio_pause_cb pause, libvlc_audio_resume_cb resume, libvlc_audio_flush_cb flush, libvlc_audio_drain_cb drain, void *opaque);
+typedef void                    (*pfn_libvlc_audio_set_format)(libvlc_media_player_t *mp, const char *format, unsigned rate, unsigned channels);
 
 // ======================================================================
 
@@ -993,6 +1000,8 @@ namespace VideoStreamNamespace
 		pfn_libvlc_video_set_format      pVideoSetFormat;
 		pfn_libvlc_media_add_option      pMediaAddOption;
 		pfn_libvlc_audio_set_volume      pAudioSetVolume;
+		pfn_libvlc_audio_set_callbacks   pAudioSetCallbacks;
+		pfn_libvlc_audio_set_format      pAudioSetFormat;
 		libvlc_instance_t *              vlcInstance;
 		bool                             loaded;
 		bool                             loadAttempted;
@@ -1033,15 +1042,16 @@ namespace VideoStreamNamespace
 		LOAD_VLC_FUNC(video_set_format, VideoSetFormat);
 		LOAD_VLC_FUNC(media_add_option, MediaAddOption);
 		LOAD_VLC_FUNC(audio_set_volume, AudioSetVolume);
+		LOAD_VLC_FUNC(audio_set_callbacks, AudioSetCallbacks);
+		LOAD_VLC_FUNC(audio_set_format, AudioSetFormat);
 
 		#undef LOAD_VLC_FUNC
 
 		const char * const vlcArgs[] = {
-			"--no-audio",
 			"--no-xlib",
 			"--no-video-title-show"
 		};
-		ms_vlcApi.vlcInstance = ms_vlcApi.pNew(3, vlcArgs);
+		ms_vlcApi.vlcInstance = ms_vlcApi.pNew(2, vlcArgs);
 		if (!ms_vlcApi.vlcInstance)
 		{
 			DEBUG_REPORT_LOG(true, ("[Titan] VideoStream: Failed to create VLC instance\n"));
@@ -1086,7 +1096,8 @@ namespace VideoStreamNamespace
 			settled(false),
 			frameReady(0),
 			appliedTimestamp(0),
-			requestedTimestamp(0)
+			requestedTimestamp(0),
+			looping(false)
 		{
 		}
 
@@ -1110,10 +1121,33 @@ namespace VideoStreamNamespace
 		int appliedTimestamp;
 		int requestedTimestamp;
 		CRITICAL_SECTION bufferLock;
+		bool looping;
 	};
 
 	typedef std::map<TangibleObject const *, VideoStreamRuntimeData> VideoStreamRuntimeDataMap;
 	VideoStreamRuntimeDataMap ms_videoStreamRuntimeDataMap;
+
+	struct EmitterRuntimeData
+	{
+		EmitterRuntimeData() :
+			owner(0),
+			parentNetworkIdStr(),
+			active(false)
+		{
+		}
+
+		TangibleObject const * owner;
+		std::string parentNetworkIdStr;
+		bool active;
+	};
+
+	typedef std::map<TangibleObject const *, EmitterRuntimeData> EmitterRuntimeDataMap;
+	EmitterRuntimeDataMap ms_emitterRuntimeDataMap;
+
+	float const AUDIO_MAX_DISTANCE = 32.0f;
+	float const AUDIO_FULL_VOLUME_DISTANCE = 5.0f;
+	float const AUDIO_OBSTRUCTION_FACTOR = 0.4f;
+	float const AUDIO_OCCLUSION_FACTOR = 0.05f;
 
 	bool urlNeedsResolution(std::string const & url)
 	{
@@ -1558,6 +1592,8 @@ m_remoteTextureScrollH   (),
 m_remoteTextureScrollV   (),
 m_remoteStreamUrl        (),
 m_remoteStreamTimestamp  (),
+m_remoteStreamLoop       (),
+m_remoteEmitterParentId  (),
 m_damageTaken            (),
 m_maxHitPoints           (),
 m_components             (),
@@ -1593,6 +1629,8 @@ m_effectsMap()
 	m_remoteTextureScrollV.setSourceObject(this);
 	m_remoteStreamUrl.setSourceObject(this);
 	m_remoteStreamTimestamp.setSourceObject(this);
+	m_remoteStreamLoop.setSourceObject(this);
+	m_remoteEmitterParentId.setSourceObject(this);
 	m_damageTaken.setSourceObject    (this);
 	m_condition.setSourceObject      (this);
 	m_maxHitPoints.setSourceObject   (this);
@@ -1619,6 +1657,8 @@ m_effectsMap()
 	addSharedVariable_np(m_remoteTextureScrollV);
 	addSharedVariable_np(m_remoteStreamUrl);
 	addSharedVariable_np(m_remoteStreamTimestamp);
+	addSharedVariable_np(m_remoteStreamLoop);
+	addSharedVariable_np(m_remoteEmitterParentId);
 
 	m_effectsMap.setOnErase(this, &TangibleObject::OnObjectEffectErased);
 	m_effectsMap.setOnInsert(this, &TangibleObject::OnObjectEffectInsert);
@@ -1725,6 +1765,10 @@ float TangibleObject::alter(const float elapsedTime)
 				{
 					updateRemoteVideoStream();
 				}
+				if (!m_remoteEmitterParentId.get().empty())
+				{
+					updateVideoEmitterAudio();
+				}
 				// Restart any object effects that are finished playing.
 				std::map<std::string, Object *>::const_iterator iter = m_objectEffects.begin();
 				for(; iter != m_objectEffects.end(); ++iter)
@@ -1745,6 +1789,8 @@ float TangibleObject::alter(const float elapsedTime)
 					clearRemoteImageTexture();
 				if (hasCondition(C_magicVideoPlayer))
 					clearRemoteVideoStream();
+				if (!m_remoteEmitterParentId.get().empty())
+					clearVideoEmitterAudio();
 			}
 
 		}
@@ -1817,6 +1863,8 @@ void TangibleObject::addToWorld()
 		updateRemoteImageTexture();
 	if (hasCondition(C_magicVideoPlayer))
 		updateRemoteVideoStream();
+	if (!m_remoteEmitterParentId.get().empty())
+		updateVideoEmitterAudio();
 }
 
 // ----------------------------------------------------------------------
@@ -1845,6 +1893,8 @@ void TangibleObject::removeFromWorld()
 		clearRemoteImageTexture();
 	if (hasCondition(C_magicVideoPlayer))
 		clearRemoteVideoStream();
+	if (!m_remoteEmitterParentId.get().empty())
+		clearVideoEmitterAudio();
 
 	ClientObject::removeFromWorld();
 }
@@ -2649,6 +2699,11 @@ void TangibleObject::updateRemoteVideoStream()
 
 		ms_vlcApi.pMediaAddOption(media, ":network-caching=1000");
 
+		std::string const & loopStr = m_remoteStreamLoop.get();
+		runtimeData.looping = (!loopStr.empty() && loopStr != "0");
+		if (runtimeData.looping)
+			ms_vlcApi.pMediaAddOption(media, ":input-repeat=65535");
+
 		runtimeData.mediaPlayer = ms_vlcApi.pMediaPlayerNew(ms_vlcApi.vlcInstance);
 		if (!runtimeData.mediaPlayer)
 		{
@@ -2729,6 +2784,137 @@ void TangibleObject::clearRemoteVideoStream()
 	runtimeData.dirty = true;
 
 	ms_videoStreamRuntimeDataMap.erase(runtimeIt);
+}
+
+//----------------------------------------------------------------------
+
+void TangibleObject::remoteStreamLoopModified(const std::string & value)
+{
+	UNREF(value);
+	VideoStreamRuntimeDataMap::iterator it = ms_videoStreamRuntimeDataMap.find(this);
+	if (it != ms_videoStreamRuntimeDataMap.end())
+	{
+		it->second.dirty = true;
+		it->second.settled = false;
+	}
+	scheduleForAlter();
+}
+
+//----------------------------------------------------------------------
+
+void TangibleObject::remoteEmitterParentIdModified(const std::string & value)
+{
+	UNREF(value);
+	scheduleForAlter();
+}
+
+//----------------------------------------------------------------------
+
+void TangibleObject::updateVideoEmitterAudio()
+{
+	std::string const & parentIdStr = m_remoteEmitterParentId.get();
+	if (parentIdStr.empty() || !isInWorld())
+	{
+		clearVideoEmitterAudio();
+		return;
+	}
+
+	EmitterRuntimeData & emitterData = ms_emitterRuntimeDataMap[this];
+	emitterData.owner = this;
+	emitterData.parentNetworkIdStr = parentIdStr;
+	emitterData.active = true;
+
+	NetworkId const parentNetId(parentIdStr);
+	Object * const parentObj = NetworkIdManager::getObjectById(parentNetId);
+	TangibleObject * const parentTangible = TangibleObject::asTangibleObject(parentObj);
+
+	if (!parentTangible)
+	{
+		scheduleForAlter();
+		return;
+	}
+
+	VideoStreamRuntimeDataMap::iterator parentIt = ms_videoStreamRuntimeDataMap.find(parentTangible);
+	if (parentIt == ms_videoStreamRuntimeDataMap.end() || !parentIt->second.mediaPlayer)
+	{
+		scheduleForAlter();
+		return;
+	}
+
+	VideoStreamRuntimeData & parentVideoData = parentIt->second;
+
+	Object const * const player = Game::getPlayer();
+	if (!player)
+		return;
+
+	Vector const emitterPos = getPosition_w();
+	Vector const playerPos = player->getPosition_w();
+	float const distance = emitterPos.magnitudeBetween(playerPos);
+
+	if (distance > AUDIO_MAX_DISTANCE)
+	{
+		ms_vlcApi.pAudioSetVolume(parentVideoData.mediaPlayer, 0);
+		scheduleForAlter();
+		return;
+	}
+
+	float volume = 1.0f;
+	if (distance > AUDIO_FULL_VOLUME_DISTANCE)
+	{
+		float const fadeRange = AUDIO_MAX_DISTANCE - AUDIO_FULL_VOLUME_DISTANCE;
+		volume = 1.0f - ((distance - AUDIO_FULL_VOLUME_DISTANCE) / fadeRange);
+		if (volume < 0.0f)
+			volume = 0.0f;
+	}
+
+	CellProperty const * const emitterCell = getParentCell();
+	CellProperty const * const playerCell = player->getParentCell();
+
+	if (emitterCell != playerCell)
+	{
+		if (emitterCell && playerCell)
+		{
+			if (emitterCell->getPortalProperty() == playerCell->getPortalProperty())
+				volume *= AUDIO_OBSTRUCTION_FACTOR;
+			else
+				volume *= AUDIO_OCCLUSION_FACTOR;
+		}
+		else
+		{
+			volume *= AUDIO_OCCLUSION_FACTOR;
+		}
+	}
+
+	int vlcVolume = static_cast<int>(volume * 100.0f);
+	if (vlcVolume < 0) vlcVolume = 0;
+	if (vlcVolume > 100) vlcVolume = 100;
+
+	ms_vlcApi.pAudioSetVolume(parentVideoData.mediaPlayer, vlcVolume);
+	scheduleForAlter();
+}
+
+//----------------------------------------------------------------------
+
+void TangibleObject::clearVideoEmitterAudio()
+{
+	EmitterRuntimeDataMap::iterator it = ms_emitterRuntimeDataMap.find(this);
+	if (it == ms_emitterRuntimeDataMap.end())
+		return;
+
+	if (!it->second.parentNetworkIdStr.empty())
+	{
+		NetworkId const parentNetId(it->second.parentNetworkIdStr);
+		Object * const parentObj = NetworkIdManager::getObjectById(parentNetId);
+		TangibleObject * const parentTangible = TangibleObject::asTangibleObject(parentObj);
+		if (parentTangible)
+		{
+			VideoStreamRuntimeDataMap::iterator parentIt = ms_videoStreamRuntimeDataMap.find(parentTangible);
+			if (parentIt != ms_videoStreamRuntimeDataMap.end() && parentIt->second.mediaPlayer && ms_vlcApi.loaded)
+				ms_vlcApi.pAudioSetVolume(parentIt->second.mediaPlayer, 0);
+		}
+	}
+
+	ms_emitterRuntimeDataMap.erase(it);
 }
 
 //----------------------------------------------------------------------

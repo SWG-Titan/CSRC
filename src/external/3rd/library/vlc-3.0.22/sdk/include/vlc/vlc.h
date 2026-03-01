@@ -15,6 +15,12 @@ typedef void (*libvlc_video_lock_cb)(void *opaque, void **planes);
 typedef void (*libvlc_video_unlock_cb)(void *opaque, void *picture, void *const *planes);
 typedef void (*libvlc_video_display_cb)(void *opaque, void *picture);
 
+typedef void (*libvlc_audio_play_cb)(void *data, const void *samples, unsigned count, __int64 pts);
+typedef void (*libvlc_audio_pause_cb)(void *data, __int64 pts);
+typedef void (*libvlc_audio_resume_cb)(void *data, __int64 pts);
+typedef void (*libvlc_audio_flush_cb)(void *data, __int64 pts);
+typedef void (*libvlc_audio_drain_cb)(void *data);
+
 typedef enum libvlc_state_t
 {
     libvlc_NothingSpecial = 0,
@@ -47,6 +53,8 @@ typedef void                    (*pfn_libvlc_video_set_callbacks)(libvlc_media_p
 typedef void                    (*pfn_libvlc_video_set_format)(libvlc_media_player_t *mp, const char *chroma, unsigned width, unsigned height, unsigned pitch);
 typedef void                    (*pfn_libvlc_media_add_option)(libvlc_media_t *p_md, const char *psz_options);
 typedef int                     (*pfn_libvlc_audio_set_volume)(libvlc_media_player_t *p_mi, int i_volume);
+typedef void                    (*pfn_libvlc_audio_set_callbacks)(libvlc_media_player_t *mp, libvlc_audio_play_cb play, libvlc_audio_pause_cb pause, libvlc_audio_resume_cb resume, libvlc_audio_flush_cb flush, libvlc_audio_drain_cb drain, void *opaque);
+typedef void                    (*pfn_libvlc_audio_set_format)(libvlc_media_player_t *mp, const char *format, unsigned rate, unsigned channels);
 
 #ifdef __cplusplus
 }

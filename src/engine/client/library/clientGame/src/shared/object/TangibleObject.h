@@ -103,6 +103,8 @@ public:
 		struct RemoteTextureScrollV;
 		struct RemoteStreamUrl;
 		struct RemoteStreamTimestamp;
+		struct RemoteStreamLoop;
+		struct RemoteEmitterParentId;
 		struct DamageTaken
 		{
 			typedef std::pair<TangibleObject *, int> Payload;
@@ -234,6 +236,8 @@ private:
 		typedef DefaultCallback<Messages::RemoteTextureScrollV, std::string> RemoteTextureScrollV;
 		typedef DefaultCallback<Messages::RemoteStreamUrl, std::string>     RemoteStreamUrl;
 		typedef DefaultCallback<Messages::RemoteStreamTimestamp, std::string> RemoteStreamTimestamp;
+		typedef DefaultCallback<Messages::RemoteStreamLoop, std::string>     RemoteStreamLoop;
+		typedef DefaultCallback<Messages::RemoteEmitterParentId, std::string> RemoteEmitterParentId;
 		typedef DefaultCallback<Messages::ConditionModified, int>           ConditionModified;
 		typedef DefaultCallback<Messages::MaxHitPointsModified, int>        MaxHitPointsModified;
 	};
@@ -246,6 +250,8 @@ private:
 	friend Callbacks::RemoteTextureScrollV;
 	friend Callbacks::RemoteStreamUrl;
 	friend Callbacks::RemoteStreamTimestamp;
+	friend Callbacks::RemoteStreamLoop;
+	friend Callbacks::RemoteEmitterParentId;
 	friend Callbacks::ConditionModified;
 	friend Callbacks::MaxHitPointsModified;
 
@@ -267,8 +273,12 @@ private:
 
 	void                          remoteStreamUrlModified(const std::string & value);
 	void                          remoteStreamTimestampModified(const std::string & value);
+	void                          remoteStreamLoopModified(const std::string & value);
+	void                          remoteEmitterParentIdModified(const std::string & value);
 	void                          updateRemoteVideoStream();
 	void                          clearRemoteVideoStream();
+	void                          updateVideoEmitterAudio();
+	void                          clearVideoEmitterAudio();
 
 	void                          updateInterestingAttachedObject(int objectCondition);
 
@@ -299,6 +309,8 @@ private:
 	Archive::AutoDeltaVariableCallback<std::string, Callbacks::RemoteTextureScrollV, TangibleObject> m_remoteTextureScrollV;
 	Archive::AutoDeltaVariableCallback<std::string, Callbacks::RemoteStreamUrl, TangibleObject> m_remoteStreamUrl;
 	Archive::AutoDeltaVariableCallback<std::string, Callbacks::RemoteStreamTimestamp, TangibleObject> m_remoteStreamTimestamp;
+	Archive::AutoDeltaVariableCallback<std::string, Callbacks::RemoteStreamLoop, TangibleObject> m_remoteStreamLoop;
+	Archive::AutoDeltaVariableCallback<std::string, Callbacks::RemoteEmitterParentId, TangibleObject> m_remoteEmitterParentId;
 	Archive::AutoDeltaVariableCallback<int,         Callbacks::DamageTaken, TangibleObject>    m_damageTaken;
 	Archive::AutoDeltaVariableCallback<int, Callbacks::MaxHitPointsModified, TangibleObject>   m_maxHitPoints;
 
@@ -412,6 +424,24 @@ inline void TangibleObject::Callbacks::RemoteStreamTimestamp::modified(TangibleO
 	UNREF(oldValue);
 	UNREF(isLocal);
 	target.remoteStreamTimestampModified(value);
+}
+
+//----------------------------------------------------------------------
+
+inline void TangibleObject::Callbacks::RemoteStreamLoop::modified(TangibleObject & target, const std::string & oldValue, const std::string & value, bool isLocal) const
+{
+	UNREF(oldValue);
+	UNREF(isLocal);
+	target.remoteStreamLoopModified(value);
+}
+
+//----------------------------------------------------------------------
+
+inline void TangibleObject::Callbacks::RemoteEmitterParentId::modified(TangibleObject & target, const std::string & oldValue, const std::string & value, bool isLocal) const
+{
+	UNREF(oldValue);
+	UNREF(isLocal);
+	target.remoteEmitterParentIdModified(value);
 }
 
 //----------------------------------------------------------------------
