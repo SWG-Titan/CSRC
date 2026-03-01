@@ -954,6 +954,9 @@
     <ClCompile Include="..\..\src\shared\clientGameServer\SuiUpdatePageMessage.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Optimized|Win32'">MaxSpeed</Optimization>
     </ClCompile>
+    <ClCompile Include="..\..\src\shared\clientGameServer\UpdateCellLightsMessage.cpp">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Optimized|Win32'">MaxSpeed</Optimization>
+    </ClCompile>
     <ClCompile Include="..\..\src\shared\clientGameServer\UpdateCellPermissionMessage.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Optimized|Win32'">MaxSpeed</Optimization>
     </ClCompile>
@@ -1448,6 +1451,7 @@
     <ClInclude Include="..\..\src\shared\clientGameServer\SuiCreatePageMessage.h" />
     <ClInclude Include="..\..\src\shared\clientGameServer\SuiEventNotification.h" />
     <ClInclude Include="..\..\src\shared\clientGameServer\SuiUpdatePageMessage.h" />
+    <ClInclude Include="..\..\src\shared\clientGameServer\UpdateCellLightsMessage.h" />
     <ClInclude Include="..\..\src\shared\clientGameServer\UpdateCellPermissionMessage.h" />
     <ClInclude Include="..\..\src\shared\clientGameServer\UpdateContainmentMessage.h" />
     <ClInclude Include="..\..\src\shared\clientGameServer\UpdateMissileMessage.h" />

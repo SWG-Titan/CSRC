@@ -14,7 +14,10 @@
 #include "clientGame/ClientObject.h"
 #include "sharedMathArchive/VectorArchive.h"
 
+#include <vector>
+
 class IndexedTriangleList;
+class Light;
 
 // ======================================================================
 
@@ -48,6 +51,8 @@ public:
 	void setAccessAllowed(bool allowed);
 	bool getAccessAllowed() const;
 
+	void setCellLightColor(float r, float g, float b, float brightness);
+
 	const IndexedTriangleList* getRadarShape () const;
 	const stdvector<Vector>::fwd* getRadarEdges () const;
 	const stdvector<Vector>::fwd* getRadarPortalEdges () const;
@@ -78,6 +83,8 @@ private:
 	IndexedTriangleList*             m_radarShape;
 	stdvector<Vector>::fwd*          m_radarEdges;
 	stdvector<Vector>::fwd*          m_radarPortalEdges;
+
+	std::vector<Light *>             m_cellLights;
 };
 
 // ======================================================================

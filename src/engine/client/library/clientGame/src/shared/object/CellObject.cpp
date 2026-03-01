@@ -13,6 +13,7 @@
 #include "clientGame/ConfigClientGame.h"
 #include "clientGraphics/Light.h"
 #include "clientGraphics/RenderWorld.h"
+#include "sharedMath/VectorArgb.h"
 #include "clientObject/InteriorEnvironmentBlock.h"
 #include "clientObject/InteriorEnvironmentBlockManager.h"
 #include "sharedCollision/Floor.h"
@@ -56,7 +57,8 @@ CellObject::CellObject(const SharedObjectTemplate *newTemplate)
 	m_accessAllowed(true),
 	m_radarShape (0),
 	m_radarEdges (0),
-	m_radarPortalEdges (0)
+	m_radarPortalEdges (0),
+	m_cellLights()
 {
 	addSharedVariable(m_isPublic);
 	addSharedVariable(m_cellNumber);
@@ -153,6 +155,7 @@ void CellObject::endBaselines()
 				Light *light = createLight(lightData);
 				light->setAffectsShadersWithPrecalculatedVertexLighting(false);
 				light->attachToObject_p(this, true);
+				m_cellLights.push_back(light);
 			}	
 
 			if (lightData.specularColor.r != 0.0f || lightData.specularColor.g != 0.0f || lightData.specularColor.b != 0.0f)
@@ -161,6 +164,7 @@ void CellObject::endBaselines()
 				light->setDiffuseColor(VectorArgb::solidBlack);
 				light->setAffectsShadersWithoutPrecalculatedVertexLighting(false);
 				light->attachToObject_p(this, true);
+				m_cellLights.push_back(light);
 			}
 		}
 	}
@@ -315,6 +319,32 @@ const std::vector<Vector>* CellObject::getRadarEdges () const
 const std::vector<Vector>* CellObject::getRadarPortalEdges () const
 {
 	return m_radarPortalEdges;
+}
+
+// ----------------------------------------------------------------------
+
+void CellObject::setCellLightColor(float r, float g, float b, float brightness)
+{
+	const VectorArgb color(1.0f, r * brightness, g * brightness, b * brightness);
+
+	for (std::vector<Light *>::iterator it = m_cellLights.begin(); it != m_cellLights.end(); ++it)
+	{
+		Light * const light = *it;
+		if (light)
+		{
+			if (light->getType() == Light::T_ambient)
+			{
+				light->setDiffuseColor(color);
+			}
+			else
+			{
+				if (light->hasDiffuseColor())
+					light->setDiffuseColor(color);
+				if (light->hasSpecularColor())
+					light->setSpecularColor(color);
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------

@@ -154,6 +154,7 @@
 #include "sharedNetworkMessages/ShipUpdateTransformCollisionMessage.h"
 #include "sharedNetworkMessages/ShipUpdateTransformMessage.h"
 #include "sharedNetworkMessages/SlowDownEffectMessage.h"
+#include "sharedNetworkMessages/UpdateCellLightsMessage.h"
 #include "sharedNetworkMessages/UpdateCellPermissionMessage.h"
 #include "sharedNetworkMessages/UpdateContainmentMessage.h"
 #include "sharedNetworkMessages/UpdateMissileMessage.h"
@@ -839,6 +840,7 @@ void GroundScene::init (const char* const terrainFilename, CreatureObject* const
 	connectToMessage ("BaselinesMessage");
 	connectToMessage ("DeltasMessage");
 	connectToMessage ("UpdatePostureMessage");
+	connectToMessage ("UpdateCellLightsMessage");
 	connectToMessage ("UpdateCellPermissionMessage");
 	connectToMessage ("UpdateScaleMessage");
 	connectToMessage ("UpdateTransformMessage");
@@ -2784,6 +2786,17 @@ void GroundScene::receiveMessage(const MessageDispatch::Emitter &, const Message
 		m_structurePlacementCamera->setTarget (player);
 
 		m_receivedSceneReady = true;
+	}
+
+	//----------------------------------------------------------------------
+
+	else if(message.isType("UpdateCellLightsMessage"))
+	{
+		Archive::ReadIterator ri = NON_NULL (gnm)->getByteStream().begin();
+		const UpdateCellLightsMessage updateCellLightsMessage(ri);
+		CellObject * const target = dynamic_cast<CellObject *>(NetworkIdManager::getObjectById(updateCellLightsMessage.getCellId()));
+		if (target)
+			target->setCellLightColor(updateCellLightsMessage.getR(), updateCellLightsMessage.getG(), updateCellLightsMessage.getB(), updateCellLightsMessage.getBrightness());
 	}
 
 	//----------------------------------------------------------------------
