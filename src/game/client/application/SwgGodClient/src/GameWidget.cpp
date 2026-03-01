@@ -139,6 +139,12 @@ namespace GameWidgetNamespace
 		MPMI_setUrl = 2
 	};
 
+	enum MagicVideoMenuIds
+	{
+		MVMI_setCondition = 1,
+		MVMI_setUrl = 2
+	};
+
 	//-- @todo: preferences manager should handle key mapping
 
 	//Transform keys
@@ -1457,7 +1463,8 @@ namespace
 		{ "Spawned Creature",        TangibleObject::C_spawnedCreature },
 		{ "Holiday Interesting",     TangibleObject::C_holidayInteresting },
 		{ "Locked",                  TangibleObject::C_locked },
-		{ "Magic Painting URL",      TangibleObject::C_magicPaintingUrl }
+		{ "Magic Painting URL",      TangibleObject::C_magicPaintingUrl },
+		{ "Magic Video Player",      TangibleObject::C_magicVideoPlayer }
 	};
 
 	void populateMenu(QPopupMenu* menu, const FilesystemTree::Node* node, int& num, QObject* const receiver, const char* const member)
@@ -1547,6 +1554,14 @@ void GameWidget::contextMenuEvent(QContextMenuEvent* evt)
 						IGNORE_RETURN(magicPaintingConditionMenu->insertItem("Set Condition", MPMI_setCondition));
 						IGNORE_RETURN(magicPaintingConditionMenu->insertItem("Set URL...", MPMI_setUrl));
 						IGNORE_RETURN(m_setConditionMenu->insertItem(s_playerFacingConditions[i].label, magicPaintingConditionMenu));
+					}
+					else if (s_playerFacingConditions[i].value == TangibleObject::C_magicVideoPlayer)
+					{
+						QPopupMenu * const magicVideoConditionMenu = new QPopupMenu(m_setConditionMenu, "GameWidget_magicVideoConditionMenu");
+						IGNORE_RETURN(connect(magicVideoConditionMenu, SIGNAL(activated(int)), this, SLOT(onMagicVideoConditionMenuActivated(int))));
+						IGNORE_RETURN(magicVideoConditionMenu->insertItem("Set Condition", MVMI_setCondition));
+						IGNORE_RETURN(magicVideoConditionMenu->insertItem("Set Stream URL...", MVMI_setUrl));
+						IGNORE_RETURN(m_setConditionMenu->insertItem(s_playerFacingConditions[i].label, magicVideoConditionMenu));
 					}
 					else
 					{
@@ -1861,6 +1876,32 @@ void GameWidget::onMagicPaintingConditionMenuActivated(int id)
 
 		std::ostringstream param;
 		param << "magicPaintingUrl " << url.latin1();
+		IGNORE_RETURN(ClientCommandQueue::enqueueCommand("developer", m_menuIds.objNetworkId, Unicode::narrowToWide(param.str())));
+	}
+}
+
+//-----------------------------------------------------------------
+
+void GameWidget::onMagicVideoConditionMenuActivated(int id)
+{
+	if (m_menuIds.objNetworkId == NetworkId::cms_invalid)
+		return;
+
+	if (id == MVMI_setCondition)
+	{
+		std::ostringstream param;
+		param << "setCondition " << TangibleObject::C_magicVideoPlayer;
+		IGNORE_RETURN(ClientCommandQueue::enqueueCommand("developer", m_menuIds.objNetworkId, Unicode::narrowToWide(param.str())));
+	}
+	else if (id == MVMI_setUrl)
+	{
+		bool ok = false;
+		QString const url = QInputDialog::getText("Magic Video Player", "Enter stream URL:", QLineEdit::Normal, QString::null, &ok, this);
+		if (!ok || url.isEmpty())
+			return;
+
+		std::ostringstream param;
+		param << "spawnTelevision " << url.latin1();
 		IGNORE_RETURN(ClientCommandQueue::enqueueCommand("developer", m_menuIds.objNetworkId, Unicode::narrowToWide(param.str())));
 	}
 }

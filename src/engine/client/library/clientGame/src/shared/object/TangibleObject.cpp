@@ -77,6 +77,30 @@
 #pragma comment(lib, "windowscodecs.lib")
 #pragma comment(lib, "ole32.lib")
 
+// libVLC types and function pointer typedefs for dynamic loading
+typedef struct libvlc_instance_t libvlc_instance_t;
+typedef struct libvlc_media_t libvlc_media_t;
+typedef struct libvlc_media_player_t libvlc_media_player_t;
+typedef __int64 libvlc_time_t;
+typedef void (*libvlc_video_lock_cb)(void *opaque, void **planes);
+typedef void (*libvlc_video_unlock_cb)(void *opaque, void *picture, void *const *planes);
+typedef void (*libvlc_video_display_cb)(void *opaque, void *picture);
+
+typedef libvlc_instance_t *     (*pfn_libvlc_new)(int argc, const char *const *argv);
+typedef void                    (*pfn_libvlc_release)(libvlc_instance_t *p_instance);
+typedef libvlc_media_t *        (*pfn_libvlc_media_new_location)(libvlc_instance_t *p_instance, const char *psz_mrl);
+typedef void                    (*pfn_libvlc_media_release)(libvlc_media_t *p_md);
+typedef libvlc_media_player_t * (*pfn_libvlc_media_player_new)(libvlc_instance_t *p_instance);
+typedef void                    (*pfn_libvlc_media_player_release)(libvlc_media_player_t *p_mi);
+typedef void                    (*pfn_libvlc_media_player_set_media)(libvlc_media_player_t *p_mi, libvlc_media_t *p_md);
+typedef int                     (*pfn_libvlc_media_player_play)(libvlc_media_player_t *p_mi);
+typedef void                    (*pfn_libvlc_media_player_stop)(libvlc_media_player_t *p_mi);
+typedef void                    (*pfn_libvlc_media_player_set_time)(libvlc_media_player_t *p_mi, libvlc_time_t i_time);
+typedef void                    (*pfn_libvlc_video_set_callbacks)(libvlc_media_player_t *mp, libvlc_video_lock_cb lock, libvlc_video_unlock_cb unlock, libvlc_video_display_cb display, void *opaque);
+typedef void                    (*pfn_libvlc_video_set_format)(libvlc_media_player_t *mp, const char *chroma, unsigned width, unsigned height, unsigned pitch);
+typedef void                    (*pfn_libvlc_media_add_option)(libvlc_media_t *p_md, const char *psz_options);
+typedef int                     (*pfn_libvlc_audio_set_volume)(libvlc_media_player_t *p_mi, int i_volume);
+
 // ======================================================================
 
 //lint -e1734 // difficulty compiling safe_cast template
@@ -947,6 +971,452 @@ namespace TangibleObjectNamespace
 using namespace TangibleObjectNamespace;
 
 // ======================================================================
+// libVLC dynamic loading and video stream support
+// ======================================================================
+
+namespace VideoStreamNamespace
+{
+	struct VlcApi
+	{
+		HMODULE                          hLibVlc;
+		pfn_libvlc_new                   pNew;
+		pfn_libvlc_release               pRelease;
+		pfn_libvlc_media_new_location    pMediaNewLocation;
+		pfn_libvlc_media_release         pMediaRelease;
+		pfn_libvlc_media_player_new      pMediaPlayerNew;
+		pfn_libvlc_media_player_release  pMediaPlayerRelease;
+		pfn_libvlc_media_player_set_media pMediaPlayerSetMedia;
+		pfn_libvlc_media_player_play     pMediaPlayerPlay;
+		pfn_libvlc_media_player_stop     pMediaPlayerStop;
+		pfn_libvlc_media_player_set_time pMediaPlayerSetTime;
+		pfn_libvlc_video_set_callbacks   pVideoSetCallbacks;
+		pfn_libvlc_video_set_format      pVideoSetFormat;
+		pfn_libvlc_media_add_option      pMediaAddOption;
+		pfn_libvlc_audio_set_volume      pAudioSetVolume;
+		libvlc_instance_t *              vlcInstance;
+		bool                             loaded;
+		bool                             loadAttempted;
+	};
+
+	VlcApi ms_vlcApi = {};
+
+	bool loadVlcApi()
+	{
+		if (ms_vlcApi.loadAttempted)
+			return ms_vlcApi.loaded;
+
+		ms_vlcApi.loadAttempted = true;
+		ms_vlcApi.loaded = false;
+
+		ms_vlcApi.hLibVlc = LoadLibraryA("libvlc.dll");
+		if (!ms_vlcApi.hLibVlc)
+		{
+			DEBUG_REPORT_LOG(true, ("[Titan] VideoStream: Failed to load libvlc.dll\n"));
+			return false;
+		}
+
+		#define LOAD_VLC_FUNC(name, type) \
+			ms_vlcApi.p##type = (pfn_libvlc_##name)GetProcAddress(ms_vlcApi.hLibVlc, "libvlc_" #name); \
+			if (!ms_vlcApi.p##type) { DEBUG_REPORT_LOG(true, ("[Titan] VideoStream: Failed to load libvlc_%s\n", #name)); return false; }
+
+		LOAD_VLC_FUNC(new, New);
+		LOAD_VLC_FUNC(release, Release);
+		LOAD_VLC_FUNC(media_new_location, MediaNewLocation);
+		LOAD_VLC_FUNC(media_release, MediaRelease);
+		LOAD_VLC_FUNC(media_player_new, MediaPlayerNew);
+		LOAD_VLC_FUNC(media_player_release, MediaPlayerRelease);
+		LOAD_VLC_FUNC(media_player_set_media, MediaPlayerSetMedia);
+		LOAD_VLC_FUNC(media_player_play, MediaPlayerPlay);
+		LOAD_VLC_FUNC(media_player_stop, MediaPlayerStop);
+		LOAD_VLC_FUNC(media_player_set_time, MediaPlayerSetTime);
+		LOAD_VLC_FUNC(video_set_callbacks, VideoSetCallbacks);
+		LOAD_VLC_FUNC(video_set_format, VideoSetFormat);
+		LOAD_VLC_FUNC(media_add_option, MediaAddOption);
+		LOAD_VLC_FUNC(audio_set_volume, AudioSetVolume);
+
+		#undef LOAD_VLC_FUNC
+
+		const char * const vlcArgs[] = {
+			"--no-audio",
+			"--no-xlib",
+			"--no-video-title-show"
+		};
+		ms_vlcApi.vlcInstance = ms_vlcApi.pNew(3, vlcArgs);
+		if (!ms_vlcApi.vlcInstance)
+		{
+			DEBUG_REPORT_LOG(true, ("[Titan] VideoStream: Failed to create VLC instance\n"));
+			return false;
+		}
+
+		ms_vlcApi.loaded = true;
+		DEBUG_REPORT_LOG(true, ("[Titan] VideoStream: libVLC loaded successfully\n"));
+		return true;
+	}
+
+	unsigned int const VIDEO_WIDTH = 640;
+	unsigned int const VIDEO_HEIGHT = 360;
+	unsigned int const VIDEO_PITCH = VIDEO_WIDTH * 4;
+
+	enum ResolveState
+	{
+		RS_none,
+		RS_pending,
+		RS_done,
+		RS_failed
+	};
+
+	struct VideoStreamRuntimeData
+	{
+		VideoStreamRuntimeData() :
+			owner(0),
+			appliedUrl(),
+			requestedUrl(),
+			resolvedUrl(),
+			resolveState(RS_none),
+			resolveThread(0),
+			mediaPlayer(0),
+			videoBuffer(0),
+			videoBufferSize(0),
+			texture(0),
+			overlayObject(0),
+			overlayBackObject(0),
+			isPaintingTemplate(false),
+			isPaintingTemplateResolved(false),
+			dirty(true),
+			settled(false),
+			frameReady(0),
+			appliedTimestamp(0),
+			requestedTimestamp(0)
+		{
+		}
+
+		TangibleObject const * owner;
+		std::string appliedUrl;
+		std::string requestedUrl;
+		std::string resolvedUrl;
+		volatile ResolveState resolveState;
+		HANDLE resolveThread;
+		libvlc_media_player_t * mediaPlayer;
+		unsigned char * videoBuffer;
+		unsigned int videoBufferSize;
+		Texture const * texture;
+		Object * overlayObject;
+		Object * overlayBackObject;
+		bool isPaintingTemplate;
+		bool isPaintingTemplateResolved;
+		bool dirty;
+		bool settled;
+		LONG frameReady;
+		int appliedTimestamp;
+		int requestedTimestamp;
+		CRITICAL_SECTION bufferLock;
+	};
+
+	typedef std::map<TangibleObject const *, VideoStreamRuntimeData> VideoStreamRuntimeDataMap;
+	VideoStreamRuntimeDataMap ms_videoStreamRuntimeDataMap;
+
+	bool urlNeedsResolution(std::string const & url)
+	{
+		if (url.find("youtube.com/") != std::string::npos)
+			return true;
+		if (url.find("youtu.be/") != std::string::npos)
+			return true;
+		if (url.find("vimeo.com/") != std::string::npos)
+			return true;
+		if (url.find("twitch.tv/") != std::string::npos)
+			return true;
+		if (url.find("dailymotion.com/") != std::string::npos)
+			return true;
+		if (url.find("streamable.com/") != std::string::npos)
+			return true;
+
+		std::string::size_type const lastDot = url.rfind('.');
+		if (lastDot != std::string::npos)
+		{
+			std::string ext = url.substr(lastDot);
+			for (std::string::iterator c = ext.begin(); c != ext.end(); ++c)
+				*c = static_cast<char>(std::tolower(static_cast<unsigned char>(*c)));
+
+			if (ext == ".mp4" || ext == ".webm" || ext == ".mkv" || ext == ".avi"
+				|| ext == ".flv" || ext == ".ogg" || ext == ".m3u8" || ext == ".ts"
+				|| ext == ".mp3" || ext == ".wav" || ext == ".m4a")
+			{
+				return false;
+			}
+		}
+
+		if (url.find("googlevideo.com/") != std::string::npos)
+			return false;
+		if (url.find("akamaized.net/") != std::string::npos)
+			return false;
+
+		return false;
+	}
+
+	struct ResolveUrlThreadData
+	{
+		std::string inputUrl;
+		VideoStreamRuntimeData * runtimeData;
+	};
+
+	DWORD WINAPI resolveUrlThreadProc(LPVOID param)
+	{
+		ResolveUrlThreadData * threadData = reinterpret_cast<ResolveUrlThreadData *>(param);
+		if (!threadData)
+			return 1;
+
+		std::string const & url = threadData->inputUrl;
+		VideoStreamRuntimeData * runtimeData = threadData->runtimeData;
+
+		std::string cmdLine = "yt-dlp.exe --get-url -f \"best[height<=720]\" --no-playlist \"";
+		cmdLine += url;
+		cmdLine += "\"";
+
+		DEBUG_REPORT_LOG(true, ("[Titan] VideoStream: Resolving URL via yt-dlp: %s\n", url.c_str()));
+
+		SECURITY_ATTRIBUTES sa;
+		memset(&sa, 0, sizeof(sa));
+		sa.nLength = sizeof(sa);
+		sa.bInheritHandle = TRUE;
+
+		HANDLE hReadPipe = 0;
+		HANDLE hWritePipe = 0;
+		if (!CreatePipe(&hReadPipe, &hWritePipe, &sa, 0))
+		{
+			DEBUG_REPORT_LOG(true, ("[Titan] VideoStream: yt-dlp CreatePipe failed\n"));
+			runtimeData->resolveState = RS_failed;
+			delete threadData;
+			return 1;
+		}
+		SetHandleInformation(hReadPipe, HANDLE_FLAG_INHERIT, 0);
+
+		HANDLE hNul = CreateFileA("NUL", GENERIC_WRITE, 0, &sa, OPEN_EXISTING, 0, 0);
+
+		STARTUPINFOA si;
+		memset(&si, 0, sizeof(si));
+		si.cb = sizeof(si);
+		si.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
+		si.hStdOutput = hWritePipe;
+		si.hStdError = hNul;
+		si.hStdInput = 0;
+		si.wShowWindow = SW_HIDE;
+
+		PROCESS_INFORMATION pi;
+		memset(&pi, 0, sizeof(pi));
+
+		char cmdBuf[2048];
+		strncpy(cmdBuf, cmdLine.c_str(), sizeof(cmdBuf) - 1);
+		cmdBuf[sizeof(cmdBuf) - 1] = '\0';
+
+		BOOL created = CreateProcessA(0, cmdBuf, 0, 0, TRUE, CREATE_NO_WINDOW, 0, 0, &si, &pi);
+		CloseHandle(hWritePipe);
+		if (hNul)
+			CloseHandle(hNul);
+
+		if (!created)
+		{
+			DEBUG_REPORT_LOG(true, ("[Titan] VideoStream: yt-dlp CreateProcess failed (error %lu). Is yt-dlp.exe in PATH or exe directory?\n", GetLastError()));
+			CloseHandle(hReadPipe);
+			runtimeData->resolveState = RS_failed;
+			delete threadData;
+			return 1;
+		}
+
+		std::string output;
+		char readBuf[4096];
+		DWORD bytesRead = 0;
+		while (ReadFile(hReadPipe, readBuf, sizeof(readBuf) - 1, &bytesRead, 0) && bytesRead > 0)
+		{
+			readBuf[bytesRead] = '\0';
+			output += readBuf;
+		}
+		CloseHandle(hReadPipe);
+
+		WaitForSingleObject(pi.hProcess, 15000);
+
+		DWORD exitCode = 1;
+		GetExitCodeProcess(pi.hProcess, &exitCode);
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+
+		while (!output.empty() && (output[output.size() - 1] == '\n' || output[output.size() - 1] == '\r'))
+			output.erase(output.size() - 1);
+
+		std::string::size_type firstNewline = output.find('\n');
+		if (firstNewline != std::string::npos)
+			output = output.substr(0, firstNewline);
+		while (!output.empty() && (output[output.size() - 1] == '\r'))
+			output.erase(output.size() - 1);
+
+		if (exitCode == 0 && !output.empty() && output.find("http") == 0)
+		{
+			DEBUG_REPORT_LOG(true, ("[Titan] VideoStream: yt-dlp resolved to: %s\n", output.c_str()));
+			runtimeData->resolvedUrl = output;
+			runtimeData->resolveState = RS_done;
+		}
+		else
+		{
+			DEBUG_REPORT_LOG(true, ("[Titan] VideoStream: yt-dlp failed (exit=%lu) output: %s\n", exitCode, output.c_str()));
+			runtimeData->resolveState = RS_failed;
+		}
+
+		delete threadData;
+		return 0;
+	}
+
+	void * videoLockCallback(void * opaque, void ** planes)
+	{
+		VideoStreamRuntimeData * data = reinterpret_cast<VideoStreamRuntimeData *>(opaque);
+		EnterCriticalSection(&data->bufferLock);
+		*planes = data->videoBuffer;
+		return 0;
+	}
+
+	void videoUnlockCallback(void * opaque, void * picture, void * const * planes)
+	{
+		UNREF(picture);
+		UNREF(planes);
+		VideoStreamRuntimeData * data = reinterpret_cast<VideoStreamRuntimeData *>(opaque);
+		InterlockedExchange(&data->frameReady, 1);
+		LeaveCriticalSection(&data->bufferLock);
+	}
+
+	void videoDisplayCallback(void * opaque, void * picture)
+	{
+		UNREF(opaque);
+		UNREF(picture);
+	}
+
+	VideoStreamRuntimeData & getVideoStreamRuntimeData(TangibleObject const * owner)
+	{
+		VideoStreamRuntimeDataMap::iterator it = ms_videoStreamRuntimeDataMap.find(owner);
+		if (it == ms_videoStreamRuntimeDataMap.end())
+		{
+			VideoStreamRuntimeData newData;
+			newData.owner = owner;
+			newData.videoBufferSize = VIDEO_WIDTH * VIDEO_HEIGHT * 4;
+			newData.videoBuffer = new unsigned char[newData.videoBufferSize];
+			memset(newData.videoBuffer, 0, newData.videoBufferSize);
+			InitializeCriticalSection(&newData.bufferLock);
+			it = ms_videoStreamRuntimeDataMap.insert(std::make_pair(owner, newData)).first;
+		}
+		return it->second;
+	}
+
+	void stopAndReleaseMediaPlayer(VideoStreamRuntimeData & data)
+	{
+		if (data.mediaPlayer && ms_vlcApi.loaded)
+		{
+			ms_vlcApi.pMediaPlayerStop(data.mediaPlayer);
+			ms_vlcApi.pMediaPlayerRelease(data.mediaPlayer);
+			data.mediaPlayer = 0;
+		}
+	}
+
+	void removeVideoOverlayObject(TangibleObject & owner, Object *& objectToRemove)
+	{
+		if (!objectToRemove)
+			return;
+
+		if (objectToRemove->isInWorld())
+			objectToRemove->removeFromWorld();
+
+		if (objectToRemove->getAttachedTo() == &owner)
+			owner.removeChildObject(objectToRemove, Object::DF_none);
+
+		if (objectToRemove->isInWorld())
+			objectToRemove->removeFromWorld();
+
+		delete objectToRemove;
+		objectToRemove = 0;
+	}
+
+	void createVideoOverlayObject(TangibleObject & owner, VideoStreamRuntimeData & runtimeData, Object *& target, bool backFace)
+	{
+		if (target)
+			return;
+
+		if (!owner.isInWorld())
+			return;
+
+		Appearance * const appearance = createMagicPaintingOverlayAppearance();
+		if (!appearance)
+			return;
+
+		target = new Object();
+		target->setAppearance(appearance);
+		target->addNotification(ClientWorld::getIntangibleNotification());
+		RenderWorld::addObjectNotifications(*target);
+
+		Transform overlayTransform = Transform::identity;
+		float const yOffset = runtimeData.isPaintingTemplate ? 0.0f : cs_magicPaintingOverlayHeight;
+		overlayTransform.setPosition_p(Vector(0.0f, yOffset, 0.0f));
+		overlayTransform.pitch_l(1.5707963267948966f);
+		if (backFace)
+			overlayTransform.yaw_l(cs_magicPaintingOverlayBackYaw);
+		target->setTransform_o2p(overlayTransform);
+
+		target->setScale(Vector(cs_magicPaintingOverlayBaseScale, cs_magicPaintingOverlayBaseScale, cs_magicPaintingOverlayBaseScale));
+
+		bool const portalDisabled = (owner.getCellProperty() != 0);
+		if (portalDisabled)
+		{
+			CellProperty::setPortalTransitionsEnabled(false);
+			target->setParentCell(owner.getCellProperty());
+		}
+
+		target->attachToObject_w(&owner, true);
+		target->addToWorld();
+
+		if (runtimeData.texture)
+			appearance->setTexture(TAG_MAIN, *runtimeData.texture);
+
+		if (portalDisabled)
+			CellProperty::setPortalTransitionsEnabled(true);
+	}
+
+	void ensureVideoOverlayObjects(TangibleObject & owner, VideoStreamRuntimeData & runtimeData)
+	{
+		if (runtimeData.isPaintingTemplate)
+		{
+			removeVideoOverlayObject(owner, runtimeData.overlayBackObject);
+			removeVideoOverlayObject(owner, runtimeData.overlayObject);
+			return;
+		}
+
+		createVideoOverlayObject(owner, runtimeData, runtimeData.overlayObject, false);
+		createVideoOverlayObject(owner, runtimeData, runtimeData.overlayBackObject, true);
+	}
+
+	void applyVideoTextureToSurfaces(VideoStreamRuntimeData & runtimeData, Appearance * ownerAppearance)
+	{
+		if (!runtimeData.texture)
+			return;
+
+		if (runtimeData.isPaintingTemplate)
+		{
+			if (ownerAppearance)
+				ownerAppearance->setTexture(TAG_MAIN, *runtimeData.texture);
+			return;
+		}
+
+		Appearance * const overlayAppearance = runtimeData.overlayObject ? runtimeData.overlayObject->getAppearance() : 0;
+		if (overlayAppearance)
+			overlayAppearance->setTexture(TAG_MAIN, *runtimeData.texture);
+
+		Appearance * const overlayBackAppearance = runtimeData.overlayBackObject ? runtimeData.overlayBackObject->getAppearance() : 0;
+		if (overlayBackAppearance)
+			overlayBackAppearance->setTexture(TAG_MAIN, *runtimeData.texture);
+
+		if (ownerAppearance)
+			ownerAppearance->setTexture(TAG_MAIN, *runtimeData.texture);
+	}
+
+} // namespace VideoStreamNamespace
+
+using namespace VideoStreamNamespace;
+
+// ======================================================================
 // class TangibleObject: public static member functions
 // ======================================================================
 
@@ -1086,6 +1556,8 @@ m_remoteTextureMode      (),
 m_remoteTextureDisplayMode(),
 m_remoteTextureScrollH   (),
 m_remoteTextureScrollV   (),
+m_remoteStreamUrl        (),
+m_remoteStreamTimestamp  (),
 m_damageTaken            (),
 m_maxHitPoints           (),
 m_components             (),
@@ -1119,6 +1591,8 @@ m_effectsMap()
 	m_remoteTextureDisplayMode.setSourceObject(this);
 	m_remoteTextureScrollH.setSourceObject(this);
 	m_remoteTextureScrollV.setSourceObject(this);
+	m_remoteStreamUrl.setSourceObject(this);
+	m_remoteStreamTimestamp.setSourceObject(this);
 	m_damageTaken.setSourceObject    (this);
 	m_condition.setSourceObject      (this);
 	m_maxHitPoints.setSourceObject   (this);
@@ -1143,6 +1617,8 @@ m_effectsMap()
 	addSharedVariable_np(m_remoteTextureDisplayMode);
 	addSharedVariable_np(m_remoteTextureScrollH);
 	addSharedVariable_np(m_remoteTextureScrollV);
+	addSharedVariable_np(m_remoteStreamUrl);
+	addSharedVariable_np(m_remoteStreamTimestamp);
 
 	m_effectsMap.setOnErase(this, &TangibleObject::OnObjectEffectErased);
 	m_effectsMap.setOnInsert(this, &TangibleObject::OnObjectEffectInsert);
@@ -1245,6 +1721,10 @@ float TangibleObject::alter(const float elapsedTime)
 					updateRemoteImageTexture();
 					updateGifAnimation(elapsedTime);
 				}
+				if (hasCondition(C_magicVideoPlayer))
+				{
+					updateRemoteVideoStream();
+				}
 				// Restart any object effects that are finished playing.
 				std::map<std::string, Object *>::const_iterator iter = m_objectEffects.begin();
 				for(; iter != m_objectEffects.end(); ++iter)
@@ -1263,6 +1743,8 @@ float TangibleObject::alter(const float elapsedTime)
 
 				if (hasCondition(C_magicPaintingUrl))
 					clearRemoteImageTexture();
+				if (hasCondition(C_magicVideoPlayer))
+					clearRemoteVideoStream();
 			}
 
 		}
@@ -1333,6 +1815,8 @@ void TangibleObject::addToWorld()
 	updateInterestingAttachedObject(getCondition ());
 	if (hasCondition(C_magicPaintingUrl))
 		updateRemoteImageTexture();
+	if (hasCondition(C_magicVideoPlayer))
+		updateRemoteVideoStream();
 }
 
 // ----------------------------------------------------------------------
@@ -1359,6 +1843,8 @@ void TangibleObject::removeFromWorld()
 
 	if (hasCondition(C_magicPaintingUrl))
 		clearRemoteImageTexture();
+	if (hasCondition(C_magicVideoPlayer))
+		clearRemoteVideoStream();
 
 	ClientObject::removeFromWorld();
 }
@@ -1983,6 +2469,266 @@ void TangibleObject::updateGifAnimation(float elapsedTime)
 	}
 
 	scheduleForAlter();
+}
+
+//----------------------------------------------------------------------
+
+void TangibleObject::remoteStreamUrlModified(const std::string & value)
+{
+	UNREF(value);
+	VideoStreamRuntimeDataMap::iterator it = ms_videoStreamRuntimeDataMap.find(this);
+	if (it != ms_videoStreamRuntimeDataMap.end())
+	{
+		it->second.dirty = true;
+		it->second.settled = false;
+	}
+	scheduleForAlter();
+}
+
+//----------------------------------------------------------------------
+
+void TangibleObject::remoteStreamTimestampModified(const std::string & value)
+{
+	UNREF(value);
+	VideoStreamRuntimeDataMap::iterator it = ms_videoStreamRuntimeDataMap.find(this);
+	if (it != ms_videoStreamRuntimeDataMap.end())
+	{
+		it->second.dirty = true;
+		it->second.settled = false;
+	}
+	scheduleForAlter();
+}
+
+//----------------------------------------------------------------------
+
+void TangibleObject::updateRemoteVideoStream()
+{
+	if (!hasCondition(C_magicVideoPlayer) || !isInWorld())
+	{
+		VideoStreamRuntimeDataMap::iterator runtimeIt = ms_videoStreamRuntimeDataMap.find(this);
+		if (runtimeIt != ms_videoStreamRuntimeDataMap.end())
+			clearRemoteVideoStream();
+		return;
+	}
+
+	if (!loadVlcApi())
+		return;
+
+	VideoStreamRuntimeData & runtimeData = getVideoStreamRuntimeData(this);
+
+	if (runtimeData.settled && !runtimeData.dirty)
+	{
+		if (InterlockedCompareExchange(&runtimeData.frameReady, 0, 1) == 1)
+		{
+			EnterCriticalSection(&runtimeData.bufferLock);
+
+			if (runtimeData.texture)
+			{
+				runtimeData.texture->release();
+				runtimeData.texture = 0;
+			}
+
+			TextureFormat const runtimeFormats[] = { TF_ARGB_8888 };
+			Texture const * newTexture = TextureList::fetch(runtimeData.videoBuffer, TF_ARGB_8888, static_cast<int>(VIDEO_WIDTH), static_cast<int>(VIDEO_HEIGHT), runtimeFormats, 1);
+			if (newTexture)
+			{
+				runtimeData.texture = newTexture;
+				applyVideoTextureToSurfaces(runtimeData, getAppearance());
+			}
+
+			LeaveCriticalSection(&runtimeData.bufferLock);
+		}
+		scheduleForAlter();
+		return;
+	}
+
+	std::string const & streamUrl = m_remoteStreamUrl.get();
+	if (streamUrl.empty())
+	{
+		if (runtimeData.mediaPlayer || runtimeData.texture || runtimeData.overlayObject)
+			clearRemoteVideoStream();
+		return;
+	}
+
+	if (!runtimeData.isPaintingTemplateResolved)
+	{
+		runtimeData.isPaintingTemplate = templateNameContainsPainting(getObjectTemplateName());
+		runtimeData.isPaintingTemplateResolved = true;
+	}
+
+	bool const urlChanged = (runtimeData.appliedUrl != streamUrl);
+
+	std::string const & timestampStr = m_remoteStreamTimestamp.get();
+	int const requestedTimestamp = timestampStr.empty() ? 0 : atoi(timestampStr.c_str());
+
+	if (runtimeData.dirty)
+	{
+		ensureVideoOverlayObjects(*this, runtimeData);
+		runtimeData.dirty = false;
+
+		if (!urlChanged && runtimeData.mediaPlayer)
+		{
+			if (requestedTimestamp != runtimeData.appliedTimestamp && requestedTimestamp > 0)
+			{
+				ms_vlcApi.pMediaPlayerSetTime(runtimeData.mediaPlayer, static_cast<libvlc_time_t>(requestedTimestamp) * 1000);
+				runtimeData.appliedTimestamp = requestedTimestamp;
+			}
+			runtimeData.settled = true;
+			scheduleForAlter();
+			return;
+		}
+	}
+
+	if (urlChanged)
+	{
+		stopAndReleaseMediaPlayer(runtimeData);
+
+		if (runtimeData.resolveThread)
+		{
+			DWORD waitResult = WaitForSingleObject(runtimeData.resolveThread, 0);
+			if (waitResult != WAIT_OBJECT_0)
+			{
+				scheduleForAlter();
+				return;
+			}
+			CloseHandle(runtimeData.resolveThread);
+			runtimeData.resolveThread = 0;
+		}
+
+		runtimeData.appliedUrl = streamUrl;
+		runtimeData.requestedUrl = streamUrl;
+		runtimeData.resolvedUrl.clear();
+		runtimeData.resolveState = RS_none;
+
+		if (urlNeedsResolution(streamUrl))
+		{
+			ResolveUrlThreadData * threadData = new ResolveUrlThreadData;
+			threadData->inputUrl = streamUrl;
+			threadData->runtimeData = &runtimeData;
+
+			runtimeData.resolveState = RS_pending;
+			runtimeData.resolveThread = CreateThread(0, 0, resolveUrlThreadProc, threadData, 0, 0);
+			if (!runtimeData.resolveThread)
+			{
+				DEBUG_REPORT_LOG(true, ("[Titan] VideoStream: Failed to create resolve thread\n"));
+				runtimeData.resolveState = RS_failed;
+				runtimeData.settled = true;
+				delete threadData;
+				return;
+			}
+
+			scheduleForAlter();
+			return;
+		}
+	}
+
+	if (runtimeData.resolveState == RS_pending)
+	{
+		scheduleForAlter();
+		return;
+	}
+
+	if (runtimeData.resolveState == RS_failed)
+	{
+		DEBUG_REPORT_LOG(true, ("[Titan] VideoStream: URL resolution failed for: %s\n", streamUrl.c_str()));
+		runtimeData.settled = true;
+		return;
+	}
+
+	std::string const & playUrl = runtimeData.resolvedUrl.empty() ? streamUrl : runtimeData.resolvedUrl;
+
+	if (!runtimeData.mediaPlayer)
+	{
+		libvlc_media_t * media = ms_vlcApi.pMediaNewLocation(ms_vlcApi.vlcInstance, playUrl.c_str());
+		if (!media)
+		{
+			DEBUG_REPORT_LOG(true, ("[Titan] VideoStream: Failed to create media for URL: %s\n", playUrl.c_str()));
+			runtimeData.settled = true;
+			return;
+		}
+
+		ms_vlcApi.pMediaAddOption(media, ":network-caching=1000");
+
+		runtimeData.mediaPlayer = ms_vlcApi.pMediaPlayerNew(ms_vlcApi.vlcInstance);
+		if (!runtimeData.mediaPlayer)
+		{
+			ms_vlcApi.pMediaRelease(media);
+			DEBUG_REPORT_LOG(true, ("[Titan] VideoStream: Failed to create media player\n"));
+			runtimeData.settled = true;
+			return;
+		}
+
+		ms_vlcApi.pMediaPlayerSetMedia(runtimeData.mediaPlayer, media);
+		ms_vlcApi.pMediaRelease(media);
+
+		ms_vlcApi.pVideoSetFormat(runtimeData.mediaPlayer, "BGRA", VIDEO_WIDTH, VIDEO_HEIGHT, VIDEO_PITCH);
+		ms_vlcApi.pVideoSetCallbacks(runtimeData.mediaPlayer,
+			reinterpret_cast<libvlc_video_lock_cb>(videoLockCallback),
+			reinterpret_cast<libvlc_video_unlock_cb>(videoUnlockCallback),
+			reinterpret_cast<libvlc_video_display_cb>(videoDisplayCallback),
+			&runtimeData);
+
+		ms_vlcApi.pAudioSetVolume(runtimeData.mediaPlayer, 0);
+		ms_vlcApi.pMediaPlayerPlay(runtimeData.mediaPlayer);
+
+		if (requestedTimestamp > 0)
+		{
+			ms_vlcApi.pMediaPlayerSetTime(runtimeData.mediaPlayer, static_cast<libvlc_time_t>(requestedTimestamp) * 1000);
+		}
+		runtimeData.appliedTimestamp = requestedTimestamp;
+
+		DEBUG_REPORT_LOG(true, ("[Titan] VideoStream: Playing %s\n", playUrl.c_str()));
+	}
+
+	runtimeData.settled = true;
+	scheduleForAlter();
+}
+
+//----------------------------------------------------------------------
+
+void TangibleObject::clearRemoteVideoStream()
+{
+	VideoStreamRuntimeDataMap::iterator runtimeIt = ms_videoStreamRuntimeDataMap.find(this);
+	if (runtimeIt == ms_videoStreamRuntimeDataMap.end())
+		return;
+
+	VideoStreamRuntimeData & runtimeData = runtimeIt->second;
+
+	if (runtimeData.resolveThread)
+	{
+		WaitForSingleObject(runtimeData.resolveThread, 5000);
+		CloseHandle(runtimeData.resolveThread);
+		runtimeData.resolveThread = 0;
+	}
+
+	stopAndReleaseMediaPlayer(runtimeData);
+
+	TangibleObject & mutableSelf = *const_cast<TangibleObject *>(runtimeData.owner);
+	removeVideoOverlayObject(mutableSelf, runtimeData.overlayObject);
+	removeVideoOverlayObject(mutableSelf, runtimeData.overlayBackObject);
+
+	if (runtimeData.texture)
+	{
+		runtimeData.texture->release();
+		runtimeData.texture = 0;
+	}
+
+	if (runtimeData.videoBuffer)
+	{
+		delete[] runtimeData.videoBuffer;
+		runtimeData.videoBuffer = 0;
+	}
+
+	DeleteCriticalSection(&runtimeData.bufferLock);
+
+	runtimeData.appliedUrl.clear();
+	runtimeData.requestedUrl.clear();
+	runtimeData.resolvedUrl.clear();
+	runtimeData.resolveState = RS_none;
+	runtimeData.settled = false;
+	runtimeData.dirty = true;
+
+	ms_videoStreamRuntimeDataMap.erase(runtimeIt);
 }
 
 //----------------------------------------------------------------------

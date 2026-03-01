@@ -104,6 +104,7 @@ private slots:
 	void onPopupItemActivated(int id) const;
 	void onSetConditionMenuActivated(int id);
 	void onMagicPaintingConditionMenuActivated(int id);
+	void onMagicVideoConditionMenuActivated(int id);
 	void onPopupMenuShow     () const;
 	void onPopupMenuHide     () const;
 	void onTemplateMenuShow  ();

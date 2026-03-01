@@ -87,7 +87,8 @@ public:
 		C_spawnedCreature      = 0x04000000,
 		C_holidayInteresting   = 0x08000000,
 		C_locked               = 0x10000000,
-		C_magicPaintingUrl     = 0x20000000, // Used to render a remote image above the object, double sided or single.
+		C_magicPaintingUrl     = 0x20000000,
+		C_magicVideoPlayer     = 0x40000000,
 	};
 
 public:
@@ -100,6 +101,8 @@ public:
 		struct RemoteTextureDisplayMode;
 		struct RemoteTextureScrollH;
 		struct RemoteTextureScrollV;
+		struct RemoteStreamUrl;
+		struct RemoteStreamTimestamp;
 		struct DamageTaken
 		{
 			typedef std::pair<TangibleObject *, int> Payload;
@@ -229,6 +232,8 @@ private:
 		typedef DefaultCallback<Messages::RemoteTextureDisplayMode, std::string> RemoteTextureDisplayMode;
 		typedef DefaultCallback<Messages::RemoteTextureScrollH, std::string> RemoteTextureScrollH;
 		typedef DefaultCallback<Messages::RemoteTextureScrollV, std::string> RemoteTextureScrollV;
+		typedef DefaultCallback<Messages::RemoteStreamUrl, std::string>     RemoteStreamUrl;
+		typedef DefaultCallback<Messages::RemoteStreamTimestamp, std::string> RemoteStreamTimestamp;
 		typedef DefaultCallback<Messages::ConditionModified, int>           ConditionModified;
 		typedef DefaultCallback<Messages::MaxHitPointsModified, int>        MaxHitPointsModified;
 	};
@@ -239,6 +244,8 @@ private:
 	friend Callbacks::RemoteTextureDisplayMode;
 	friend Callbacks::RemoteTextureScrollH;
 	friend Callbacks::RemoteTextureScrollV;
+	friend Callbacks::RemoteStreamUrl;
+	friend Callbacks::RemoteStreamTimestamp;
 	friend Callbacks::ConditionModified;
 	friend Callbacks::MaxHitPointsModified;
 
@@ -257,6 +264,11 @@ private:
 	void                          updateRemoteImageTexture();
 	void                          updateGifAnimation(float elapsedTime);
 	void                          clearRemoteImageTexture();
+
+	void                          remoteStreamUrlModified(const std::string & value);
+	void                          remoteStreamTimestampModified(const std::string & value);
+	void                          updateRemoteVideoStream();
+	void                          clearRemoteVideoStream();
 
 	void                          updateInterestingAttachedObject(int objectCondition);
 
@@ -285,6 +297,8 @@ private:
 	Archive::AutoDeltaVariableCallback<std::string, Callbacks::RemoteTextureDisplayMode, TangibleObject> m_remoteTextureDisplayMode;
 	Archive::AutoDeltaVariableCallback<std::string, Callbacks::RemoteTextureScrollH, TangibleObject> m_remoteTextureScrollH;
 	Archive::AutoDeltaVariableCallback<std::string, Callbacks::RemoteTextureScrollV, TangibleObject> m_remoteTextureScrollV;
+	Archive::AutoDeltaVariableCallback<std::string, Callbacks::RemoteStreamUrl, TangibleObject> m_remoteStreamUrl;
+	Archive::AutoDeltaVariableCallback<std::string, Callbacks::RemoteStreamTimestamp, TangibleObject> m_remoteStreamTimestamp;
 	Archive::AutoDeltaVariableCallback<int,         Callbacks::DamageTaken, TangibleObject>    m_damageTaken;
 	Archive::AutoDeltaVariableCallback<int, Callbacks::MaxHitPointsModified, TangibleObject>   m_maxHitPoints;
 
@@ -380,6 +394,24 @@ inline void TangibleObject::Callbacks::RemoteTextureScrollV::modified(TangibleOb
 	UNREF(oldValue);
 	UNREF(isLocal);
 	target.remoteTextureScrollVModified(value);
+}
+
+//----------------------------------------------------------------------
+
+inline void TangibleObject::Callbacks::RemoteStreamUrl::modified(TangibleObject & target, const std::string & oldValue, const std::string & value, bool isLocal) const
+{
+	UNREF(oldValue);
+	UNREF(isLocal);
+	target.remoteStreamUrlModified(value);
+}
+
+//----------------------------------------------------------------------
+
+inline void TangibleObject::Callbacks::RemoteStreamTimestamp::modified(TangibleObject & target, const std::string & oldValue, const std::string & value, bool isLocal) const
+{
+	UNREF(oldValue);
+	UNREF(isLocal);
+	target.remoteStreamTimestampModified(value);
 }
 
 //----------------------------------------------------------------------
