@@ -26,8 +26,11 @@
 #include "UnicodeUtils.h"
 
 #include "UIButton.h"
+#include "UICheckbox.h"
 #include "UIPage.h"
 #include "UIText.h"
+
+#include "sharedUtility/LocalMachineOptionManager.h"
 
 #include <cmath>
 
@@ -39,6 +42,9 @@ namespace
 	float const cs_autoPilotArrivalThreshold = 15.0f;
 	float const cs_skywayCollisionMinHeight = 50.0f;
 	float const cs_skywayCollisionCheckRadius = 30.0f;
+
+	bool ms_gpsMuted = false;
+	bool ms_gpsMutedRegistered = false;
 }
 
 //======================================================================
@@ -57,7 +63,9 @@ SwgCuiAirspeederPanel::SwgCuiAirspeederPanel(UIPage & page) :
 	m_buttonBoost(NULL),
 	m_buttonTraffic(NULL),
 	m_buttonHorn(NULL),
+	m_buttonHandbrake(NULL),
 	m_buttonAutoPilotCancel(NULL),
+	m_checkMuteGps(NULL),
 	m_textAutoPilotStatus(NULL),
 	m_inSkyway(false),
 	m_boostMode(false),
@@ -70,11 +78,19 @@ SwgCuiAirspeederPanel::SwgCuiAirspeederPanel(UIPage & page) :
 	m_autoPilotTargetZ(0.0f),
 	m_skywayCollisionSent(false)
 {
+	if (!ms_gpsMutedRegistered)
+	{
+		LocalMachineOptionManager::registerOption(ms_gpsMuted, "SwgCuiAirspeederPanel", "gpsMuted");
+		ms_gpsMutedRegistered = true;
+	}
+
 	getCodeDataObject(TUIButton, m_buttonSkyway, "buttonSkyway");
 	getCodeDataObject(TUIButton, m_buttonBoost, "buttonBoost");
 	getCodeDataObject(TUIButton, m_buttonTraffic, "buttonTraffic");
 	getCodeDataObject(TUIButton, m_buttonHorn, "buttonHorn");
+	getCodeDataObject(TUIButton, m_buttonHandbrake, "buttonHandbrake");
 	getCodeDataObject(TUIButton, m_buttonAutoPilotCancel, "buttonAutoPilotCancel");
+	getCodeDataObject(TUICheckbox, m_checkMuteGps, "checkMuteGps");
 	getCodeDataObject(TUIText, m_textAutoPilotStatus, "textAutoPilotStatus");
 
 	registerMediatorObject(getPage(), true);
@@ -86,8 +102,15 @@ SwgCuiAirspeederPanel::SwgCuiAirspeederPanel(UIPage & page) :
 		registerMediatorObject(*m_buttonTraffic, true);
 	if (m_buttonHorn)
 		registerMediatorObject(*m_buttonHorn, true);
+	if (m_buttonHandbrake)
+		registerMediatorObject(*m_buttonHandbrake, true);
 	if (m_buttonAutoPilotCancel)
 		registerMediatorObject(*m_buttonAutoPilotCancel, true);
+	if (m_checkMuteGps)
+	{
+		registerMediatorObject(*m_checkMuteGps, true);
+		m_checkMuteGps->SetChecked(ms_gpsMuted, false);
+	}
 }
 
 //----------------------------------------------------------------------
@@ -98,7 +121,9 @@ SwgCuiAirspeederPanel::~SwgCuiAirspeederPanel()
 	m_buttonBoost = NULL;
 	m_buttonTraffic = NULL;
 	m_buttonHorn = NULL;
+	m_buttonHandbrake = NULL;
 	m_buttonAutoPilotCancel = NULL;
+	m_checkMuteGps = NULL;
 	m_textAutoPilotStatus = NULL;
 }
 
@@ -112,6 +137,9 @@ void SwgCuiAirspeederPanel::performActivate()
 	refreshBoostTrafficButtons();
 	refreshAutoPilotUI();
 	getPage().SetVisible(true);
+
+	if (ms_gpsMuted)
+		sendAirspeederCommand("gps_mute");
 }
 
 //----------------------------------------------------------------------
@@ -169,6 +197,30 @@ void SwgCuiAirspeederPanel::OnButtonPressed(UIWidget * context)
 		sendAirspeederCommand("horn");
 		return;
 	}
+	if (context == m_buttonHandbrake)
+	{
+		CreatureObject * const player = Game::getPlayerCreature();
+		if (player)
+		{
+			PlayerCreatureController * const controller = safe_cast<PlayerCreatureController *>(player->getController());
+			if (controller)
+			{
+				controller->fullStop();
+				controller->setAutoPilotLocked(false);
+			}
+		}
+
+		if (m_autoPilotEngaged || m_autoPilotActive)
+		{
+			m_autoPilotEngaged = false;
+			m_autoPilotActive = false;
+			refreshAutoPilotUI();
+
+			GenericValueTypeMessage<std::string> const msg("AutoPilotCancel", "cancel");
+			GameNetwork::send(msg, true);
+		}
+		return;
+	}
 	if (context == m_buttonAutoPilotCancel)
 	{
 		m_autoPilotEngaged = false;
@@ -190,6 +242,30 @@ void SwgCuiAirspeederPanel::OnButtonPressed(UIWidget * context)
 		GenericValueTypeMessage<std::string> const msg("AutoPilotCancel", "cancel");
 		GameNetwork::send(msg, true);
 		return;
+	}
+}
+
+//----------------------------------------------------------------------
+
+void SwgCuiAirspeederPanel::OnCheckboxSet(UIWidget * context)
+{
+	if (context == m_checkMuteGps)
+	{
+		ms_gpsMuted = true;
+		LocalMachineOptionManager::save();
+		sendAirspeederCommand("gps_mute");
+	}
+}
+
+//----------------------------------------------------------------------
+
+void SwgCuiAirspeederPanel::OnCheckboxUnset(UIWidget * context)
+{
+	if (context == m_checkMuteGps)
+	{
+		ms_gpsMuted = false;
+		LocalMachineOptionManager::save();
+		sendAirspeederCommand("gps_unmute");
 	}
 }
 
@@ -227,12 +303,12 @@ void SwgCuiAirspeederPanel::refreshBoostTrafficButtons()
 {
 	if (m_buttonBoost)
 	{
-		m_buttonBoost->SetLocalText(m_boostMode ? Unicode::narrowToWide("Boost Mode (ON)") : Unicode::narrowToWide("Boost Mode"));
+		m_buttonBoost->SetLocalText(m_boostMode ? Unicode::narrowToWide("Boost (ON)") : Unicode::narrowToWide("Boost"));
 		m_buttonBoost->SetEnabled(!m_trafficMode);
 	}
 	if (m_buttonTraffic)
 	{
-		m_buttonTraffic->SetLocalText(m_trafficMode ? Unicode::narrowToWide("Traffic Mode (ON)") : Unicode::narrowToWide("Traffic Mode"));
+		m_buttonTraffic->SetLocalText(m_trafficMode ? Unicode::narrowToWide("Traffic (ON)") : Unicode::narrowToWide("Traffic"));
 		m_buttonTraffic->SetEnabled(!m_boostMode);
 	}
 }
@@ -482,6 +558,13 @@ bool SwgCuiAirspeederPanel::isInSkyway()
 		return false;
 
 	return panel->m_inSkyway;
+}
+
+//----------------------------------------------------------------------
+
+bool SwgCuiAirspeederPanel::isGpsMuted()
+{
+	return ms_gpsMuted;
 }
 
 //----------------------------------------------------------------------

@@ -2,22 +2,24 @@
 			BackgroundColor='#2D2D2D'
 			BackgroundOpacity='0.95'
 			Location='804,400'
-			MinimumSize='240,240'
+			MinimumSize='240,280'
 			Name='AirspeederPanel'
 			PackLocation='fff,nfn'
 			PackSize='f,f'
 			RStyleDefault='/Styles.New.tool.tool_tip.rs_default'
-			ScrollExtent='256,240'
-			Size='256,240'
+			ScrollExtent='256,280'
+			Size='256,280'
 			UserMovable='true'
 			Visible='false'
 		>
 			<Data
 				buttonAutoPilotCancel='buttonAutoPilotCancel'
 				buttonBoost='buttonBoost'
+				buttonHandbrake='buttonHandbrake'
 				buttonHorn='buttonHorn'
 				buttonSkyway='buttonSkyway'
 				buttonTraffic='buttonTraffic'
+				checkMuteGps='checkMuteGps'
 				textAutoPilotStatus='textAutoPilotStatus'
 				Name='CodeData'
 			/>
@@ -37,10 +39,19 @@
 					LocalText='Skyway Controls'
 					Location='12,6'
 					Name='labelTitle'
-					ScrollExtent='232,18'
-					Size='232,18'
+					ScrollExtent='140,18'
+					Size='140,18'
 					TextColor='#E8E8E8'
 				>Skyway Controls</Text>
+				<Checkbox
+					Checked='false'
+					LocalText='Mute GPS'
+					Location='160,5'
+					Name='checkMuteGps'
+					ScrollExtent='84,18'
+					Size='84,18'
+					TextColor='#AAAAAA'
+				/>
 				<Page
 					BackgroundColor='#505050'
 					BackgroundOpacity='1.00'
@@ -61,25 +72,25 @@
 				Style='/Styles.New.buttons.hud.style'
 			>Enter Skyway</Button>
 			<Button
-				LocalText='Boost Mode'
+				LocalText='Boost'
 				Location='12,68'
 				Name='buttonBoost'
-				ScrollExtent='232,26'
-				Size='232,26'
+				ScrollExtent='112,26'
+				Size='112,26'
 				Style='/Styles.New.buttons.hud.style'
-			>Boost Mode</Button>
+			>Boost</Button>
 			<Button
-				LocalText='Traffic Mode'
-				Location='12,100'
+				LocalText='Traffic'
+				Location='132,68'
 				Name='buttonTraffic'
-				ScrollExtent='232,26'
-				Size='232,26'
+				ScrollExtent='112,26'
+				Size='112,26'
 				Style='/Styles.New.buttons.hud.style'
-			>Traffic Mode</Button>
+			>Traffic</Button>
 		<Text
 			Font='bold_13'
 			LocalText=''
-			Location='12,134'
+			Location='12,102'
 			Name='textAutoPilotStatus'
 			ScrollExtent='232,36'
 			Size='232,36'
@@ -88,19 +99,27 @@
 		></Text>
 		<Button
 			LocalText='Cancel Auto-Pilot'
-			Location='12,176'
+			Location='12,142'
 			Name='buttonAutoPilotCancel'
 			ScrollExtent='232,26'
 			Size='232,26'
 			Style='/Styles.New.buttons.hud.style'
 			Visible='false'
 		>Cancel Auto-Pilot</Button>
-			<Button
-				LocalText='Horn'
-				Location='176,208'
-				Name='buttonHorn'
-				ScrollExtent='68,24'
-				Size='68,24'
-				Style='/Styles.New.buttons.hud.style'
-			>Horn</Button>
-		</Page>
+		<Button
+			LocalText='Handbrake'
+			Location='12,208'
+			Name='buttonHandbrake'
+			ScrollExtent='112,26'
+			Size='112,26'
+			Style='/Styles.New.buttons.hud.style'
+		>Handbrake</Button>
+		<Button
+			LocalText='Horn'
+			Location='132,208'
+			Name='buttonHorn'
+			ScrollExtent='112,26'
+			Size='112,26'
+			Style='/Styles.New.buttons.hud.style'
+		>Horn</Button>
+	</Page>

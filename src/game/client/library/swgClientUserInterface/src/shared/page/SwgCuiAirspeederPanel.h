@@ -16,6 +16,7 @@
 #include "UIEventCallback.h"
 
 class UIButton;
+class UICheckbox;
 class UIPage;
 class UIText;
 
@@ -33,11 +34,14 @@ public:
 	virtual void update(float deltaTimeSecs);
 
 	virtual void OnButtonPressed(UIWidget * context);
+	virtual void OnCheckboxSet(UIWidget * context);
+	virtual void OnCheckboxUnset(UIWidget * context);
 
 	static SwgCuiAirspeederPanel * createInto(UIPage & parent);
 	static void resetPersistedState();
 	static void setSkywayActive();
 	static bool isInSkyway();
+	static bool isGpsMuted();
 	static void setAutoPilotStatus(bool active, int waypointsRemaining);
 	static void engageAutoPilot(float targetX, float targetZ);
 	static void disengageAutoPilot();
@@ -54,12 +58,14 @@ private:
 
 	void sendAirspeederCommand(const char* action);
 
-	UIButton * m_buttonSkyway;
-	UIButton * m_buttonBoost;
-	UIButton * m_buttonTraffic;
-	UIButton * m_buttonHorn;
-	UIButton * m_buttonAutoPilotCancel;
-	UIText *   m_textAutoPilotStatus;
+	UIButton *   m_buttonSkyway;
+	UIButton *   m_buttonBoost;
+	UIButton *   m_buttonTraffic;
+	UIButton *   m_buttonHorn;
+	UIButton *   m_buttonHandbrake;
+	UIButton *   m_buttonAutoPilotCancel;
+	UICheckbox * m_checkMuteGps;
+	UIText *     m_textAutoPilotStatus;
 
 	bool  m_inSkyway;
 	bool  m_boostMode;
