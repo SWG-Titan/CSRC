@@ -1372,7 +1372,18 @@ void ShaderPrimitiveSorter::pushCell(CellProperty const * cellProperty, Texture 
 
 	ms_cellPropertyStack.push_back(cellProperty);
 	if (cellProperty)
+	{
 		cellProperty->callEnterRenderHookFunctions();
+
+		if (cellProperty->hasCustomLightingOverride())
+			Graphics::setOverrideFullAmbient(true, cellProperty->getCustomLightingR(), cellProperty->getCustomLightingG(), cellProperty->getCustomLightingB());
+		else
+			Graphics::setOverrideFullAmbient(false, 0.0f, 0.0f, 0.0f);
+	}
+	else
+	{
+		Graphics::setOverrideFullAmbient(false, 0.0f, 0.0f, 0.0f);
+	}
 
 	ms_popped = false;
 
@@ -1442,6 +1453,19 @@ void ShaderPrimitiveSorter::popCell()
 #endif
 	}
 	ms_cellPropertyStack.pop_back();
+
+	if (!ms_cellPropertyStack.empty() && ms_cellPropertyStack.back())
+	{
+		CellProperty const * const parentCell = ms_cellPropertyStack.back();
+		if (parentCell->hasCustomLightingOverride())
+			Graphics::setOverrideFullAmbient(true, parentCell->getCustomLightingR(), parentCell->getCustomLightingG(), parentCell->getCustomLightingB());
+		else
+			Graphics::setOverrideFullAmbient(false, 0.0f, 0.0f, 0.0f);
+	}
+	else
+	{
+		Graphics::setOverrideFullAmbient(false, 0.0f, 0.0f, 0.0f);
+	}
 
 	ms_popped = true;
 

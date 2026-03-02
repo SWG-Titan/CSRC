@@ -1567,6 +1567,14 @@ void Graphics::setLights(const stdvector<const Light*>::fwd &lightList)
 
 // ----------------------------------------------------------------------
 
+void Graphics::setOverrideFullAmbient(bool enabled, float r, float g, float b)
+{
+	NOT_NULL(ms_api->setOverrideFullAmbient);
+	ms_api->setOverrideFullAmbient(enabled, r, g, b);
+}
+
+// ----------------------------------------------------------------------
+
 void Graphics::setAlphaFadeOpacity(bool enabled, float opacity)
 {
 	NOT_NULL(ms_api->setAlphaFadeOpacity);

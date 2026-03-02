@@ -282,6 +282,7 @@ namespace Direct3d9Namespace
 	void                               optimizeIndexBuffer(WORD *indices, int numIndices);
 
 	void                               setBloomEnabled(bool enabled);
+	void                               setOverrideFullAmbient(bool enabled, float r, float g, float b);
 
 	void                               pixSetMarker(WCHAR const * markerName);
 	void                               pixBeginEvent(WCHAR const * eventName);
@@ -1137,6 +1138,7 @@ bool Direct3d9::install(Gl_install *gl_install)
 	ms_glApi.optimizeIndexBuffer			   = optimizeIndexBuffer;
 
 	ms_glApi.setBloomEnabled = setBloomEnabled;
+	ms_glApi.setOverrideFullAmbient = setOverrideFullAmbient;
 
 	ms_glApi.pixSetMarker = pixSetMarker;
 	ms_glApi.pixBeginEvent = pixBeginEvent;
@@ -4601,6 +4603,13 @@ void Direct3d9Namespace::setBloomEnabled(bool enabled)
 #else
 	UNREF(enabled);
 #endif
+}
+
+// ----------------------------------------------------------------------
+
+void Direct3d9Namespace::setOverrideFullAmbient(bool enabled, float r, float g, float b)
+{
+	Direct3d9_LightManager::setOverrideFullAmbient(enabled, r, g, b);
 }
 
 // ----------------------------------------------------------------------

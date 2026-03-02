@@ -58,7 +58,8 @@ CellObject::CellObject(const SharedObjectTemplate *newTemplate)
 	m_radarShape (0),
 	m_radarEdges (0),
 	m_radarPortalEdges (0),
-	m_cellLights()
+	m_cellLights(),
+	m_hasCustomLighting(false)
 {
 	addSharedVariable(m_isPublic);
 	addSharedVariable(m_cellNumber);
@@ -337,13 +338,20 @@ void CellObject::setCellLightColor(float r, float g, float b, float brightness)
 	}
 	m_cellLights.clear();
 
-	const VectorArgb color(1.0f, r * brightness, g * brightness, b * brightness);
+	m_hasCustomLighting = true;
 
-	Light * const ambientLight = new Light(Light::T_ambient, color);
-	ambientLight->setAffectsShadersWithPrecalculatedVertexLighting(true);
-	ambientLight->setAffectsShadersWithoutPrecalculatedVertexLighting(true);
-	ambientLight->attachToObject_p(this, true);
-	m_cellLights.push_back(ambientLight);
+	const float fr = r * brightness;
+	const float fg = g * brightness;
+	const float fb = b * brightness;
+
+	CellProperty * const cellProperty = getCellProperty();
+	if (cellProperty)
+		cellProperty->setCustomLightingOverride(true, fr, fg, fb);
+}
+
+bool CellObject::hasCustomLighting() const
+{
+	return m_hasCustomLighting;
 }
 
 //-----------------------------------------------------------------------

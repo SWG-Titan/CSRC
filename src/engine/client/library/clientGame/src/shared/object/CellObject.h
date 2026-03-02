@@ -52,6 +52,7 @@ public:
 	bool getAccessAllowed() const;
 
 	void setCellLightColor(float r, float g, float b, float brightness);
+	bool hasCustomLighting() const;
 
 	const IndexedTriangleList* getRadarShape () const;
 	const stdvector<Vector>::fwd* getRadarEdges () const;
@@ -85,6 +86,7 @@ private:
 	stdvector<Vector>::fwd*          m_radarPortalEdges;
 
 	std::vector<Light *>             m_cellLights;
+	bool                             m_hasCustomLighting;
 };
 
 // ======================================================================

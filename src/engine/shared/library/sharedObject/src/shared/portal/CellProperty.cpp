@@ -356,6 +356,10 @@ CellProperty::CellProperty(Object &owner)
 	m_fogColor(0),
 	m_fogDensity(0.f),
 	m_appliedInteriorLayout(false),
+	m_customLightingOverride(false),
+	m_customLightingR(0.0f),
+	m_customLightingG(0.0f),
+	m_customLightingB(0.0f),
 	m_preVisibilityTraversalRenderHookFunctionList(NULL),
 	m_enterRenderHookFunctionList(NULL),
 	m_preDrawRenderHookFunctionList(NULL),
@@ -1207,6 +1211,16 @@ void CellProperty::setEnvironmentTexture(Texture const * environmentTexture)
 		ms_textureRelease(m_environmentTexture);
 
 	m_environmentTexture = environmentTexture;
+}
+
+// ----------------------------------------------------------------------
+
+void CellProperty::setCustomLightingOverride(bool enabled, float r, float g, float b)
+{
+	m_customLightingOverride = enabled;
+	m_customLightingR = r;
+	m_customLightingG = g;
+	m_customLightingB = b;
 }
 
 // ----------------------------------------------------------------------

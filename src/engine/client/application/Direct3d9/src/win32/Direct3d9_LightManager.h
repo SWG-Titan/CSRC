@@ -48,6 +48,7 @@ public:
 	static void selectLights();
 
 	static void setFullAmbientOn(bool on);
+	static void setOverrideFullAmbient(bool enabled, float r, float g, float b);
 
 private:
 
@@ -190,6 +191,8 @@ private:
 	static Vector            ms_cameraPosition;
 	static LightList         ms_lightList;
 	static VectorRgba        ms_fullAmbient;
+	static bool              ms_overrideFullAmbient;
+	static VectorRgba        ms_overrideFullAmbientColor;
 	static SelectedLights    ms_currentLights;
 	static SelectedLights    ms_lastLights;
 	static const Light      *ms_fixedFunctionPipelineLight[FixedFunctionPipelineLightCount];
@@ -200,6 +203,15 @@ private:
 
 inline void Direct3d9_LightManager::setFullAmbientOn(bool on)
 {
+	if (ms_overrideFullAmbient)
+	{
+		ms_fullAmbient.r = ms_overrideFullAmbientColor.r;
+		ms_fullAmbient.g = ms_overrideFullAmbientColor.g;
+		ms_fullAmbient.b = ms_overrideFullAmbientColor.b;
+		ms_fullAmbient.a = 0.0f;
+		return;
+	}
+
 	if (on)
 	{
 		ms_fullAmbient.r = 1.0f;
@@ -214,6 +226,16 @@ inline void Direct3d9_LightManager::setFullAmbientOn(bool on)
 		ms_fullAmbient.b = 0.0f;
 		ms_fullAmbient.a = 0.0f;
 	}
+}
+
+inline void Direct3d9_LightManager::setOverrideFullAmbient(bool enabled, float r, float g, float b)
+{
+	ms_overrideFullAmbient = enabled;
+	ms_overrideFullAmbientColor.r = r;
+	ms_overrideFullAmbientColor.g = g;
+	ms_overrideFullAmbientColor.b = b;
+	ms_overrideFullAmbientColor.a = 0.0f;
+	ms_dirty = true;
 }
 
 // ======================================================================

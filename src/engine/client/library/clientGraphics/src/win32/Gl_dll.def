@@ -222,6 +222,7 @@ struct Gl_api
 	int (*getMaximumVertexBufferStreamCount)();
 
 	void (*setBloomEnabled)(bool enabled);
+	void (*setOverrideFullAmbient)(bool enabled, float r, float g, float b);
 
 	void (*pixSetMarker)(WCHAR const * markerName);
 	void (*pixBeginEvent)(WCHAR const * eventName);

@@ -167,6 +167,12 @@ public:
 	void                  setEnvironmentTexture(Texture const *texture);
 	Texture const *       getEnvironmentTexture() const;
 
+	void                  setCustomLightingOverride(bool enabled, float r, float g, float b);
+	bool                  hasCustomLightingOverride() const;
+	float                 getCustomLightingR() const;
+	float                 getCustomLightingG() const;
+	float                 getCustomLightingB() const;
+
 	void                  setVisible(bool visible) const;
 	bool                  wasVisible() const;
 
@@ -228,6 +234,11 @@ private:
 	float                             m_fogDensity;
 	bool mutable m_appliedInteriorLayout;
 
+	bool                              m_customLightingOverride;
+	float                             m_customLightingR;
+	float                             m_customLightingG;
+	float                             m_customLightingB;
+
 	mutable RenderHookFunctionList   *m_preVisibilityTraversalRenderHookFunctionList;
 	mutable RenderHookFunctionList   *m_enterRenderHookFunctionList;
 	mutable RenderHookFunctionList   *m_preDrawRenderHookFunctionList;
@@ -288,6 +299,34 @@ inline void CellProperty::setVisible(bool visible) const
 inline bool CellProperty::wasVisible() const
 {
 	return m_visible;
+}
+
+// ----------------------------------------------------------------------
+
+inline bool CellProperty::hasCustomLightingOverride() const
+{
+	return m_customLightingOverride;
+}
+
+// ----------------------------------------------------------------------
+
+inline float CellProperty::getCustomLightingR() const
+{
+	return m_customLightingR;
+}
+
+// ----------------------------------------------------------------------
+
+inline float CellProperty::getCustomLightingG() const
+{
+	return m_customLightingG;
+}
+
+// ----------------------------------------------------------------------
+
+inline float CellProperty::getCustomLightingB() const
+{
+	return m_customLightingB;
 }
 
 // ======================================================================

@@ -46,6 +46,8 @@ Vector                                      Direct3d9_LightManager::ms_objectPos
 Vector                                      Direct3d9_LightManager::ms_cameraPosition;
 Direct3d9_LightManager::LightList           Direct3d9_LightManager::ms_lightList;
 VectorRgba                                  Direct3d9_LightManager::ms_fullAmbient;
+bool                                        Direct3d9_LightManager::ms_overrideFullAmbient;
+VectorRgba                                  Direct3d9_LightManager::ms_overrideFullAmbientColor;
 Direct3d9_LightManager::SelectedLights      Direct3d9_LightManager::ms_currentLights;
 Direct3d9_LightManager::SelectedLights      Direct3d9_LightManager::ms_lastLights;
 const Light                                *Direct3d9_LightManager::ms_fixedFunctionPipelineLight[FixedFunctionPipelineLightCount];

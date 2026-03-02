@@ -200,6 +200,7 @@ public:
 
 	// light routines
 	static void                          setLights(LightList const & lightList);
+	static void                          setOverrideFullAmbient(bool enabled, float r, float g, float b);
 
 	// vertex buffer routines
 	static void                               setVertexBuffer(const HardwareVertexBuffer &vertexBuffer);
