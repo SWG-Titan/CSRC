@@ -35,6 +35,8 @@
 #include "sharedObject/PortalPropertyTemplate.h"
 #include "sharedObject/PortalPropertyTemplateList.h"
 
+#include <set>
+
 // ======================================================================
 
 namespace CellObjectNamespace
@@ -42,6 +44,7 @@ namespace CellObjectNamespace
 	Light *createLight(const PortalPropertyTemplateCellLight &lightData);
 	void swapBuildingToDarkPob(CellProperty * cellProperty);
 
+	std::set<const PortalProperty *> ms_swappedBuildings;
 	std::string const & ms_debugInfoSectionName = "CellObject";
 }
 using namespace CellObjectNamespace;
@@ -145,6 +148,13 @@ void CellObjectNamespace::swapBuildingToDarkPob(CellProperty * cellProperty)
 		REPORT_LOG(true, ("swapBuildingToDarkPob: portalProperty is NULL\n"));
 		return;
 	}
+
+	if (ms_swappedBuildings.find(portalProperty) != ms_swappedBuildings.end())
+	{
+		REPORT_LOG(true, ("swapBuildingToDarkPob: building already swapped, skipping\n"));
+		return;
+	}
+	ms_swappedBuildings.insert(portalProperty);
 
 	const char * pobName = portalProperty->getPobName();
 	if (!pobName || !*pobName)
@@ -476,15 +486,17 @@ void CellObject::setCellLightColor(float r, float g, float b, float brightness)
 			REPORT_LOG(true, ("setCellLightColor: first custom lighting, calling swapBuildingToDarkPob\n"));
 			swapBuildingToDarkPob(cellProperty);
 		}
-		else
-		{
-			REPORT_LOG(true, ("setCellLightColor: already had custom lighting, skipping swap\n"));
-		}
 	}
-	else
-	{
-		REPORT_LOG(true, ("setCellLightColor: cellProperty is NULL!\n"));
-	}
+
+	const float clampR = (fr > 1.0f) ? 1.0f : fr;
+	const float clampG = (fg > 1.0f) ? 1.0f : fg;
+	const float clampB = (fb > 1.0f) ? 1.0f : fb;
+
+	Light * ambientLight = new Light(Light::T_ambient, VectorArgb(1.0f, clampR, clampG, clampB));
+	ambientLight->setAffectsShadersWithPrecalculatedVertexLighting(true);
+	ambientLight->setAffectsShadersWithoutPrecalculatedVertexLighting(true);
+	ambientLight->attachToObject_p(this, true);
+	m_cellLights.push_back(ambientLight);
 }
 
 bool CellObject::hasCustomLighting() const
