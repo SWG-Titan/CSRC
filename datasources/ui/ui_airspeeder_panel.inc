@@ -81,14 +81,14 @@
 			LocalText=''
 			Location='12,134'
 			Name='textAutoPilotStatus'
-			ScrollExtent='232,18'
-			Size='232,18'
+			ScrollExtent='232,36'
+			Size='232,36'
 			TextColor='#90EE90'
 			Visible='false'
 		></Text>
 		<Button
 			LocalText='Cancel Auto-Pilot'
-			Location='12,158'
+			Location='12,176'
 			Name='buttonAutoPilotCancel'
 			ScrollExtent='232,26'
 			Size='232,26'
