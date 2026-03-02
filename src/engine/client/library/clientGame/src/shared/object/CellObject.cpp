@@ -161,12 +161,13 @@ void CellObjectNamespace::swapBuildingToDarkPob(CellProperty * cellProperty)
 	if (!darkTemplate)
 		return;
 
-	const int numCells = portalProperty->getNumberOfCells();
+	PortalProperty * mutablePortalProperty = const_cast<PortalProperty *>(portalProperty);
+	const int numCells = mutablePortalProperty->getNumberOfCells();
 	const int darkNumCells = darkTemplate->getNumberOfCells();
 
 	for (int i = 1; i < numCells && i < darkNumCells; ++i)
 	{
-		const CellProperty * cell = portalProperty->getCell(i);
+		CellProperty * cell = mutablePortalProperty->getCell(i);
 		if (!cell)
 			continue;
 
@@ -189,7 +190,7 @@ void CellObjectNamespace::swapBuildingToDarkPob(CellProperty * cellProperty)
 	const char * darkExteriorName = darkTemplate->getExteriorAppearanceName();
 	if (darkExteriorName && *darkExteriorName)
 	{
-		Object & buildingObj = const_cast<PortalProperty *>(portalProperty)->getOwner();
+		Object & buildingObj = mutablePortalProperty->getOwner();
 		Appearance * const darkExterior = AppearanceTemplateList::createAppearance(darkExteriorName);
 		if (darkExterior)
 		{
