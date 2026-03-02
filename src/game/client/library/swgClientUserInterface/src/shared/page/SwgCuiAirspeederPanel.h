@@ -30,6 +30,7 @@ public:
 
 	virtual void performActivate();
 	virtual void performDeactivate();
+	virtual void update(float deltaTimeSecs);
 
 	virtual void OnButtonPressed(UIWidget * context);
 
@@ -38,6 +39,8 @@ public:
 	static void setSkywayActive();
 	static bool isInSkyway();
 	static void setAutoPilotStatus(bool active, int waypointsRemaining);
+	static void engageAutoPilot(float targetX, float targetZ);
+	static void disengageAutoPilot();
 
 private:
 	~SwgCuiAirspeederPanel();
@@ -58,12 +61,15 @@ private:
 	UIButton * m_buttonAutoPilotCancel;
 	UIText *   m_textAutoPilotStatus;
 
-	bool m_inSkyway;
-	bool m_boostMode;
-	bool m_trafficMode;
-	bool m_ascending;
-	bool m_autoPilotActive;
-	int  m_autoPilotWaypointsRemaining;
+	bool  m_inSkyway;
+	bool  m_boostMode;
+	bool  m_trafficMode;
+	bool  m_ascending;
+	bool  m_autoPilotActive;
+	int   m_autoPilotWaypointsRemaining;
+	bool  m_autoPilotEngaged;
+	float m_autoPilotTargetX;
+	float m_autoPilotTargetZ;
 };
 
 //======================================================================

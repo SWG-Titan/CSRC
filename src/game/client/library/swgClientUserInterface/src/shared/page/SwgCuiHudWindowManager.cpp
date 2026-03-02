@@ -459,6 +459,8 @@ void SwgCuiHudWindowManager::handlePerformActivate ()
 	connectToMessage (EnterTicketPurchaseModeMessage::cms_name);
 	connectToMessage (ShowAirspeederPanelMessage::cms_name);
 	connectToMessage ("AutoPilotStatusMessage");
+	connectToMessage ("AutoPilotEngageMessage");
+	connectToMessage ("AutoPilotDisengageMessage");
 	connectToMessage ("SetObjectCollidableMessage");
 	connectToMessage (NewbieTutorialRequest::cms_name);
 	connectToMessage (NewbieTutorialEnableHudElement::cms_name);
@@ -509,6 +511,8 @@ void SwgCuiHudWindowManager::handlePerformDeactivate ()
 	disconnectFromMessage (EnterTicketPurchaseModeMessage::cms_name);
 	disconnectFromMessage (ShowAirspeederPanelMessage::cms_name);
 	disconnectFromMessage ("AutoPilotStatusMessage");
+	disconnectFromMessage ("AutoPilotEngageMessage");
+	disconnectFromMessage ("AutoPilotDisengageMessage");
 	disconnectFromMessage ("SetObjectCollidableMessage");
 	disconnectFromMessage (NewbieTutorialRequest::cms_name);
 	disconnectFromMessage (NewbieTutorialEnableHudElement::cms_name);
@@ -633,6 +637,22 @@ void SwgCuiHudWindowManager::receiveMessage(const MessageDispatch::Emitter & , c
 		Archive::ReadIterator ri = NON_NULL (safe_cast<const GameNetworkMessage *>(&message))->getByteStream().begin();
 		GenericValueTypeMessage<std::pair<bool, int> > const msg(ri);
 		SwgCuiAirspeederPanel::setAutoPilotStatus(msg.getValue().first, msg.getValue().second);
+	}
+
+	//----------------------------------------------------------------------
+
+	else if (message.isType ("AutoPilotEngageMessage"))
+	{
+		Archive::ReadIterator ri = NON_NULL (safe_cast<const GameNetworkMessage *>(&message))->getByteStream().begin();
+		GenericValueTypeMessage<std::pair<float, float> > const msg(ri);
+		SwgCuiAirspeederPanel::engageAutoPilot(msg.getValue().first, msg.getValue().second);
+	}
+
+	//----------------------------------------------------------------------
+
+	else if (message.isType ("AutoPilotDisengageMessage"))
+	{
+		SwgCuiAirspeederPanel::disengageAutoPilot();
 	}
 
 	//----------------------------------------------------------------------

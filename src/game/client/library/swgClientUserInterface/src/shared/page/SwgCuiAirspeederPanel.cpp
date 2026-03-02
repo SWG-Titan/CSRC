@@ -10,9 +10,13 @@
 #include "swgClientUserInterface/FirstSwgClientUserInterface.h"
 #include "swgClientUserInterface/SwgCuiAirspeederPanel.h"
 
+#include "clientGame/CreatureObject.h"
+#include "clientGame/Game.h"
 #include "clientGame/GameNetwork.h"
+#include "clientGame/PlayerCreatureController.h"
 #include "clientGraphics/ConfigClientGraphics.h"
 #include "clientUserInterface/CuiWorkspace.h"
+#include "sharedFoundation/GameControllerMessage.h"
 #include "sharedNetworkMessages/GenericValueTypeMessage.h"
 #include "UnicodeUtils.h"
 
@@ -20,11 +24,14 @@
 #include "UIPage.h"
 #include "UIText.h"
 
+#include <cmath>
+
 //======================================================================
 
 namespace
 {
 	int const marginPixels = 16;
+	float const cs_autoPilotArrivalThreshold = 15.0f;
 }
 
 //======================================================================
@@ -50,7 +57,10 @@ SwgCuiAirspeederPanel::SwgCuiAirspeederPanel(UIPage & page) :
 	m_trafficMode(false),
 	m_ascending(false),
 	m_autoPilotActive(false),
-	m_autoPilotWaypointsRemaining(0)
+	m_autoPilotWaypointsRemaining(0),
+	m_autoPilotEngaged(false),
+	m_autoPilotTargetX(0.0f),
+	m_autoPilotTargetZ(0.0f)
 {
 	getCodeDataObject(TUIButton, m_buttonSkyway, "buttonSkyway");
 	getCodeDataObject(TUIButton, m_buttonBoost, "buttonBoost");
@@ -151,6 +161,16 @@ void SwgCuiAirspeederPanel::OnButtonPressed(UIWidget * context)
 	}
 	if (context == m_buttonAutoPilotCancel)
 	{
+		m_autoPilotEngaged = false;
+
+		CreatureObject * const player = Game::getPlayerCreature();
+		if (player)
+		{
+			PlayerCreatureController * const controller = safe_cast<PlayerCreatureController *>(player->getController());
+			if (controller)
+				controller->appendMessage(CM_cancelAutoRun, 0.0f);
+		}
+
 		GenericValueTypeMessage<std::string> const msg("AutoPilotCancel", "cancel");
 		GameNetwork::send(msg, true);
 		return;
@@ -220,6 +240,7 @@ void SwgCuiAirspeederPanel::resetPersistedState()
 		panel->m_trafficMode = false;
 		panel->m_autoPilotActive = false;
 		panel->m_autoPilotWaypointsRemaining = 0;
+		panel->m_autoPilotEngaged = false;
 		panel->refreshAutoPilotUI();
 	}
 }
@@ -247,6 +268,119 @@ void SwgCuiAirspeederPanel::sendAirspeederCommand(const char* action)
 {
 	GenericValueTypeMessage<std::string> const msg("AirspeederControl", action);
 	GameNetwork::send(msg, true);
+}
+
+//----------------------------------------------------------------------
+
+void SwgCuiAirspeederPanel::update(float deltaTimeSecs)
+{
+	CuiMediator::update(deltaTimeSecs);
+
+	if (!m_autoPilotEngaged)
+		return;
+
+	CreatureObject * const player = Game::getPlayerCreature();
+	if (!player)
+		return;
+
+	CreatureObject * const mount = player->getMountedCreature();
+	Object * const movementObject = mount ? static_cast<Object *>(mount) : static_cast<Object *>(player);
+
+	Vector const & pos = movementObject->getPosition_w();
+	float const dx = m_autoPilotTargetX - pos.x;
+	float const dz = m_autoPilotTargetZ - pos.z;
+	float const distSq = dx * dx + dz * dz;
+
+	if (distSq <= cs_autoPilotArrivalThreshold * cs_autoPilotArrivalThreshold)
+	{
+		m_autoPilotEngaged = false;
+
+		PlayerCreatureController * const controller = safe_cast<PlayerCreatureController *>(player->getController());
+		if (controller)
+			controller->appendMessage(CM_cancelAutoRun, 0.0f);
+
+		GenericValueTypeMessage<std::string> const msg("AutoPilotArrived", "arrived");
+		GameNetwork::send(msg, true);
+		return;
+	}
+
+	float const targetYaw = atan2(dx, dz);
+
+	PlayerCreatureController * const controller = safe_cast<PlayerCreatureController *>(player->getController());
+	if (controller)
+	{
+		controller->setDesiredYaw_w(targetYaw, true);
+
+		if (!controller->getAutoRun())
+			controller->appendMessage(CM_autoRun, 0.0f);
+	}
+}
+
+//----------------------------------------------------------------------
+
+void SwgCuiAirspeederPanel::engageAutoPilot(float targetX, float targetZ)
+{
+	CuiWorkspace * const ws = CuiWorkspace::getGameWorkspace();
+	if (!ws)
+		return;
+
+	CuiMediator * const med = ws->findMediatorByType(typeid(SwgCuiAirspeederPanel));
+	if (!med)
+		return;
+
+	SwgCuiAirspeederPanel * const panel = dynamic_cast<SwgCuiAirspeederPanel *>(med);
+	if (!panel)
+		return;
+
+	panel->m_autoPilotEngaged = true;
+	panel->m_autoPilotTargetX = targetX;
+	panel->m_autoPilotTargetZ = targetZ;
+
+	CreatureObject * const player = Game::getPlayerCreature();
+	if (player)
+	{
+		PlayerCreatureController * const controller = safe_cast<PlayerCreatureController *>(player->getController());
+		if (controller)
+		{
+			CreatureObject * const mount = player->getMountedCreature();
+			Object * const movementObject = mount ? static_cast<Object *>(mount) : static_cast<Object *>(player);
+			Vector const & pos = movementObject->getPosition_w();
+			float const dx = targetX - pos.x;
+			float const dz = targetZ - pos.z;
+			float const targetYaw = atan2(dx, dz);
+			controller->setDesiredYaw_w(targetYaw, true);
+
+			if (!controller->getAutoRun())
+				controller->appendMessage(CM_autoRun, 0.0f);
+		}
+	}
+}
+
+//----------------------------------------------------------------------
+
+void SwgCuiAirspeederPanel::disengageAutoPilot()
+{
+	CuiWorkspace * const ws = CuiWorkspace::getGameWorkspace();
+	if (!ws)
+		return;
+
+	CuiMediator * const med = ws->findMediatorByType(typeid(SwgCuiAirspeederPanel));
+	if (!med)
+		return;
+
+	SwgCuiAirspeederPanel * const panel = dynamic_cast<SwgCuiAirspeederPanel *>(med);
+	if (!panel)
+		return;
+
+	panel->m_autoPilotEngaged = false;
+
+	CreatureObject * const player = Game::getPlayerCreature();
+	if (player)
+	{
+		PlayerCreatureController * const controller = safe_cast<PlayerCreatureController *>(player->getController());
+		if (controller)
+			controller->appendMessage(CM_cancelAutoRun, 0.0f);
+	}
 }
 
 //----------------------------------------------------------------------

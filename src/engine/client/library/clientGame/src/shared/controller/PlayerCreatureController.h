@@ -117,6 +117,7 @@ public:
 	virtual bool          shouldApplyAnimationDrivenLocomotion () const;
 
 	void                  setDesiredYaw_w (float desiredYaw_w, bool shouldFaceDesiredYaw);
+	bool                  getAutoRun () const;
 	void                  warpClient (const Transform& transform_p);
 	void                  sendCommandQueueEnqueue(uint32 sequenceId, uint32 commandHash, NetworkId const &targetId, Unicode::String const &params);
 	void                  sendCommandQueueRemove(uint32 sequenceId);

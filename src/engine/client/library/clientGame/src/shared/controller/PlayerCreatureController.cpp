@@ -473,6 +473,13 @@ void PlayerCreatureController::setDesiredYaw_w (const float desiredYaw, bool sho
 
 // ----------------------------------------------------------------------
 
+bool PlayerCreatureController::getAutoRun() const
+{
+	return m_autoRun;
+}
+
+// ----------------------------------------------------------------------
+
 float PlayerCreatureController::realAlter (const float elapsedTime)
 {
 	NP_PROFILER_AUTO_BLOCK_DEFINE ("PlayerCreatureController::realAlter");
