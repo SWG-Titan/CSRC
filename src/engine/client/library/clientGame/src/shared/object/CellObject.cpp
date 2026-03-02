@@ -135,83 +135,83 @@ void CellObjectNamespace::swapBuildingToDarkPob(CellProperty * cellProperty)
 {
 	if (!cellProperty)
 	{
-		DEBUG_REPORT_LOG(true, ("swapBuildingToDarkPob: cellProperty is NULL\n"));
+		REPORT_LOG(true, ("swapBuildingToDarkPob: cellProperty is NULL\n"));
 		return;
 	}
 
 	const PortalProperty * portalProperty = cellProperty->getPortalProperty();
 	if (!portalProperty)
 	{
-		DEBUG_REPORT_LOG(true, ("swapBuildingToDarkPob: portalProperty is NULL\n"));
+		REPORT_LOG(true, ("swapBuildingToDarkPob: portalProperty is NULL\n"));
 		return;
 	}
 
 	const char * pobName = portalProperty->getPobName();
 	if (!pobName || !*pobName)
 	{
-		DEBUG_REPORT_LOG(true, ("swapBuildingToDarkPob: pobName is NULL or empty\n"));
+		REPORT_LOG(true, ("swapBuildingToDarkPob: pobName is NULL or empty\n"));
 		return;
 	}
 
-	DEBUG_REPORT_LOG(true, ("swapBuildingToDarkPob: pobName = [%s]\n", pobName));
+	REPORT_LOG(true, ("swapBuildingToDarkPob: pobName = [%s]\n", pobName));
 
 	std::string pobStr(pobName);
 	const std::string::size_type dotPos = pobStr.rfind(".pob");
 	if (dotPos == std::string::npos)
 	{
-		DEBUG_REPORT_LOG(true, ("swapBuildingToDarkPob: no .pob extension found\n"));
+		REPORT_LOG(true, ("swapBuildingToDarkPob: no .pob extension found\n"));
 		return;
 	}
 
 	if (pobStr.find("_dark.pob") != std::string::npos)
 	{
-		DEBUG_REPORT_LOG(true, ("swapBuildingToDarkPob: already a _dark pob\n"));
+		REPORT_LOG(true, ("swapBuildingToDarkPob: already a _dark pob\n"));
 		return;
 	}
 
 	std::string darkPobStr = pobStr.substr(0, dotPos) + "_dark.pob";
-	DEBUG_REPORT_LOG(true, ("swapBuildingToDarkPob: looking for [%s]\n", darkPobStr.c_str()));
+	REPORT_LOG(true, ("swapBuildingToDarkPob: looking for [%s]\n", darkPobStr.c_str()));
 
 	if (!TreeFile::exists(darkPobStr.c_str()))
 	{
-		DEBUG_REPORT_LOG(true, ("swapBuildingToDarkPob: _dark.pob does NOT exist in TreeFile\n"));
+		REPORT_LOG(true, ("swapBuildingToDarkPob: _dark.pob does NOT exist in TreeFile\n"));
 		return;
 	}
 
-	DEBUG_REPORT_LOG(true, ("swapBuildingToDarkPob: _dark.pob EXISTS, fetching template\n"));
+	REPORT_LOG(true, ("swapBuildingToDarkPob: _dark.pob EXISTS, fetching template\n"));
 
 	const PortalPropertyTemplate * darkTemplate = PortalPropertyTemplateList::fetch(CrcLowerString(darkPobStr.c_str()));
 	if (!darkTemplate)
 	{
-		DEBUG_REPORT_LOG(true, ("swapBuildingToDarkPob: failed to fetch dark template\n"));
+		REPORT_LOG(true, ("swapBuildingToDarkPob: failed to fetch dark template\n"));
 		return;
 	}
 
 	PortalProperty * mutablePortalProperty = const_cast<PortalProperty *>(portalProperty);
 	const int numCells = mutablePortalProperty->getNumberOfCells();
 	const int darkNumCells = darkTemplate->getNumberOfCells();
-	DEBUG_REPORT_LOG(true, ("swapBuildingToDarkPob: numCells=%d darkNumCells=%d\n", numCells, darkNumCells));
+	REPORT_LOG(true, ("swapBuildingToDarkPob: numCells=%d darkNumCells=%d\n", numCells, darkNumCells));
 
 	for (int i = 1; i < numCells && i < darkNumCells; ++i)
 	{
 		CellProperty * cell = mutablePortalProperty->getCell(i);
 		if (!cell)
 		{
-			DEBUG_REPORT_LOG(true, ("swapBuildingToDarkPob: cell %d is NULL\n", i));
+			REPORT_LOG(true, ("swapBuildingToDarkPob: cell %d is NULL\n", i));
 			continue;
 		}
 
 		Object * appearanceObj = cell->getAppearanceObject();
 		if (!appearanceObj)
 		{
-			DEBUG_REPORT_LOG(true, ("swapBuildingToDarkPob: cell %d appearanceObj is NULL\n", i));
+			REPORT_LOG(true, ("swapBuildingToDarkPob: cell %d appearanceObj is NULL\n", i));
 			continue;
 		}
 
 		const char * darkAppName = darkTemplate->getCell(i).getAppearanceName();
 		if (darkAppName && *darkAppName)
 		{
-			DEBUG_REPORT_LOG(true, ("swapBuildingToDarkPob: cell %d swapping to [%s]\n", i, darkAppName));
+			REPORT_LOG(true, ("swapBuildingToDarkPob: cell %d swapping to [%s]\n", i, darkAppName));
 			Appearance * const darkAppearance = AppearanceTemplateList::createAppearance(darkAppName);
 			if (darkAppearance)
 			{
@@ -220,7 +220,7 @@ void CellObjectNamespace::swapBuildingToDarkPob(CellProperty * cellProperty)
 			}
 			else
 			{
-				DEBUG_REPORT_LOG(true, ("swapBuildingToDarkPob: cell %d failed to create appearance [%s]\n", i, darkAppName));
+				REPORT_LOG(true, ("swapBuildingToDarkPob: cell %d failed to create appearance [%s]\n", i, darkAppName));
 			}
 		}
 	}
@@ -228,7 +228,7 @@ void CellObjectNamespace::swapBuildingToDarkPob(CellProperty * cellProperty)
 	const char * darkExteriorName = darkTemplate->getExteriorAppearanceName();
 	if (darkExteriorName && *darkExteriorName)
 	{
-		DEBUG_REPORT_LOG(true, ("swapBuildingToDarkPob: swapping exterior to [%s]\n", darkExteriorName));
+		REPORT_LOG(true, ("swapBuildingToDarkPob: swapping exterior to [%s]\n", darkExteriorName));
 		Object & buildingObj = mutablePortalProperty->getOwner();
 		Appearance * const darkExterior = AppearanceTemplateList::createAppearance(darkExteriorName);
 		if (darkExterior)
@@ -239,7 +239,7 @@ void CellObjectNamespace::swapBuildingToDarkPob(CellProperty * cellProperty)
 	}
 
 	darkTemplate->release();
-	DEBUG_REPORT_LOG(true, ("swapBuildingToDarkPob: COMPLETE\n"));
+	REPORT_LOG(true, ("swapBuildingToDarkPob: COMPLETE\n"));
 }
 
 // ----------------------------------------------------------------------
@@ -446,7 +446,7 @@ const std::vector<Vector>* CellObject::getRadarPortalEdges () const
 
 void CellObject::setCellLightColor(float r, float g, float b, float brightness)
 {
-	DEBUG_REPORT_LOG(true, ("setCellLightColor: r=%.2f g=%.2f b=%.2f brightness=%.2f\n", r, g, b, brightness));
+	REPORT_LOG(true, ("setCellLightColor: r=%.2f g=%.2f b=%.2f brightness=%.2f\n", r, g, b, brightness));
 
 	for (std::vector<Light *>::iterator it = m_cellLights.begin(); it != m_cellLights.end(); ++it)
 	{
@@ -473,17 +473,17 @@ void CellObject::setCellLightColor(float r, float g, float b, float brightness)
 
 		if (!wasCustom)
 		{
-			DEBUG_REPORT_LOG(true, ("setCellLightColor: first custom lighting, calling swapBuildingToDarkPob\n"));
+			REPORT_LOG(true, ("setCellLightColor: first custom lighting, calling swapBuildingToDarkPob\n"));
 			swapBuildingToDarkPob(cellProperty);
 		}
 		else
 		{
-			DEBUG_REPORT_LOG(true, ("setCellLightColor: already had custom lighting, skipping swap\n"));
+			REPORT_LOG(true, ("setCellLightColor: already had custom lighting, skipping swap\n"));
 		}
 	}
 	else
 	{
-		DEBUG_REPORT_LOG(true, ("setCellLightColor: cellProperty is NULL!\n"));
+		REPORT_LOG(true, ("setCellLightColor: cellProperty is NULL!\n"));
 	}
 }
 
