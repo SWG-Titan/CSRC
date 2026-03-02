@@ -636,6 +636,8 @@ void SwgCuiHudWindowManager::receiveMessage(const MessageDispatch::Emitter & , c
 			if (collision)
 				collision->setCollidable(msg.getValue().second);
 		}
+		if (!msg.getValue().second)
+			SwgCuiAirspeederPanel::setSkywayActive();
 	}
 
 	//----------------------------------------------------------------------

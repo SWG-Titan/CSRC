@@ -29,12 +29,12 @@ public:
 
 	virtual void performActivate();
 	virtual void performDeactivate();
-	virtual void update(float deltaTimeSecs);
 
 	virtual void OnButtonPressed(UIWidget * context);
 
 	static SwgCuiAirspeederPanel * createInto(UIPage & parent);
 	static void resetPersistedState();
+	static void setSkywayActive();
 
 private:
 	~SwgCuiAirspeederPanel();
@@ -55,7 +55,6 @@ private:
 	bool m_boostMode;
 	bool m_trafficMode;
 	bool m_ascending;
-	float m_ascentEndTime;
 };
 
 //======================================================================
