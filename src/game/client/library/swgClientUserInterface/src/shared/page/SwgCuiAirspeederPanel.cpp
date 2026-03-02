@@ -26,6 +26,7 @@ namespace
 {
 	int const marginPixels = 16;
 	float const ascentDurationSecs = 5.0f;
+	bool s_persistedInSkyway = false;
 }
 
 //======================================================================
@@ -44,7 +45,7 @@ SwgCuiAirspeederPanel::SwgCuiAirspeederPanel(UIPage & page) :
 	m_buttonSkyway(NULL),
 	m_buttonBoost(NULL),
 	m_buttonTraffic(NULL),
-	m_inSkyway(false),
+	m_inSkyway(s_persistedInSkyway),
 	m_boostMode(false),
 	m_trafficMode(false),
 	m_ascending(false),
@@ -76,6 +77,7 @@ SwgCuiAirspeederPanel::~SwgCuiAirspeederPanel()
 
 void SwgCuiAirspeederPanel::performActivate()
 {
+	setIsUpdating(true);
 	positionCenterRight();
 	refreshSkywayButtonText();
 	refreshBoostTrafficButtons();
@@ -86,6 +88,11 @@ void SwgCuiAirspeederPanel::performActivate()
 
 void SwgCuiAirspeederPanel::performDeactivate()
 {
+	setIsUpdating(false);
+	m_inSkyway = false;
+	m_ascending = false;
+	m_ascentEndTime = 0.0f;
+	s_persistedInSkyway = false;
 	getPage().SetVisible(false);
 }
 
@@ -101,9 +108,8 @@ void SwgCuiAirspeederPanel::update(float deltaTimeSecs)
 		{
 			m_ascending = false;
 			m_inSkyway = true;
+			s_persistedInSkyway = true;
 			refreshSkywayButtonText();
-			if (m_buttonSkyway)
-				m_buttonSkyway->SetEnabled(true);
 		}
 	}
 }
@@ -113,10 +119,18 @@ void SwgCuiAirspeederPanel::OnButtonPressed(UIWidget * context)
 	if (context == m_buttonSkyway)
 	{
 		if (m_ascending)
-			return;
-		if (m_inSkyway)
+		{
+			m_ascending = false;
+			m_ascentEndTime = 0.0f;
+			m_inSkyway = false;
+			s_persistedInSkyway = false;
+			refreshSkywayButtonText();
+			sendAirspeederCommand("skyway");
+		}
+		else if (m_inSkyway)
 		{
 			m_inSkyway = false;
+			s_persistedInSkyway = false;
 			refreshSkywayButtonText();
 			sendAirspeederCommand("skyway");
 		}
@@ -125,8 +139,7 @@ void SwgCuiAirspeederPanel::OnButtonPressed(UIWidget * context)
 			sendAirspeederCommand("skyway");
 			m_ascending = true;
 			m_ascentEndTime = Clock::timeMs() * 0.001f + ascentDurationSecs;
-			if (m_buttonSkyway)
-				m_buttonSkyway->SetEnabled(false);
+			refreshSkywayButtonText();
 		}
 		return;
 	}
@@ -167,8 +180,17 @@ void SwgCuiAirspeederPanel::positionCenterRight()
 
 void SwgCuiAirspeederPanel::refreshSkywayButtonText()
 {
-	if (m_buttonSkyway)
-		m_buttonSkyway->SetLocalText(m_inSkyway ? Unicode::narrowToWide("Exit Skyway") : Unicode::narrowToWide("Enter Skyway"));
+	if (!m_buttonSkyway)
+		return;
+
+	if (m_ascending)
+		m_buttonSkyway->SetLocalText(Unicode::narrowToWide("Ascending..."));
+	else if (m_inSkyway)
+		m_buttonSkyway->SetLocalText(Unicode::narrowToWide("Exit Skyway"));
+	else
+		m_buttonSkyway->SetLocalText(Unicode::narrowToWide("Enter Skyway"));
+
+	m_buttonSkyway->SetEnabled(true);
 }
 
 void SwgCuiAirspeederPanel::refreshBoostTrafficButtons()
