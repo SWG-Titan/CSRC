@@ -477,9 +477,12 @@ void CellObject::setCellLightColor(float r, float g, float b, float brightness)
 	const float fb = b * brightness;
 
 	CellProperty * const cellProperty = getCellProperty();
+	PortalProperty * portalProperty = NULL;
+
 	if (cellProperty)
 	{
 		cellProperty->setCustomLightingOverride(true, fr, fg, fb);
+		portalProperty = const_cast<PortalProperty *>(cellProperty->getPortalProperty());
 
 		if (!wasCustom)
 		{
@@ -492,11 +495,69 @@ void CellObject::setCellLightColor(float r, float g, float b, float brightness)
 	const float clampG = (fg > 1.0f) ? 1.0f : fg;
 	const float clampB = (fb > 1.0f) ? 1.0f : fb;
 
-	Light * ambientLight = new Light(Light::T_ambient, VectorArgb(1.0f, clampR, clampG, clampB));
-	ambientLight->setAffectsShadersWithPrecalculatedVertexLighting(true);
-	ambientLight->setAffectsShadersWithoutPrecalculatedVertexLighting(true);
-	ambientLight->attachToObject_p(this, true);
-	m_cellLights.push_back(ambientLight);
+	// Recreate the original POB lights at their positions, tinted with the user's color.
+	if (portalProperty)
+	{
+		const PortalPropertyTemplate & templ = portalProperty->getPortalPropertyTemplate();
+		const int cellIndex = m_cellNumber.get();
+
+		if (cellIndex >= 0 && cellIndex < templ.getNumberOfCells())
+		{
+			PortalPropertyTemplateCell::LightList const * lightList = templ.getCell(cellIndex).getLightList();
+			if (lightList)
+			{
+				for (PortalPropertyTemplateCell::LightList::const_iterator i = lightList->begin(); i != lightList->end(); ++i)
+				{
+					const PortalPropertyTemplateCellLight & lightData = *i;
+
+					VectorArgb tintedColor(
+						lightData.diffuseColor.a,
+						lightData.diffuseColor.r * clampR,
+						lightData.diffuseColor.g * clampG,
+						lightData.diffuseColor.b * clampB
+					);
+
+					Light * light = NULL;
+
+					if (lightData.type == PortalPropertyTemplateCellLight::T_ambient)
+					{
+						light = new Light(Light::T_ambient, tintedColor);
+					}
+					else if (lightData.type == PortalPropertyTemplateCellLight::T_parallel)
+					{
+						light = new Light(Light::T_parallel, tintedColor);
+						light->setTransform_o2p(lightData.transform);
+					}
+					else if (lightData.type == PortalPropertyTemplateCellLight::T_point)
+					{
+						light = new Light(Light::T_point, tintedColor);
+						light->setTransform_o2p(lightData.transform);
+						light->setConstantAttenuation(lightData.constantAttenuation);
+						light->setLinearAttenuation(lightData.linearAttenuation);
+						light->setQuadraticAttenuation(lightData.quadraticAttenuation);
+					}
+
+					if (light)
+					{
+						light->setAffectsShadersWithPrecalculatedVertexLighting(true);
+						light->setAffectsShadersWithoutPrecalculatedVertexLighting(true);
+						light->attachToObject_p(this, true);
+						m_cellLights.push_back(light);
+					}
+				}
+			}
+		}
+	}
+
+	// If no POB lights were added, fall back to a single ambient light.
+	if (m_cellLights.empty())
+	{
+		Light * ambientLight = new Light(Light::T_ambient, VectorArgb(1.0f, clampR, clampG, clampB));
+		ambientLight->setAffectsShadersWithPrecalculatedVertexLighting(true);
+		ambientLight->setAffectsShadersWithoutPrecalculatedVertexLighting(true);
+		ambientLight->attachToObject_p(this, true);
+		m_cellLights.push_back(ambientLight);
+	}
 }
 
 bool CellObject::hasCustomLighting() const
