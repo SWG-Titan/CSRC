@@ -162,14 +162,20 @@ void SwgCuiAirspeederPanel::OnButtonPressed(UIWidget * context)
 	if (context == m_buttonAutoPilotCancel)
 	{
 		m_autoPilotEngaged = false;
+		m_autoPilotActive = false;
 
 		CreatureObject * const player = Game::getPlayerCreature();
 		if (player)
 		{
 			PlayerCreatureController * const controller = safe_cast<PlayerCreatureController *>(player->getController());
 			if (controller)
+			{
+				controller->setAutoPilotLocked(false);
 				controller->appendMessage(CM_cancelAutoRun, 0.0f);
+			}
 		}
+
+		refreshAutoPilotUI();
 
 		GenericValueTypeMessage<std::string> const msg("AutoPilotCancel", "cancel");
 		GameNetwork::send(msg, true);
@@ -242,6 +248,14 @@ void SwgCuiAirspeederPanel::resetPersistedState()
 		panel->m_autoPilotWaypointsRemaining = 0;
 		panel->m_autoPilotEngaged = false;
 		panel->refreshAutoPilotUI();
+
+		CreatureObject * const player = Game::getPlayerCreature();
+		if (player)
+		{
+			PlayerCreatureController * const controller = safe_cast<PlayerCreatureController *>(player->getController());
+			if (controller)
+				controller->setAutoPilotLocked(false);
+		}
 	}
 }
 
@@ -276,6 +290,9 @@ void SwgCuiAirspeederPanel::update(float deltaTimeSecs)
 {
 	CuiMediator::update(deltaTimeSecs);
 
+	if (m_autoPilotEngaged)
+		refreshAutoPilotUI();
+
 	if (!m_autoPilotEngaged)
 		return;
 
@@ -294,10 +311,16 @@ void SwgCuiAirspeederPanel::update(float deltaTimeSecs)
 	if (distSq <= cs_autoPilotArrivalThreshold * cs_autoPilotArrivalThreshold)
 	{
 		m_autoPilotEngaged = false;
+		m_autoPilotActive = false;
 
 		PlayerCreatureController * const controller = safe_cast<PlayerCreatureController *>(player->getController());
 		if (controller)
+		{
+			controller->setAutoPilotLocked(false);
 			controller->appendMessage(CM_cancelAutoRun, 0.0f);
+		}
+
+		refreshAutoPilotUI();
 
 		GenericValueTypeMessage<std::string> const msg("AutoPilotArrived", "arrived");
 		GameNetwork::send(msg, true);
@@ -333,6 +356,7 @@ void SwgCuiAirspeederPanel::engageAutoPilot(float targetX, float targetZ)
 		return;
 
 	panel->m_autoPilotEngaged = true;
+	panel->m_autoPilotActive = true;
 	panel->m_autoPilotTargetX = targetX;
 	panel->m_autoPilotTargetZ = targetZ;
 
@@ -342,6 +366,8 @@ void SwgCuiAirspeederPanel::engageAutoPilot(float targetX, float targetZ)
 		PlayerCreatureController * const controller = safe_cast<PlayerCreatureController *>(player->getController());
 		if (controller)
 		{
+			controller->setAutoPilotLocked(true);
+
 			CreatureObject * const mount = player->getMountedCreature();
 			Object * const movementObject = mount ? static_cast<Object *>(mount) : static_cast<Object *>(player);
 			Vector const & pos = movementObject->getPosition_w();
@@ -354,6 +380,8 @@ void SwgCuiAirspeederPanel::engageAutoPilot(float targetX, float targetZ)
 				controller->appendMessage(CM_autoRun, 0.0f);
 		}
 	}
+
+	panel->refreshAutoPilotUI();
 }
 
 //----------------------------------------------------------------------
@@ -373,14 +401,20 @@ void SwgCuiAirspeederPanel::disengageAutoPilot()
 		return;
 
 	panel->m_autoPilotEngaged = false;
+	panel->m_autoPilotActive = false;
 
 	CreatureObject * const player = Game::getPlayerCreature();
 	if (player)
 	{
 		PlayerCreatureController * const controller = safe_cast<PlayerCreatureController *>(player->getController());
 		if (controller)
+		{
+			controller->setAutoPilotLocked(false);
 			controller->appendMessage(CM_cancelAutoRun, 0.0f);
+		}
 	}
+
+	panel->refreshAutoPilotUI();
 }
 
 //----------------------------------------------------------------------
@@ -427,15 +461,38 @@ void SwgCuiAirspeederPanel::setAutoPilotStatus(bool active, int waypointsRemaini
 
 void SwgCuiAirspeederPanel::refreshAutoPilotUI()
 {
+	bool const showAP = m_autoPilotActive || m_autoPilotEngaged;
+
 	if (m_buttonAutoPilotCancel)
-		m_buttonAutoPilotCancel->SetVisible(m_autoPilotActive);
+		m_buttonAutoPilotCancel->SetVisible(showAP);
 
 	if (m_textAutoPilotStatus)
 	{
-		if (m_autoPilotActive)
+		if (showAP)
 		{
-			char buf[64];
-			snprintf(buf, sizeof(buf), "Auto-Pilot: %d waypoint%s", m_autoPilotWaypointsRemaining, m_autoPilotWaypointsRemaining == 1 ? "" : "s");
+			char buf[128];
+			if (m_autoPilotEngaged)
+			{
+				CreatureObject * const player = Game::getPlayerCreature();
+				if (player)
+				{
+					CreatureObject * const mount = player->getMountedCreature();
+					Object * const movObj = mount ? static_cast<Object *>(mount) : static_cast<Object *>(player);
+					Vector const & pos = movObj->getPosition_w();
+					float const dx = m_autoPilotTargetX - pos.x;
+					float const dz = m_autoPilotTargetZ - pos.z;
+					float const dist = sqrt(dx * dx + dz * dz);
+					snprintf(buf, sizeof(buf), "Auto-Pilot: %.0fm to (%.0f, %.0f)", dist, m_autoPilotTargetX, m_autoPilotTargetZ);
+				}
+				else
+				{
+					snprintf(buf, sizeof(buf), "Auto-Pilot: En route...");
+				}
+			}
+			else
+			{
+				snprintf(buf, sizeof(buf), "Auto-Pilot: Standing by");
+			}
 			m_textAutoPilotStatus->SetLocalText(Unicode::narrowToWide(buf));
 			m_textAutoPilotStatus->SetVisible(true);
 		}

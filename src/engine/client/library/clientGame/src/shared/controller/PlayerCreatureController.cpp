@@ -441,7 +441,8 @@ PlayerCreatureController::PlayerCreatureController (CreatureObject* const newOwn
 	m_desiredSpeed(0.0f),
 	m_buildingSharedTemplateNameCrc(Crc::crcNull),
 	m_cellNameCrc(Crc::crcNull),
-	m_allowMovement(true)
+	m_allowMovement(true),
+	m_autoPilotLocked(false)
 {
 }
 
@@ -738,108 +739,127 @@ float PlayerCreatureController::realAlter (const float elapsedTime)
 				float               value;
 				MessageQueue::Data* data;
 
-				getMessageQueue ()->getMessage (i, &message, &value, &data);
+			getMessageQueue ()->getMessage (i, &message, &value, &data);
 
+			if (m_autoPilotLocked)
+			{
 				switch (message)
 				{
-				case CM_right:
-					desiredVelocity_c.x += 1.f;
-					break;
-
-				case CM_left:
-					desiredVelocity_c.x -= 1.f;
-					break;
-
-				case CM_walk:
-					if ( desiredVelocity_c.z > -FLT_EPSILON )
-					{
-						desiredVelocity_c.z += 1.f;
-					}
-					break;
-
-				case CM_mouseWalkStart:
-					m_autoRun = false;
-
-					if (CuiManager::getPointerInputActive ())
-						m_mouseWalkMode = MWM_followMouse;
+				case CM_autoRun:
+					if (m_autoFollowTarget->getPointer () == NULL)
+						m_autoRun = !m_autoRun;
 					else
-						m_mouseWalkMode = MWM_ahead;
+						m_autoRun = false;
 					break;
-
-				case CM_mouseWalk:
-					if (m_mouseWalkMode == MWM_followMouse)
-					{
-						if (!CuiManager::getPointerInputActive ())
-							m_mouseWalkMode = MWM_ahead;
-
-						const int x = s_systemMouseCursor.getX ();
-						const int y = s_systemMouseCursor.getY ();
-
-						//-- convert mouse coords into world velocity
-						const float centerX = static_cast<float> (static_cast<uint32> (Graphics::getCurrentRenderTargetWidth ()) >> 1);
-						const float centerY = static_cast<float> (static_cast<uint32> (Graphics::getCurrentRenderTargetHeight ()) >> 1);
-
-						const Vector direction_c (static_cast<float> (x) - centerX, 0.f, centerY - static_cast<float> (y));
-						desiredVelocity_c += direction_c;
-					}
-					else if (m_mouseWalkMode == MWM_ahead)
-					{
-						if (CuiManager::getPointerInputActive ())
-							m_mouseWalkMode = MWM_followMouse;
-
-						desiredVelocity_c.z += 1.f;
-					}
-					break;
-
-				case CM_down:
-
-					if ( desiredVelocity_c.z > FLT_EPSILON )
-					{
-						desiredVelocity_c.z = 0.f;
-					}
-					
-					desiredVelocity_c.z -= 1.f;
-					break;
-
-				case CM_moveLateral:
-					desiredVelocity_c.x += value;
-					break;
-
-				case CM_moveLongitudinal:
-					desiredVelocity_c.x += value;
-					break;
-
-				case CM_toggleRunOn:
-					running = !ms_runWhenMoving;
-					break;
-
-				case CM_turn:
-					{
-						if (isTurnStrafe)
-						{
-							if (value > 0.0f)
-								getMessageQueue ()->appendMessage (static_cast<int>(CM_right), 0.0f);
-							else
-								getMessageQueue ()->appendMessage (static_cast<int>(CM_left),  0.0f);
-						}
-						else if ( !isFirstPerson && !m_shouldFaceDesiredYaw )
-							turn += value;
-					}
-					break;
-
 				case CM_cancelAutoRun:
 					m_autoRun = false;
 					break;
-
-				case CM_autoRun:
-					{
-						// Ignore if we have an auto-follow target.
-						if (m_autoFollowTarget->getPointer () == NULL)
-							m_autoRun = !m_autoRun;
-						else
-							m_autoRun = false;
-					}
+				default:
 					break;
+				}
+				continue;
+			}
+
+			switch (message)
+			{
+			case CM_right:
+				desiredVelocity_c.x += 1.f;
+				break;
+
+			case CM_left:
+				desiredVelocity_c.x -= 1.f;
+				break;
+
+			case CM_walk:
+				if ( desiredVelocity_c.z > -FLT_EPSILON )
+				{
+					desiredVelocity_c.z += 1.f;
+				}
+				break;
+
+			case CM_mouseWalkStart:
+				m_autoRun = false;
+
+				if (CuiManager::getPointerInputActive ())
+					m_mouseWalkMode = MWM_followMouse;
+				else
+					m_mouseWalkMode = MWM_ahead;
+				break;
+
+			case CM_mouseWalk:
+				if (m_mouseWalkMode == MWM_followMouse)
+				{
+					if (!CuiManager::getPointerInputActive ())
+						m_mouseWalkMode = MWM_ahead;
+
+					const int x = s_systemMouseCursor.getX ();
+					const int y = s_systemMouseCursor.getY ();
+
+					//-- convert mouse coords into world velocity
+					const float centerX = static_cast<float> (static_cast<uint32> (Graphics::getCurrentRenderTargetWidth ()) >> 1);
+					const float centerY = static_cast<float> (static_cast<uint32> (Graphics::getCurrentRenderTargetHeight ()) >> 1);
+
+					const Vector direction_c (static_cast<float> (x) - centerX, 0.f, centerY - static_cast<float> (y));
+					desiredVelocity_c += direction_c;
+				}
+				else if (m_mouseWalkMode == MWM_ahead)
+				{
+					if (CuiManager::getPointerInputActive ())
+						m_mouseWalkMode = MWM_followMouse;
+
+					desiredVelocity_c.z += 1.f;
+				}
+				break;
+
+			case CM_down:
+
+				if ( desiredVelocity_c.z > FLT_EPSILON )
+				{
+					desiredVelocity_c.z = 0.f;
+				}
+				
+				desiredVelocity_c.z -= 1.f;
+				break;
+
+			case CM_moveLateral:
+				desiredVelocity_c.x += value;
+				break;
+
+			case CM_moveLongitudinal:
+				desiredVelocity_c.x += value;
+				break;
+
+			case CM_toggleRunOn:
+				running = !ms_runWhenMoving;
+				break;
+
+			case CM_turn:
+				{
+					if (isTurnStrafe)
+					{
+						if (value > 0.0f)
+							getMessageQueue ()->appendMessage (static_cast<int>(CM_right), 0.0f);
+						else
+							getMessageQueue ()->appendMessage (static_cast<int>(CM_left),  0.0f);
+					}
+					else if ( !isFirstPerson && !m_shouldFaceDesiredYaw )
+						turn += value;
+				}
+				break;
+
+			case CM_cancelAutoRun:
+				m_autoRun = false;
+				break;
+
+			case CM_autoRun:
+				{
+					// Ignore if we have an auto-follow target.
+					if (m_autoFollowTarget->getPointer () == NULL)
+						m_autoRun = !m_autoRun;
+					else
+						m_autoRun = false;
+				}
+				break;
 
 				case CM_movePlayer:
 					{
@@ -2718,6 +2738,20 @@ bool PlayerCreatureController::shouldSendUpdatedTransform() const
 void PlayerCreatureController::allowMovement(bool const allow)
 {
 	m_allowMovement = allow;
+}
+
+//----------------------------------------------------------------------
+
+void PlayerCreatureController::setAutoPilotLocked(bool locked)
+{
+	m_autoPilotLocked = locked;
+}
+
+//----------------------------------------------------------------------
+
+bool PlayerCreatureController::getAutoPilotLocked() const
+{
+	return m_autoPilotLocked;
 }
 
 //----------------------------------------------------------------------

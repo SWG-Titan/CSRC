@@ -131,6 +131,9 @@ public:
 	MessageQueue         *getMessageQueue();
 	const MessageQueue   *getMessageQueue() const;
 
+	void                  setAutoPilotLocked(bool locked);
+	bool                  getAutoPilotLocked() const;
+
 	void                  setServerCellObject (Object const * serverCellObject);
 	void                  setServerTransform  (const Transform& serverTransform);
 
@@ -221,6 +224,7 @@ private:
 	uint32 m_buildingSharedTemplateNameCrc;
 	uint32 m_cellNameCrc;
 	bool m_allowMovement;
+	bool m_autoPilotLocked;
 };         
 
 // ----------------------------------------------------------------------
