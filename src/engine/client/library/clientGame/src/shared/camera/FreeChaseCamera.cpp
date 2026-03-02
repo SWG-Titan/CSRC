@@ -571,9 +571,12 @@ float FreeChaseCamera::alter (float elapsedTime)
 			m_offsetYaw_w -= turnTotal;
 		}
 
-		playerCreatureController->setDesiredYaw_w(
-			m_yaw_w,
-			ms_cameraMode == CM_chase && mouseLookState != CuiIoWin::MouseLookState_Camera && !playerCreatureController->getAutoPilotLocked() );
+		if (!playerCreatureController->getAutoPilotLocked())
+		{
+			playerCreatureController->setDesiredYaw_w(
+				m_yaw_w,
+				ms_cameraMode == CM_chase && mouseLookState != CuiIoWin::MouseLookState_Camera );
+		}
 
 	}
 	
