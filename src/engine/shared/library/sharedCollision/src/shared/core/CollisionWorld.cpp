@@ -186,8 +186,9 @@ namespace CollisionWorldNamespace
 	CollisionWorld::DoCollisionWithTerrainFunction ms_doCollisionWithTerrainFunction = 0;
 	CollisionWorld::SkywayCollisionCallback ms_skywayCollisionCallback = 0;
 
-	float const cs_skywayCollisionMargin = 5.0f;
+	float const cs_skywayHeightThreshold = 1.0f;
 	float const cs_skywayQueryRadius = 60.0f;
+	float const cs_skywayMinBuildingHeight = 40.0f;
 
 	bool checkSkywayCollision(CollisionProperty * collider)
 	{
@@ -208,6 +209,9 @@ namespace CollisionWorldNamespace
 			if (!staticObj)
 				continue;
 
+			if (staticObj == &owner)
+				continue;
+
 			CollisionProperty * staticCollision = staticObj->getCollisionProperty();
 			if (!staticCollision)
 				continue;
@@ -216,11 +220,15 @@ namespace CollisionWorldNamespace
 			if (!extent)
 				continue;
 
-			AxialBox const box = extent->getBoundingBox();
-			Vector const topLocal(0.0f, box.getMax().y, 0.0f);
+			AxialBox const localBox = extent->getBoundingBox();
+			float const localHeight = localBox.getMax().y - localBox.getMin().y;
+			if (localHeight < cs_skywayMinBuildingHeight)
+				continue;
+
+			Vector const topLocal(0.0f, localBox.getMax().y, 0.0f);
 			Vector const topWorld = staticObj->getTransform_o2w().rotateTranslate_l2p(topLocal);
 
-			if (topWorld.y >= vehiclePos_w.y - cs_skywayCollisionMargin)
+			if (topWorld.y >= vehiclePos_w.y - cs_skywayHeightThreshold)
 				return true;
 		}
 
