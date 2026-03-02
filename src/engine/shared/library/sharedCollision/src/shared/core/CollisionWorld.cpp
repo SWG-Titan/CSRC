@@ -188,7 +188,6 @@ namespace CollisionWorldNamespace
 
 	float const cs_skywayHeightThreshold = 1.0f;
 	float const cs_skywayQueryRadius = 60.0f;
-	float const cs_skywayMinBuildingHeight = 40.0f;
 
 	bool checkSkywayCollision(CollisionProperty * collider)
 	{
@@ -221,14 +220,21 @@ namespace CollisionWorldNamespace
 				continue;
 
 			AxialBox const localBox = extent->getBoundingBox();
-			float const localHeight = localBox.getMax().y - localBox.getMin().y;
-			if (localHeight < cs_skywayMinBuildingHeight)
+			Transform const & o2w = staticObj->getTransform_o2w();
+			Vector const minWorld = o2w.rotateTranslate_l2p(localBox.getMin());
+			Vector const maxWorld = o2w.rotateTranslate_l2p(localBox.getMax());
+
+			float const worldTop = std::max(minWorld.y, maxWorld.y);
+			if (worldTop < vehiclePos_w.y - cs_skywayHeightThreshold)
 				continue;
 
-			Vector const topLocal(0.0f, localBox.getMax().y, 0.0f);
-			Vector const topWorld = staticObj->getTransform_o2w().rotateTranslate_l2p(topLocal);
+			float const worldMinX = std::min(minWorld.x, maxWorld.x);
+			float const worldMaxX = std::max(minWorld.x, maxWorld.x);
+			float const worldMinZ = std::min(minWorld.z, maxWorld.z);
+			float const worldMaxZ = std::max(minWorld.z, maxWorld.z);
 
-			if (topWorld.y >= vehiclePos_w.y - cs_skywayHeightThreshold)
+			if (vehiclePos_w.x >= worldMinX && vehiclePos_w.x <= worldMaxX &&
+				vehiclePos_w.z >= worldMinZ && vehiclePos_w.z <= worldMaxZ)
 				return true;
 		}
 
