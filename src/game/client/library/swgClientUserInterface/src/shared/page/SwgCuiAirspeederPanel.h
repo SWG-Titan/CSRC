@@ -70,6 +70,7 @@ private:
 	bool  m_autoPilotEngaged;
 	float m_autoPilotTargetX;
 	float m_autoPilotTargetZ;
+	bool  m_skywayCollisionSent;
 };
 
 //======================================================================

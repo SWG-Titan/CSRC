@@ -10,13 +10,18 @@
 #include "swgClientUserInterface/FirstSwgClientUserInterface.h"
 #include "swgClientUserInterface/SwgCuiAirspeederPanel.h"
 
+#include "clientGame/ClientWorld.h"
 #include "clientGame/CreatureObject.h"
 #include "clientGame/Game.h"
 #include "clientGame/GameNetwork.h"
 #include "clientGame/PlayerCreatureController.h"
 #include "clientGraphics/ConfigClientGraphics.h"
 #include "clientUserInterface/CuiWorkspace.h"
+#include "sharedCollision/CollisionDetect.h"
+#include "sharedCollision/CollisionProperty.h"
+#include "sharedCollision/BaseExtent.h"
 #include "sharedFoundation/GameControllerMessage.h"
+#include "sharedMath/AxialBox.h"
 #include "sharedNetworkMessages/GenericValueTypeMessage.h"
 #include "UnicodeUtils.h"
 
@@ -32,6 +37,8 @@ namespace
 {
 	int const marginPixels = 16;
 	float const cs_autoPilotArrivalThreshold = 15.0f;
+	float const cs_skywayCollisionMinHeight = 50.0f;
+	float const cs_skywayCollisionCheckRadius = 30.0f;
 }
 
 //======================================================================
@@ -60,7 +67,8 @@ SwgCuiAirspeederPanel::SwgCuiAirspeederPanel(UIPage & page) :
 	m_autoPilotWaypointsRemaining(0),
 	m_autoPilotEngaged(false),
 	m_autoPilotTargetX(0.0f),
-	m_autoPilotTargetZ(0.0f)
+	m_autoPilotTargetZ(0.0f),
+	m_skywayCollisionSent(false)
 {
 	getCodeDataObject(TUIButton, m_buttonSkyway, "buttonSkyway");
 	getCodeDataObject(TUIButton, m_buttonBoost, "buttonBoost");
@@ -249,6 +257,7 @@ void SwgCuiAirspeederPanel::resetPersistedState()
 		panel->m_autoPilotActive = false;
 		panel->m_autoPilotWaypointsRemaining = 0;
 		panel->m_autoPilotEngaged = false;
+		panel->m_skywayCollisionSent = false;
 		panel->refreshAutoPilotUI();
 
 		CreatureObject * const player = Game::getPlayerCreature();
@@ -276,6 +285,7 @@ void SwgCuiAirspeederPanel::setSkywayActive()
 	{
 		panel->m_ascending = false;
 		panel->m_inSkyway = true;
+		panel->m_skywayCollisionSent = false;
 		panel->refreshSkywayButtonText();
 	}
 }
@@ -292,18 +302,54 @@ void SwgCuiAirspeederPanel::update(float deltaTimeSecs)
 {
 	CuiMediator::update(deltaTimeSecs);
 
-	if (m_autoPilotEngaged)
-		refreshAutoPilotUI();
-
-	if (!m_autoPilotEngaged)
-		return;
-
 	CreatureObject * const player = Game::getPlayerCreature();
 	if (!player)
 		return;
 
 	CreatureObject * const mount = player->getMountedCreature();
 	Object * const movementObject = mount ? static_cast<Object *>(mount) : static_cast<Object *>(player);
+
+	if (m_inSkyway && !m_skywayCollisionSent && mount)
+	{
+		ClientWorld::ObjectVector objectVector;
+		ClientWorld::findObjectsInRange(mount->getPosition_w(), cs_skywayCollisionCheckRadius, objectVector);
+
+		for (size_t i = 0; i < objectVector.size(); ++i)
+		{
+			Object * const obj = objectVector[i];
+			if (!obj || obj == mount || obj == player)
+				continue;
+
+			CollisionProperty const * const collision = obj->getCollisionProperty();
+			if (!collision)
+				continue;
+
+			BaseExtent const * const extent = collision->getExtent_l();
+			if (!extent)
+				continue;
+
+			AxialBox const box = extent->getBoundingBox();
+			float const objectHeight = box.getMax().y - box.getMin().y;
+
+			if (objectHeight < cs_skywayCollisionMinHeight)
+				continue;
+
+			DetectResult const result = CollisionDetect::testObjects(mount, obj);
+			if (result.collided)
+			{
+				m_skywayCollisionSent = true;
+				GenericValueTypeMessage<std::string> const msg("AirspeederCrash", "crash");
+				GameNetwork::send(msg, true);
+				break;
+			}
+		}
+	}
+
+	if (m_autoPilotEngaged)
+		refreshAutoPilotUI();
+
+	if (!m_autoPilotEngaged)
+		return;
 
 	Vector const & pos = movementObject->getPosition_w();
 	float const dx = m_autoPilotTargetX - pos.x;
