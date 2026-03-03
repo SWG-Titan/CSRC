@@ -644,7 +644,8 @@ void CollisionWorld::update(CollisionProperty * collider, float time)
 
 	Vector delta = pointB_w - pointA_w;
 
-	delta.y = 0.0f;
+	if (object->getParentCell() == CellProperty::getWorldCellProperty())
+		delta.y = 0.0f;
 
 	float moveLength = delta.magnitude();
 

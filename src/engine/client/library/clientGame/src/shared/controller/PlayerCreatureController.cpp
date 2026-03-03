@@ -1114,7 +1114,7 @@ float PlayerCreatureController::realAlter (const float elapsedTime)
 				Vector desiredVelocity_o;
 
 				ShipObject * const ship = Game::getPlayerContainingShip();
-				if (ship)
+				if (ship && Game::isSpace())
 				{
 					movementOverrideVect = movementCreatureObject->rotate_p2w(desiredVelocity_w);
 					desiredVelocity_o = movementCreatureObject->rotate_p2o (desiredVelocity_w);
