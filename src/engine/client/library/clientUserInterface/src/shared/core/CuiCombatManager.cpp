@@ -460,10 +460,14 @@ void CuiCombatManagerNamespace::TargetResult::testCandidate(Object * const candi
 		return;
 	}
 
-	// only test against things that were on screen
-	if (!RenderWorld::wasObjectRenderedThisFrame(candidate->getNetworkId()))
+	bool const isAtmosphericFlight = !Game::isSpace() && Game::isHudSceneTypeSpace();
+
+	if (!isAtmosphericFlight)
 	{
-		return;
+		if (!RenderWorld::wasObjectRenderedThisFrame(candidate->getNetworkId()))
+		{
+			return;
+		}
 	}
 
 	Vector const candidate_w(candidate->getPosition_w());
@@ -655,8 +659,20 @@ CachedNetworkId const & CuiCombatManagerNamespace::cycleTargetsForPlayer(ActorAn
 
 	CachedNetworkId const & target = useIntendedTarget ? player->getIntendedTarget() : player->getLookAtTarget();
 
-	Vector const playerPosition(player->getPosition_w());
-	float const targetingRange = ConfigClientGame::getTargetingRange ();
+	Vector playerPosition(player->getPosition_w());
+	float targetingRange = ConfigClientGame::getTargetingRange ();
+
+	bool const isAtmosphericFlight = !Game::isSpace() && Game::isHudSceneTypeSpace();
+	if (isAtmosphericFlight)
+	{
+		ShipObject const * const containingShip = Game::getPlayerContainingShip();
+		if (containingShip)
+		{
+			playerPosition = containingShip->getPosition_w();
+		}
+		if (targetingRange < 512.0f)
+			targetingRange = 512.0f;
+	}
 
 	ClientWorld::ObjectVector objectsInRange;
 	ClientWorld::findObjectsInRange(playerPosition, targetingRange, objectsInRange);
@@ -1419,6 +1435,7 @@ const CachedNetworkId & CuiCombatManager::cycleTargetsInwardAll()
 
 bool CuiCombatManagerNamespace::isTargetCycleOk(TangibleObject const & obj)
 {
+	bool const isAtmosphericFlight = !Game::isSpace() && Game::isHudSceneTypeSpace();
 	bool useIntendedTarget = !Game::isSpace();
 	
 	CreatureObject * const player = Game::getPlayerCreature ();
@@ -1446,9 +1463,7 @@ bool CuiCombatManagerNamespace::isTargetCycleOk(TangibleObject const & obj)
 	if (creature && creature->isDead ())
 		return false;
 	
-	// frustum test
-
-	if (!Game::isSpace())
+	if (!Game::isSpace() && !isAtmosphericFlight)
 	{
 		const Camera * const camera = Game::getCamera ();
 		if (!camera)
