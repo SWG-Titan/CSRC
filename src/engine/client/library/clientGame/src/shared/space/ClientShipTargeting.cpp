@@ -10,6 +10,8 @@
 
 #include "clientGame/ClientSharedObjectTemplateInterface.h"
 #include "clientGame/ClientObject.h"
+#include "clientGame/ClientWorld.h"
+#include "clientGame/ConfigClientGame.h"
 #include "clientGame/CreatureObject.h"
 #include "clientGame/Game.h"
 #include "clientGame/GroupObject.h"
@@ -62,6 +64,9 @@ namespace ClientShipTargetingNamespace
 	void gatherUniqueShipsFromGroup(GroupObject const * group, std::vector<NetworkId> & ships, NetworkId const & ToIgnore);
 
 	float getOnScreenTargetFov();
+
+	bool isAtmosphericFlight();
+	void allTargetablesInAtmosphericFlight(Object const * targetingObject, ShipTargeting::ActorAndTargetHaveReletionship function, ShipTargeting::ObjectVector & resultObjects);
 }
 
 //=======================================================================
@@ -252,6 +257,54 @@ void ClientShipTargetingNamespace::gatherUniqueShipsFromGroup(GroupObject const 
 	}
 }
 
+// ----------------------------------------------------------------------
+
+bool ClientShipTargetingNamespace::isAtmosphericFlight()
+{
+	return !Game::isSpace() && Game::isHudSceneTypeSpace();
+}
+
+// ----------------------------------------------------------------------
+
+void ClientShipTargetingNamespace::allTargetablesInAtmosphericFlight(Object const * const targetingObject, ShipTargeting::ActorAndTargetHaveReletionship function, ShipTargeting::ObjectVector & resultObjects)
+{
+	if (!targetingObject)
+		return;
+
+	ShipObject const * const containingShip = Game::getPlayerContainingShip();
+	Vector const searchPosition = containingShip ? containingShip->getPosition_w() : targetingObject->getPosition_w();
+	float const searchRange = 512.0f;
+
+	ClientWorld::ObjectVector objectsInRange;
+	ClientWorld::findObjectsInRange(searchPosition, searchRange, objectsInRange);
+
+	for (ClientWorld::ObjectVector::const_iterator ii = objectsInRange.begin(); ii != objectsInRange.end(); ++ii)
+	{
+		Object * const obj = *ii;
+		if (!obj || obj == targetingObject->getRootParent())
+			continue;
+
+		ClientObject const * const clientObj = obj->asClientObject();
+		if (!clientObj)
+			continue;
+
+		TangibleObject const * const tangObj = clientObj->asTangibleObject();
+		if (!tangObj || !tangObj->isTargettable())
+			continue;
+
+		CreatureObject const * const creature = tangObj->asCreatureObject();
+		if (creature && creature->isDead())
+			continue;
+
+		if (function && !function(targetingObject, obj))
+			continue;
+
+		resultObjects.push_back(obj);
+	}
+
+	std::sort(resultObjects.begin(), resultObjects.end());
+}
+
 //=======================================================================
 
 using namespace ClientShipTargetingNamespace;
@@ -312,6 +365,12 @@ Object * ClientShipTargeting::closestNPC(Object const * const targetingObject)
 
 Object * ClientShipTargeting::closestEnemy(Object const * const targetingObject)
 {
+	if (isAtmosphericFlight())
+	{
+		ShipTargeting::ObjectVector resultObjects;
+		allTargetablesInAtmosphericFlight(targetingObject, actorAndTargetAreEnemies, resultObjects);
+		return closestObjectFromListMeetingCriteria(cs_sharedObjectTemplateInterface, targetingObject, resultObjects);
+	}
 	return closestShipInWorldWithRelationShip(cs_sharedObjectTemplateInterface, targetingObject, actorAndTargetAreEnemies);
 }
 
@@ -326,6 +385,12 @@ Object * ClientShipTargeting::closestEnemyPlayer(Object const * const targetingO
 
 Object * ClientShipTargeting::closestFriend(Object const * const targetingObject)
 {
+	if (isAtmosphericFlight())
+	{
+		ShipTargeting::ObjectVector resultObjects;
+		allTargetablesInAtmosphericFlight(targetingObject, actorAndTargetAreFriends, resultObjects);
+		return closestObjectFromListMeetingCriteria(cs_sharedObjectTemplateInterface, targetingObject, resultObjects);
+	}
 	return closestShipInWorldWithRelationShip(cs_sharedObjectTemplateInterface, targetingObject, actorAndTargetAreFriends);
 }
 
@@ -341,7 +406,10 @@ Object * ClientShipTargeting::closestFriendPlayer(Object const * const targeting
 Object * ClientShipTargeting::getNextAnything(Object const * const targetingObject, Object const * const currentTarget)
 {
 	ShipTargeting::ObjectVector resultObjects;
-	ShipTargeting::allShipsWithRelationshipInWorld(cs_sharedObjectTemplateInterface, targetingObject, alwaysTrueRelationship, resultObjects);
+	if (isAtmosphericFlight())
+		allTargetablesInAtmosphericFlight(targetingObject, alwaysTrueRelationship, resultObjects);
+	else
+		ShipTargeting::allShipsWithRelationshipInWorld(cs_sharedObjectTemplateInterface, targetingObject, alwaysTrueRelationship, resultObjects);
 	return getNextTarget(resultObjects, currentTarget);
 }
 
@@ -350,7 +418,10 @@ Object * ClientShipTargeting::getNextAnything(Object const * const targetingObje
 Object * ClientShipTargeting::getPreviousAnything(Object const * const targetingObject, Object const * const currentTarget)
 {
 	ShipTargeting::ObjectVector resultObjects;
-	ShipTargeting::allShipsWithRelationshipInWorld(cs_sharedObjectTemplateInterface, targetingObject, alwaysTrueRelationship, resultObjects);
+	if (isAtmosphericFlight())
+		allTargetablesInAtmosphericFlight(targetingObject, alwaysTrueRelationship, resultObjects);
+	else
+		ShipTargeting::allShipsWithRelationshipInWorld(cs_sharedObjectTemplateInterface, targetingObject, alwaysTrueRelationship, resultObjects);
 	return getPreviousTarget(resultObjects, currentTarget);
 }
 
@@ -359,7 +430,10 @@ Object * ClientShipTargeting::getPreviousAnything(Object const * const targeting
 Object * ClientShipTargeting::getNextFriendly(Object const * const targetingObject, Object const * const currentTarget)
 {
 	ShipTargeting::ObjectVector resultObjects;
-	ShipTargeting::allShipsWithRelationshipInWorld(cs_sharedObjectTemplateInterface, targetingObject, actorAndTargetAreFriends, resultObjects);
+	if (isAtmosphericFlight())
+		allTargetablesInAtmosphericFlight(targetingObject, actorAndTargetAreFriends, resultObjects);
+	else
+		ShipTargeting::allShipsWithRelationshipInWorld(cs_sharedObjectTemplateInterface, targetingObject, actorAndTargetAreFriends, resultObjects);
 	return getNextTarget(resultObjects, currentTarget);
 }
 
@@ -368,7 +442,10 @@ Object * ClientShipTargeting::getNextFriendly(Object const * const targetingObje
 Object * ClientShipTargeting::getPreviousFriendly(Object const * const targetingObject, Object const * const currentTarget)
 {
 	ShipTargeting::ObjectVector resultObjects;
-	ShipTargeting::allShipsWithRelationshipInWorld(cs_sharedObjectTemplateInterface, targetingObject, actorAndTargetAreFriends, resultObjects);
+	if (isAtmosphericFlight())
+		allTargetablesInAtmosphericFlight(targetingObject, actorAndTargetAreFriends, resultObjects);
+	else
+		ShipTargeting::allShipsWithRelationshipInWorld(cs_sharedObjectTemplateInterface, targetingObject, actorAndTargetAreFriends, resultObjects);
 	return getPreviousTarget(resultObjects, currentTarget);
 }
 
@@ -377,7 +454,10 @@ Object * ClientShipTargeting::getPreviousFriendly(Object const * const targeting
 Object * ClientShipTargeting::getNextEnemy(Object const * const targetingObject, Object const * const currentTarget)
 {
 	ShipTargeting::ObjectVector resultObjects;
-	ShipTargeting::allShipsWithRelationshipInWorld(cs_sharedObjectTemplateInterface, targetingObject, actorAndTargetAreEnemies, resultObjects);
+	if (isAtmosphericFlight())
+		allTargetablesInAtmosphericFlight(targetingObject, actorAndTargetAreEnemies, resultObjects);
+	else
+		ShipTargeting::allShipsWithRelationshipInWorld(cs_sharedObjectTemplateInterface, targetingObject, actorAndTargetAreEnemies, resultObjects);
 	return getNextTarget(resultObjects, currentTarget);
 }
 
@@ -386,7 +466,10 @@ Object * ClientShipTargeting::getNextEnemy(Object const * const targetingObject,
 Object * ClientShipTargeting::getPreviousEnemy(Object const * const targetingObject, Object const * const currentTarget)
 {
 	ShipTargeting::ObjectVector resultObjects;
-	ShipTargeting::allShipsWithRelationshipInWorld(cs_sharedObjectTemplateInterface, targetingObject, actorAndTargetAreEnemies, resultObjects);
+	if (isAtmosphericFlight())
+		allTargetablesInAtmosphericFlight(targetingObject, actorAndTargetAreEnemies, resultObjects);
+	else
+		ShipTargeting::allShipsWithRelationshipInWorld(cs_sharedObjectTemplateInterface, targetingObject, actorAndTargetAreEnemies, resultObjects);
 	return getPreviousTarget(resultObjects, currentTarget);
 }
 
@@ -449,8 +532,13 @@ int ClientShipTargeting::getOnScreenVariableReticleRadius()
 Object * ClientShipTargeting::getNextTargetOnScreenUnderVariableReticle(Object const * const targetingObject, Object const * const currentTarget)
 {
 	ShipTargeting::ObjectVector objectsInFov;
-	float const onScreenTargetFov = ClientShipTargetingNamespace::getOnScreenTargetFov();
-	ShipTargeting::allShipsInWorldUnderDefinedReticle(cs_sharedObjectTemplateInterface, targetingObject, onScreenTargetFov, objectsInFov);
+	if (isAtmosphericFlight())
+		allTargetablesInAtmosphericFlight(targetingObject, alwaysTrueRelationship, objectsInFov);
+	else
+	{
+		float const onScreenTargetFov = ClientShipTargetingNamespace::getOnScreenTargetFov();
+		ShipTargeting::allShipsInWorldUnderDefinedReticle(cs_sharedObjectTemplateInterface, targetingObject, onScreenTargetFov, objectsInFov);
+	}
 	return getNextTarget(objectsInFov, currentTarget);
 }
 
@@ -459,8 +547,13 @@ Object * ClientShipTargeting::getNextTargetOnScreenUnderVariableReticle(Object c
 Object * ClientShipTargeting::getPreviousTargetOnScreenUnderVariableReticle(Object const * const targetingObject, Object const * const currentTarget)
 {
 	ShipTargeting::ObjectVector objectsInFov;
-	float const onScreenTargetFov = ClientShipTargetingNamespace::getOnScreenTargetFov();
-	ShipTargeting::allShipsInWorldUnderDefinedReticle(cs_sharedObjectTemplateInterface, targetingObject, onScreenTargetFov, objectsInFov);
+	if (isAtmosphericFlight())
+		allTargetablesInAtmosphericFlight(targetingObject, alwaysTrueRelationship, objectsInFov);
+	else
+	{
+		float const onScreenTargetFov = ClientShipTargetingNamespace::getOnScreenTargetFov();
+		ShipTargeting::allShipsInWorldUnderDefinedReticle(cs_sharedObjectTemplateInterface, targetingObject, onScreenTargetFov, objectsInFov);
+	}
 	return getPreviousTarget(objectsInFov, currentTarget);
 }
 
