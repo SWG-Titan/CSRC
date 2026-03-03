@@ -15,6 +15,7 @@
 #include "clientGame/CreatureObject.h"
 #include "clientGame/Game.h"
 #include "clientGame/GroundScene.h"
+#include "clientGame/ShipObject.h"
 #include "clientGame/PlayerShipController.h"
 #include "clientGame/WeaponObject.h"
 #include "clientGraphics/Graphics.h"
@@ -470,7 +471,15 @@ void SwgCuiAllTargets::update(const Camera & camera)
 				Vector const & cameraPos_w = camera.getPosition_w();
 				float const cameraDistance = tangible->getPosition_w().magnitudeBetween(cameraPos_w);
 				float const cameraScale = clamp(0.0f, (camera.getFarPlane() - cameraDistance) / camera.getFarPlane(), 1.0f);
-				float const playerDistance = tangible->getPosition_w().magnitudeBetween(player->getPosition_w());
+
+				Vector playerPos_w = player->getPosition_w();
+				if (!Game::isSpace() && Game::isHudSceneTypeSpace())
+				{
+					ShipObject const * const containingShip = Game::getPlayerContainingShip();
+					if (containingShip)
+						playerPos_w = containingShip->getPosition_w();
+				}
+				float const playerDistance = tangible->getPosition_w().magnitudeBetween(playerPos_w);
 				
 				IGNORE_RETURN(s_distanceMap.insert(std::make_pair(cameraDistance, status)));
 

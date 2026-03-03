@@ -143,13 +143,24 @@ namespace CuiObjectTextManagerNamespace
 		if (!app->isLoaded())
 			return false;
 
+		bool const isAtmosphericFlight = !Game::isSpace() && Game::isHudSceneTypeSpace();
+
 		if (!app->getRenderedThisFrame())
-			return false;
+		{
+			if (!(isAtmosphericFlight && targetObject.getParentCell() == CellProperty::getWorldCellProperty()))
+				return false;
+		}
 
 		CellProperty const * const worldCell = CellProperty::getWorldCellProperty();
 		CellProperty const * const targetCell = targetObject.getParentCell();
-		if (((sourceCell == worldCell) || (targetCell == worldCell)) && (sourceCell != targetCell))
+		if (!isAtmosphericFlight && ((sourceCell == worldCell) || (targetCell == worldCell)) && (sourceCell != targetCell))
 			return false;
+
+		if (isAtmosphericFlight && targetCell == worldCell)
+		{
+			timeFactor = 1.0f;
+			return true;
+		}
 
 		Vector const & targetPos = targetObject.rotateTranslate_o2w(CuiObjectTextManager::getCurrentObjectHeadPoint_o (targetObject));
 				
@@ -665,7 +676,14 @@ void CuiObjectTextManager::drawObjectLabels(Camera const & camera)
 	Object const * const thePlayer = Game::getPlayer();
 	float const distanceCameraToPlayer = thePlayer ? thePlayer->getPosition_w().magnitudeBetween(selfPos) : 0.0f;
 	
-	ClientWorld::findObjectsInRange(selfPos, (CuiPreferences::getObjectNameRange() + distanceCameraToPlayer) * 2.0f, cov);
+	float nameRange = (CuiPreferences::getObjectNameRange() + distanceCameraToPlayer) * 2.0f;
+	if (!Game::isSpace() && Game::isHudSceneTypeSpace())
+	{
+		float const atmoRange = 512.0f;
+		if (nameRange < atmoRange)
+			nameRange = atmoRange;
+	}
+	ClientWorld::findObjectsInRange(selfPos, nameRange, cov);
 	
 	CreatureObject const * const player = Game::getPlayerCreature ();
 	int const drawNetworkIds = CuiPreferences::getDrawNetworkIds();
@@ -713,11 +731,16 @@ void CuiObjectTextManager::drawObjectLabels(Camera const & camera)
 		{
 			continue;
 		}
+		bool const isAtmoFlight = !Game::isSpace() && Game::isHudSceneTypeSpace();
 		bool isVisibleThisFrame = false;
 		if (object) 
 		{
 			Appearance const * const app = object->getAppearance();
 			if (app && app->getRenderedThisFrame())
+			{
+				isVisibleThisFrame = true;
+			}
+			else if (isAtmoFlight && object->getParentCell() == CellProperty::getWorldCellProperty())
 			{
 				isVisibleThisFrame = true;
 			}

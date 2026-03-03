@@ -670,8 +670,8 @@ CachedNetworkId const & CuiCombatManagerNamespace::cycleTargetsForPlayer(ActorAn
 		{
 			playerPosition = containingShip->getPosition_w();
 		}
-		if (targetingRange < 512.0f)
-			targetingRange = 512.0f;
+		if (targetingRange < 1024.0f)
+			targetingRange = 1024.0f;
 	}
 
 	ClientWorld::ObjectVector objectsInRange;
