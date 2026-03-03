@@ -49,6 +49,7 @@ namespace CollisionCallbacksNamespace
 	bool onHitDoVisualsOnly(Object * const object, Object * const wasHitByThisObject);
 	bool onHitDoCollisionWith(Object * const object, Object * const wasHitByThisObject);
 	bool onHitDoCollisionWithPOBShipElseDoVisualsOnly(Object * const object, Object * const wasHitByThisObject);
+	bool onHitDoCollisionWithBuilding(Object * const object, Object * const wasHitByThisObject);
 	bool onDoCollisionWithTerrain(Object * const object);
 	void onSkywayCollision(Object * const object);
 }
@@ -83,6 +84,15 @@ void CollisionCallbacks::install()
 	CollisionCallbackManager::registerOnHitFunction(CollisionCallbacksNamespace::onHitDoCollisionWith, shipFighter, asteroid);
 	CollisionCallbackManager::registerOnHitFunction(CollisionCallbacksNamespace::onHitDoCollisionWith, shipFighter, miningAsteroidStatic);
 	CollisionCallbackManager::registerOnHitFunction(CollisionCallbacksNamespace::onHitDoCollisionWith, shipFighter, miningAsteroidDynamic);
+
+	int const building = static_cast<int>(SharedObjectTemplate::GOT_building);
+	int const buildingMunicipal = static_cast<int>(SharedObjectTemplate::GOT_building_municipal);
+	int const buildingPlayer = static_cast<int>(SharedObjectTemplate::GOT_building_player);
+	int const buildingFactional = static_cast<int>(SharedObjectTemplate::GOT_building_factional);
+	CollisionCallbackManager::registerOnHitFunction(CollisionCallbacksNamespace::onHitDoCollisionWithBuilding, shipFighter, building);
+	CollisionCallbackManager::registerOnHitFunction(CollisionCallbacksNamespace::onHitDoCollisionWithBuilding, shipFighter, buildingMunicipal);
+	CollisionCallbackManager::registerOnHitFunction(CollisionCallbacksNamespace::onHitDoCollisionWithBuilding, shipFighter, buildingPlayer);
+	CollisionCallbackManager::registerOnHitFunction(CollisionCallbacksNamespace::onHitDoCollisionWithBuilding, shipFighter, buildingFactional);
 
 	// Enable terrain collision for ships (atmospheric flight support)
 	CollisionCallbackManager::registerDoCollisionWithTerrainFunction(CollisionCallbacksNamespace::onDoCollisionWithTerrain);
@@ -260,6 +270,52 @@ bool CollisionCallbacksNamespace::onHitDoCollisionWithPOBShipElseDoVisualsOnly(O
 	}
 
 	return CollisionCallbacksNamespace::onHitDoVisualsOnly(object, wasHitByThisObject);
+}
+
+// ----------------------------------------------------------------------
+
+bool CollisionCallbacksNamespace::onHitDoCollisionWithBuilding(Object * const object, Object * const wasHitByThisObject)
+{
+	if (ms_ignoreCollision)
+	{
+		return false;
+	}
+
+	DEBUG_FATAL(!object, ("CollisionCallbacksNamespace::onHitDoCollisionWithBuilding: Object == NULL"));
+	DEBUG_FATAL(!wasHitByThisObject, ("CollisionCallbacksNamespace::onHitDoCollisionWithBuilding: wasHitByThisObject == NULL"));
+
+	ShipObject * shipObject = safe_cast<ShipObject *>(object);
+	DEBUG_FATAL(!shipObject, ("CollisionCallbacksNamespace::onHitDoCollisionWithBuilding: shipObject == NULL"));
+
+	if (Game::getConstPlayerPilotedShip() != shipObject)
+	{
+		return false;
+	}
+
+	CollisionCallbackManager::Result result;
+	if (CollisionCallbackManager::intersectAndReflect(object, wasHitByThisObject, result))
+	{
+		ShipController * const shipController = safe_cast<ShipController *>(shipObject->getController());
+		NOT_NULL(shipController);
+
+		shipController->respondToCollision(result.m_deltaToMoveBack_p, result.m_newReflection_p, result.m_normalOfSurface_p);
+
+		if (!ms_isPlayingClientEffect && ms_shipObjectClientEffectTemplate)
+		{
+			ClientEffect * const clientEffect = ms_shipObjectClientEffectTemplate->createClientEffect(CellProperty::getWorldCellProperty(), result.m_pointOfCollision_p, Vector::unitY);
+			clientEffect->execute();
+			delete clientEffect;
+		}
+		ms_isPlayingClientEffect = true;
+
+		if (Game::isShipScene())
+		{
+			GenericValueTypeMessage<std::string> const buildingMsg("ShipTerrainCollision", "hit");
+			GameNetwork::send(buildingMsg, true);
+		}
+		return true;
+	}
+	return false;
 }
 
 // ----------------------------------------------------------------------
