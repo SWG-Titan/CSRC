@@ -1458,6 +1458,7 @@ bool SwgCuiToolbar::OnMessage(UIWidget *context, const UIMessage & msg)
 
 							appendPopupOptions(pop);
 
+							pop->SetLocation (screenPt);
 							pop->AddCallback (this);
 							UIManager::gUIManager ().PushContextWidget (*pop);
 							return false;
