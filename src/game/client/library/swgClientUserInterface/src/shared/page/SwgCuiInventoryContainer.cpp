@@ -22,8 +22,10 @@
 #include "clientGame/ContainerInterface.h"
 #include "sharedObject/Container.h"
 #include "clientGame/CreatureObject.h"
+#include "clientGame/DraftSchematicManager.h"
 #include "clientGame/Game.h"
 #include "clientGame/ClientCommandQueue.h"
+#include "clientGame/PlayerObject.h"
 #include "clientGame/GroupObject.h"
 #include "clientUserInterface/CuiDragInfo.h"
 #include "clientUserInterface/CuiDragManager.h"
@@ -1214,10 +1216,16 @@ bool SwgCuiInventoryContainer::handleDoubleClick (CuiWidget3dObjectListViewer & 
 
 bool SwgCuiInventoryContainer::handleRadialMenu (CuiWidget3dObjectListViewer & viewer, const UIPoint & pt) const
 {
-	if (m_disableRadial)
-		return false;
+	ClientObject * const moving_obj = safe_cast<ClientObject *>(viewer.getLastObject ());
 
-	ClientObject * const moving_obj = safe_cast<ClientObject *>(viewer.getLastObject ()) ;
+	if (m_disableRadial)
+	{
+		if (!moving_obj || !PlayerObject::isAdmin())
+			return false;
+
+		if (!DraftSchematicManager::findDraftSchematicForObject(*moving_obj))
+			return false;
+	}
 
 	if (moving_obj)
 		return !CuiRadialMenuManager::createMenu (*moving_obj, pt);
