@@ -773,7 +773,6 @@ float PlayerShipController::realAlter(float const elapsedTime)
 
 		if (!Game::isSpace())
 		{
-			static float const c_landingVariance = 0.001f;
 			Transform t = m_shipDynamicsModel->getTransform();
 			Vector pos = t.getPosition_p();
 
@@ -786,7 +785,7 @@ float PlayerShipController::realAlter(float const elapsedTime)
 			float const extentBottom = shipExtent.getMin().y;
 			float const minShipY = terrainHeight - extentBottom;
 
-			if (pos.y <= minShipY + c_landingVariance)
+			if (pos.y < minShipY)
 			{
 				pos.y = minShipY;
 				t.setPosition_p(pos);

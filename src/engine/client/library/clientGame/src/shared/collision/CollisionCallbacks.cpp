@@ -343,26 +343,27 @@ bool CollisionCallbacksNamespace::onDoCollisionWithTerrain(Object * const object
 		ShipController * const shipController = safe_cast<ShipController *>(shipObject->getController());
 		NOT_NULL(shipController);
 
-		float const collisionDelta = result.m_deltaToMoveBack_p.magnitude();
-		bool const isLanding = !Game::isSpace() && collisionDelta < 1.0f;
+		if (!Game::isSpace())
+		{
+			// Atmospheric flight: terrain clamping is handled by PlayerShipController.
+			// Skip collision response entirely to prevent velocity reflection flutter.
+			return false;
+		}
 
 		shipController->respondToCollision(result.m_deltaToMoveBack_p, result.m_newReflection_p, result.m_normalOfSurface_p);
 
-		if (!isLanding)
+		if (!ms_isPlayingClientEffect && ms_shipObjectClientEffectTemplate)
 		{
-			if (!ms_isPlayingClientEffect && ms_shipObjectClientEffectTemplate)
-			{
-				ClientEffect * const clientEffect = ms_shipObjectClientEffectTemplate->createClientEffect(CellProperty::getWorldCellProperty(), result.m_pointOfCollision_p, Vector::unitY);
-				clientEffect->execute();
-				delete clientEffect;
-			}
-			ms_isPlayingClientEffect = true;
+			ClientEffect * const clientEffect = ms_shipObjectClientEffectTemplate->createClientEffect(CellProperty::getWorldCellProperty(), result.m_pointOfCollision_p, Vector::unitY);
+			clientEffect->execute();
+			delete clientEffect;
+		}
+		ms_isPlayingClientEffect = true;
 
-			if (Game::isShipScene())
-			{
-				GenericValueTypeMessage<std::string> const terrainMsg("ShipTerrainCollision", "hit");
-				GameNetwork::send(terrainMsg, true);
-			}
+		if (Game::isShipScene())
+		{
+			GenericValueTypeMessage<std::string> const terrainMsg("ShipTerrainCollision", "hit");
+			GameNetwork::send(terrainMsg, true);
 		}
 		return true;
 	}
