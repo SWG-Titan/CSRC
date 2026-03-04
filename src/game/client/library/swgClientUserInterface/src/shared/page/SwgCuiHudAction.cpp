@@ -1433,7 +1433,7 @@ bool  SwgCuiHudAction::performAction (const std::string & id, const Unicode::Str
 		}
 	}
 
-	//used in ground for decimator map
+	//used in ground for atmo flight map 
 	else if (id == CuiActions::spaceZoneMap)
 	{
 		if (Game::isSpace())

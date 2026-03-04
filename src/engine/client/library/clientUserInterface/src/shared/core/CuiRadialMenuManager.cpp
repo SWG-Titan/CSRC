@@ -19,6 +19,8 @@
 #include "clientGame/ClientWaypointObject.h"
 #include "clientGame/ContainerInterface.h"
 #include "clientGame/CreatureObject.h"
+#include "clientGame/DraftSchematicManager.h"
+#include "clientGame/DraftSchematicInfo.h"
 #include "clientGame/DroidProgramSizeManager.h"
 #include "clientGame/FactoryObject.h"
 #include "clientGame/Game.h"
@@ -78,6 +80,7 @@
 #include "sharedNetworkMessages/MessageQueueObjectMenuRequest.h"
 #include "sharedNetworkMessages/ObjectMenuSelectMessage.h" 
 #include "sharedObject/Appearance.h"
+#include "sharedObject/ObjectTemplateList.h"
 #include "sharedObject/AppearanceTemplate.h"
 #include "sharedObject/ArrangementDescriptor.h"
 #include "sharedObject/CellProperty.h"
@@ -1833,6 +1836,16 @@ bool CuiRadialMenuManager::populateMenu (CuiMenuInfoHelper & helper, const Objec
 		helper.addRootMenu (EXAMINE,      got);
 	}
 
+	if (PlayerObject::isAdmin() && clientObject)
+	{
+		const DraftSchematicInfo * const draftInfo = DraftSchematicManager::findDraftSchematicForObject(*clientObject);
+		if (draftInfo)
+		{
+			helper.addRootMenu(GM_CRAFT_SCHEMATIC, Unicode::narrowToWide("[GM] Craft (q1000)"));
+			helper.addRootMenu(GM_CRATE_SCHEMATIC, Unicode::narrowToWide("[GM] Factory Crate (q1000 x100)"));
+		}
+	}
+
 	return true;
 }
 
@@ -2421,6 +2434,22 @@ void CuiRadialMenuManager::performMenuAction (int sel, int index, bool serverNot
 		ClientWaypointObject const * const cwo = dynamic_cast<ClientWaypointObject const *>(clientObject);
 		GenericValueTypeMessage<std::pair<NetworkId, std::string> > const msg("handleWaypointWarp", std::make_pair(cwo->getNetworkId(), ""));
 		GameNetwork::send(msg, true);
+	}
+	else if (sel == GM_CRAFT_SCHEMATIC || sel == GM_CRATE_SCHEMATIC)
+	{
+		if (clientObject && PlayerObject::isAdmin())
+		{
+			const DraftSchematicInfo * const draftInfo = DraftSchematicManager::findDraftSchematicForObject(*clientObject);
+			if (draftInfo)
+			{
+				const ConstCharCrcString & templateName = ObjectTemplateList::lookUp(draftInfo->getServerDraftSchematicTemplate());
+				if (!templateName.isEmpty())
+				{
+					const std::string cmdName = (sel == GM_CRAFT_SCHEMATIC) ? "gmCraftSchematic" : "gmCrateSchematic";
+					ClientCommandQueue::enqueueCommand(Crc::normalizeAndCalculate(cmdName.c_str()), NetworkId::cms_invalid, Unicode::narrowToWide(templateName.getString()));
+				}
+			}
+		}
 	}
 	else if (sel == SHIP_MANAGE_COMPONENTS)
 	{
