@@ -771,6 +771,36 @@ float PlayerShipController::realAlter(float const elapsedTime)
 			m_shipDynamicsModel->setTransform(t);
 		}
 
+		if (!Game::isSpace())
+		{
+			static float const c_landingVariance = 0.001f;
+			Transform t = m_shipDynamicsModel->getTransform();
+			Vector pos = t.getPosition_p();
+
+			float terrainHeight = 0.0f;
+			TerrainObject const * const terrain = TerrainObject::getConstInstance();
+			if (terrain)
+				terrain->getHeight(pos, terrainHeight);
+
+			AxialBox const shipExtent = owner->getTangibleExtent();
+			float const extentBottom = shipExtent.getMin().y;
+			float const minShipY = terrainHeight - extentBottom;
+
+			if (pos.y <= minShipY + c_landingVariance)
+			{
+				pos.y = minShipY;
+				t.setPosition_p(pos);
+				m_shipDynamicsModel->setTransform(t);
+
+				Vector vel = m_shipDynamicsModel->getVelocity();
+				if (vel.y < 0.f)
+				{
+					vel.y = 0.f;
+					m_shipDynamicsModel->setVelocity(vel);
+				}
+			}
+		}
+
 		m_serverShipDynamicsModel->setTransform(m_shipDynamicsModel->getTransform());
 		m_serverShipDynamicsModel->setVelocity(m_shipDynamicsModel->getVelocity());
 		m_serverShipDynamicsModel->setYawRate(m_shipDynamicsModel->getYawRate());
