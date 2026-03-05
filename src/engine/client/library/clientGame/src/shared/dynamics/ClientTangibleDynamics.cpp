@@ -85,7 +85,7 @@ ClientTangibleDynamics::ClientTangibleDynamics(Object* owner) :
 	m_spinElapsed(0.0f),
 	m_spinForceActive(false),
 	m_spinAroundAppearanceCenter(false),
-	m_baseScale(owner ? owner->getScale() : Vector::one),
+	m_baseScale(owner ? owner->getScale() : Vector::xyz111),
 	m_breathingMin(1.0f),
 	m_breathingMax(1.0f),
 	m_breathingSpeed(1.0f),
