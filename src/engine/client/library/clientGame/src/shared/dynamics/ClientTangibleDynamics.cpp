@@ -14,7 +14,12 @@
 #include "sharedMath/Vector.h"
 #include "sharedObject/Object.h"
 #include "sharedObject/AlterResult.h"
+#include "sharedObject/CellProperty.h"
+#include "sharedObject/NetworkIdManager.h"
+#include "sharedFoundation/NetworkId.h"
 #include "sharedMath/Transform.h"
+#include "sharedTerrain/TerrainObject.h"
+#include "sharedCollision/CollisionWorld.h"
 
 #include <cmath>
 
@@ -115,6 +120,22 @@ ClientTangibleDynamics::ClientTangibleDynamics(Object* owner) :
 	m_orbitDuration(-1.0f),
 	m_orbitElapsed(0.0f),
 	m_orbitEffectActive(false),
+	m_hoverHeight(1.0f),
+	m_hoverBobAmplitude(0.1f),
+	m_hoverBobSpeed(1.0f),
+	m_hoverBobPhase(0.0f),
+	m_hoverDuration(-1.0f),
+	m_hoverElapsed(0.0f),
+	m_hoverEffectActive(false),
+	m_followTargetId(0),
+	m_followDistance(2.0f),
+	m_followSpeed(3.0f),
+	m_followHoverHeight(1.0f),
+	m_followBobAmplitude(0.05f),
+	m_followBobPhase(0.0f),
+	m_followDuration(-1.0f),
+	m_followElapsed(0.0f),
+	m_followTargetEffectActive(false),
 	m_easeType(ET_none),
 	m_easeDuration(0.5f),
 	m_activeForceMask(FM_none)
@@ -363,6 +384,77 @@ Vector ClientTangibleDynamics::getOrbitCenter() const  { return m_orbitCenter; }
 float  ClientTangibleDynamics::getOrbitRadius() const  { return m_orbitRadius; }
 
 // ======================================================================
+// HOVER
+// ======================================================================
+
+void ClientTangibleDynamics::setHoverEffect(float hoverHeight, float bobAmplitude, float bobSpeed, float duration)
+{
+	m_hoverHeight = hoverHeight;
+	m_hoverBobAmplitude = bobAmplitude;
+	m_hoverBobSpeed = bobSpeed;
+	m_hoverBobPhase = 0.0f;
+	m_hoverDuration = duration;
+	m_hoverElapsed = 0.0f;
+	m_hoverEffectActive = true;
+	recalculateMode();
+}
+
+void ClientTangibleDynamics::clearHoverEffect()
+{
+	m_hoverHeight = 1.0f;
+	m_hoverBobAmplitude = 0.1f;
+	m_hoverBobSpeed = 1.0f;
+	m_hoverBobPhase = 0.0f;
+	m_hoverDuration = -1.0f;
+	m_hoverElapsed = 0.0f;
+	m_hoverEffectActive = false;
+	recalculateMode();
+}
+
+float ClientTangibleDynamics::getHoverHeight() const       { return m_hoverHeight; }
+float ClientTangibleDynamics::getHoverBobAmplitude() const { return m_hoverBobAmplitude; }
+float ClientTangibleDynamics::getHoverBobSpeed() const     { return m_hoverBobSpeed; }
+
+// ======================================================================
+// FOLLOW TARGET
+// ======================================================================
+
+void ClientTangibleDynamics::setFollowTargetEffect(uint64 targetNetworkId, float followDistance, float followSpeed,
+	float hoverHeight, float bobAmplitude, float duration)
+{
+	m_followTargetId = targetNetworkId;
+	m_followDistance = followDistance;
+	m_followSpeed = followSpeed;
+	m_followHoverHeight = hoverHeight;
+	m_followBobAmplitude = bobAmplitude;
+	m_followBobPhase = 0.0f;
+	m_followDuration = duration;
+	m_followElapsed = 0.0f;
+	m_followTargetEffectActive = true;
+	recalculateMode();
+}
+
+void ClientTangibleDynamics::clearFollowTargetEffect()
+{
+	m_followTargetId = 0;
+	m_followDistance = 2.0f;
+	m_followSpeed = 3.0f;
+	m_followHoverHeight = 1.0f;
+	m_followBobAmplitude = 0.05f;
+	m_followBobPhase = 0.0f;
+	m_followDuration = -1.0f;
+	m_followElapsed = 0.0f;
+	m_followTargetEffectActive = false;
+	recalculateMode();
+}
+
+uint64 ClientTangibleDynamics::getFollowTargetId() const  { return m_followTargetId; }
+float  ClientTangibleDynamics::getFollowDistance() const  { return m_followDistance; }
+float  ClientTangibleDynamics::getFollowSpeed() const     { return m_followSpeed; }
+float  ClientTangibleDynamics::getFollowHoverHeight() const    { return m_followHoverHeight; }
+float  ClientTangibleDynamics::getFollowBobAmplitude() const   { return m_followBobAmplitude; }
+
+// ======================================================================
 // EASING / COMBINED / QUERY
 // ======================================================================
 
@@ -388,6 +480,8 @@ void ClientTangibleDynamics::clearAllForces()
 	clearBounceEffect();
 	clearWobbleEffect();
 	clearOrbitEffect();
+	clearHoverEffect();
+	clearFollowTargetEffect();
 }
 
 int  ClientTangibleDynamics::getActiveForceMask() const          { return m_activeForceMask; }
@@ -404,12 +498,14 @@ float ClientTangibleDynamics::alter(float elapsedTime)
 
 	if (m_activeForceMask != FM_none)
 	{
-		if (m_pushForceActive)       updatePushForce(elapsedTime);
-		if (m_spinForceActive)       updateSpinForce(elapsedTime);
-		if (m_breathingEffectActive) updateBreathingEffect(elapsedTime);
-		if (m_bounceEffectActive)    updateBounceEffect(elapsedTime);
-		if (m_wobbleEffectActive)    updateWobbleEffect(elapsedTime);
-		if (m_orbitEffectActive)     updateOrbitEffect(elapsedTime);
+		if (m_pushForceActive)         updatePushForce(elapsedTime);
+		if (m_spinForceActive)         updateSpinForce(elapsedTime);
+		if (m_breathingEffectActive)   updateBreathingEffect(elapsedTime);
+		if (m_bounceEffectActive)      updateBounceEffect(elapsedTime);
+		if (m_wobbleEffectActive)      updateWobbleEffect(elapsedTime);
+		if (m_orbitEffectActive)       updateOrbitEffect(elapsedTime);
+		if (m_hoverEffectActive)       updateHoverEffect(elapsedTime);
+		if (m_followTargetEffectActive) updateFollowTargetEffect(elapsedTime);
 	}
 
 	// Return cms_alterNextFrame (0.0f) to ensure we get called every frame when forces are active
@@ -437,22 +533,115 @@ void ClientTangibleDynamics::updatePushForce(float elapsedTime)
 	{
 		float const dragFactor = exp(-m_pushDrag * elapsedTime);
 		m_pushVelocity *= dragFactor;
-		if (m_pushVelocity.magnitudeSquared() < 0.001f) { clearPushForce(); return; }
+		// Soft termination when velocity drops below ~0.1 m/s
+		if (m_pushVelocity.magnitudeSquared() < 0.01f) { clearPushForce(); return; }
 	}
 
 	Vector const vel = m_pushVelocity * ease;
 
-	switch (m_pushSpace)
+	// Skip complex physics if inside a building cell
+	CellProperty const * const cell = owner->getParentCell();
+	bool const insideBuilding = (cell && cell != CellProperty::getWorldCellProperty());
+
+	if (m_pushSpace == MS_world && !insideBuilding)
 	{
-	case MS_world:
-		owner->move_o(owner->rotate_w2o(vel * elapsedTime));
-		break;
-	case MS_parent:
-		owner->move_o(owner->rotate_p2o(vel * elapsedTime));
-		break;
-	case MS_object:
-		owner->move_o(vel * elapsedTime);
-		break;
+		// Hockey puck mode: terrain following and collision
+		Vector const currentPos = owner->getPosition_w();
+		Vector nextPos = currentPos + vel * elapsedTime;
+
+		// ========================================
+		// TERRAIN FOLLOWING
+		// ========================================
+		TerrainObject const * const terrain = TerrainObject::getConstInstance();
+		if (terrain)
+		{
+			float terrainHeight = currentPos.y;
+			if (terrain->getHeight(nextPos, terrainHeight))
+			{
+				float const groundOffset = 0.05f;
+				nextPos.y = terrainHeight + groundOffset;
+			}
+		}
+
+		// ========================================
+		// COLLISION DETECTION (RICOCHET)
+		// ========================================
+		float const objectRadius = 0.5f;
+		CanMoveResult const moveResult = CollisionWorld::canMove(
+			owner,
+			nextPos,
+			objectRadius,
+			false,    // checkY
+			false,    // checkFlora
+			false     // checkFauna
+		);
+
+		if (moveResult != CMR_MoveOK)
+		{
+			// Hit something - find obstacle and ricochet
+			Object const * hitObject = nullptr;
+			bool const foundObstacle = CollisionWorld::findFirstObstacle(
+				owner,
+				objectRadius,
+				currentPos,
+				nextPos,
+				true,     // testStatics
+				false,    // testCreatures
+				hitObject
+			);
+
+			if (foundObstacle && hitObject)
+			{
+				// Calculate reflection
+				Vector const toObstacle = hitObject->getPosition_w() - currentPos;
+				Vector normal(toObstacle.x, 0.0f, toObstacle.z);
+				if (normal.normalize())
+				{
+					normal = -normal;
+					float const dot = m_pushVelocity.x * normal.x + m_pushVelocity.z * normal.z;
+					m_pushVelocity.x = m_pushVelocity.x - 2.0f * dot * normal.x;
+					m_pushVelocity.z = m_pushVelocity.z - 2.0f * dot * normal.z;
+					m_pushVelocity *= 0.8f; // Energy loss
+
+					// Push away from wall
+					nextPos = currentPos + normal * (objectRadius * 0.5f);
+
+					// Re-apply terrain height
+					if (terrain)
+					{
+						float terrainHeight = nextPos.y;
+						if (terrain->getHeight(nextPos, terrainHeight))
+						{
+							nextPos.y = terrainHeight + 0.05f;
+						}
+					}
+				}
+			}
+			else
+			{
+				// Unknown obstacle - reverse and lose energy
+				m_pushVelocity = -m_pushVelocity * 0.5f;
+				return;
+			}
+		}
+
+		owner->setPosition_w(nextPos);
+	}
+	else
+	{
+		// Standard movement (inside building or non-world space)
+		switch (m_pushSpace)
+		{
+		case MS_world:
+			owner->move_o(owner->rotate_w2o(vel * elapsedTime));
+			break;
+		case MS_parent:
+			owner->move_o(owner->rotate_p2o(vel * elapsedTime));
+			break;
+		case MS_object:
+			owner->move_o(vel * elapsedTime);
+			break;
+		}
 	}
 }
 
@@ -591,6 +780,122 @@ void ClientTangibleDynamics::updateOrbitEffect(float elapsedTime)
 	owner->setPosition_w(pos);
 }
 
+// ----------------------------------------------------------------------
+
+void ClientTangibleDynamics::updateHoverEffect(float elapsedTime)
+{
+	Object* const owner = getOwner();
+	if (owner == NULL) { clearHoverEffect(); return; }
+
+	if (m_hoverDuration >= 0.0f)
+	{
+		m_hoverElapsed += elapsedTime;
+		if (m_hoverElapsed >= m_hoverDuration) { clearHoverEffect(); return; }
+	}
+
+	// Update bob phase continuously for smooth animation
+	m_hoverBobPhase += elapsedTime * m_hoverBobSpeed;
+
+	// Get current position
+	Vector pos = owner->getPosition_w();
+
+	// Get terrain height at current XZ position
+	TerrainObject const * const terrain = TerrainObject::getConstInstance();
+	if (terrain)
+	{
+		float terrainHeight = 0.0f;
+		if (terrain->getHeight(pos, terrainHeight))
+		{
+			// Calculate target Y with hover height and smooth bob
+			float const bob = m_hoverBobAmplitude * sin(m_hoverBobPhase * PI_TIMES_2);
+			float const targetY = terrainHeight + m_hoverHeight + bob;
+
+			// Smooth interpolation toward target Y (lerp factor based on elapsed time)
+			float const lerpFactor = 1.0f - exp(-10.0f * elapsedTime);  // Smooth exponential interpolation
+			pos.y = pos.y + (targetY - pos.y) * lerpFactor;
+
+			owner->setPosition_w(pos);
+		}
+	}
+}
+
+// ----------------------------------------------------------------------
+
+void ClientTangibleDynamics::updateFollowTargetEffect(float elapsedTime)
+{
+	Object* const owner = getOwner();
+	if (owner == NULL) { clearFollowTargetEffect(); return; }
+
+	if (m_followDuration >= 0.0f)
+	{
+		m_followElapsed += elapsedTime;
+		if (m_followElapsed >= m_followDuration) { clearFollowTargetEffect(); return; }
+	}
+
+	// Get target object
+	if (m_followTargetId == 0) { clearFollowTargetEffect(); return; }
+
+	Object const * const target = NetworkIdManager::getObjectById(NetworkId(static_cast<NetworkId::NetworkIdType>(m_followTargetId)));
+	if (!target) { clearFollowTargetEffect(); return; }
+
+	// Update bob phase continuously for smooth animation
+	m_followBobPhase += elapsedTime * 1.0f;
+
+	Vector const targetPos = target->getPosition_w();
+	Vector const ownerPos = owner->getPosition_w();
+
+	// Get target's facing direction
+	Transform const & targetTransform = target->getTransform_o2w();
+	Vector const targetFacing = targetTransform.getLocalFrameK_p();
+
+	// Calculate desired position behind the target at follow distance
+	Vector desiredPos;
+	desiredPos.x = targetPos.x - targetFacing.x * m_followDistance;
+	desiredPos.z = targetPos.z - targetFacing.z * m_followDistance;
+
+	// Apply hover height with smooth bob
+	TerrainObject const * const terrain = TerrainObject::getConstInstance();
+	float terrainHeight = targetPos.y;
+	if (terrain)
+	{
+		terrain->getHeight(desiredPos, terrainHeight);
+	}
+	float const bob = m_followBobAmplitude * sin(m_followBobPhase * PI_TIMES_2);
+	desiredPos.y = terrainHeight + m_followHoverHeight + bob;
+
+	// Smooth exponential interpolation toward desired position
+	// Higher values = faster catch-up, lower = smoother but laggier
+	float const smoothFactor = 8.0f;
+	float const lerpFactor = 1.0f - exp(-smoothFactor * elapsedTime);
+
+	Vector newPos;
+	newPos.x = ownerPos.x + (desiredPos.x - ownerPos.x) * lerpFactor;
+	newPos.y = ownerPos.y + (desiredPos.y - ownerPos.y) * lerpFactor;
+	newPos.z = ownerPos.z + (desiredPos.z - ownerPos.z) * lerpFactor;
+
+	owner->setPosition_w(newPos);
+
+	// Smoothly interpolate rotation toward target's facing
+	Transform ownerTransform = owner->getTransform_o2w();
+	Vector const currentFacing = ownerTransform.getLocalFrameK_p();
+
+	// Slerp-like interpolation for rotation (simplified)
+	Vector newFacing;
+	newFacing.x = currentFacing.x + (targetFacing.x - currentFacing.x) * lerpFactor;
+	newFacing.y = 0.0f;
+	newFacing.z = currentFacing.z + (targetFacing.z - currentFacing.z) * lerpFactor;
+
+	// Normalize and apply
+	float const facingMag = sqrt(newFacing.x * newFacing.x + newFacing.z * newFacing.z);
+	if (facingMag > 0.001f)
+	{
+		newFacing.x /= facingMag;
+		newFacing.z /= facingMag;
+		ownerTransform.setLocalFrameKJ_p(newFacing, Vector::unitY);
+		owner->setTransform_o2w(ownerTransform);
+	}
+}
+
 // ======================================================================
 // RECALCULATE
 // ======================================================================
@@ -598,12 +903,14 @@ void ClientTangibleDynamics::updateOrbitEffect(float elapsedTime)
 void ClientTangibleDynamics::recalculateMode()
 {
 	m_activeForceMask = FM_none;
-	if (m_pushForceActive)       m_activeForceMask |= FM_push;
-	if (m_spinForceActive)       m_activeForceMask |= FM_spin;
-	if (m_breathingEffectActive) m_activeForceMask |= FM_breathing;
-	if (m_bounceEffectActive)    m_activeForceMask |= FM_bounce;
-	if (m_wobbleEffectActive)    m_activeForceMask |= FM_wobble;
-	if (m_orbitEffectActive)     m_activeForceMask |= FM_orbit;
+	if (m_pushForceActive)         m_activeForceMask |= FM_push;
+	if (m_spinForceActive)         m_activeForceMask |= FM_spin;
+	if (m_breathingEffectActive)   m_activeForceMask |= FM_breathing;
+	if (m_bounceEffectActive)      m_activeForceMask |= FM_bounce;
+	if (m_wobbleEffectActive)      m_activeForceMask |= FM_wobble;
+	if (m_orbitEffectActive)       m_activeForceMask |= FM_orbit;
+	if (m_hoverEffectActive)       m_activeForceMask |= FM_hover;
+	if (m_followTargetEffectActive) m_activeForceMask |= FM_followTarget;
 }
 
 // ======================================================================

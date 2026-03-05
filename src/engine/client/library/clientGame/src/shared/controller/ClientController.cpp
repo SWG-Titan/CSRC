@@ -857,6 +857,14 @@ void ClientController::handleMessage (const int message, const float value, cons
 						if (v.size() >= 6)
 							ctd->setOrbitEffect(Vector(v[0], v[1], v[2]), v[3], v[4], v[5]);
 						break;
+					case 'H': // Hover: hoverHeight,bobAmplitude,bobSpeed,duration
+						if (v.size() >= 4)
+							ctd->setHoverEffect(v[0], v[1], v[2], v[3]);
+						break;
+					case 'F': // Follow: targetId,distance,speed,hoverHeight,bobAmplitude,duration
+						if (v.size() >= 6)
+							ctd->setFollowTargetEffect(static_cast<uint64>(v[0]), v[1], v[2], v[3], v[4], v[5]);
+						break;
 					case 'E': // Easing: type,duration
 						if (v.size() >= 2)
 							ctd->setEasing(static_cast<ClientTangibleDynamics::EaseType>(static_cast<int>(v[0])), v[1]);

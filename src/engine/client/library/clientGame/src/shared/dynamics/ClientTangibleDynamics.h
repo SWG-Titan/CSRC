@@ -27,13 +27,15 @@ public:
 
 	enum ForceMode
 	{
-		FM_none       = 0,
-		FM_push       = (1 << 0),
-		FM_spin       = (1 << 1),
-		FM_breathing  = (1 << 2),
-		FM_bounce     = (1 << 3),
-		FM_wobble     = (1 << 4),
-		FM_orbit      = (1 << 5)
+		FM_none         = 0,
+		FM_push         = (1 << 0),
+		FM_spin         = (1 << 1),
+		FM_breathing    = (1 << 2),
+		FM_bounce       = (1 << 3),
+		FM_wobble       = (1 << 4),
+		FM_orbit        = (1 << 5),
+		FM_hover        = (1 << 6),
+		FM_followTarget = (1 << 7)
 	};
 
 	enum MovementSpace
@@ -97,6 +99,23 @@ public:
 	Vector getOrbitCenter() const;
 	float  getOrbitRadius() const;
 
+	// Hover (terrain-following with slight bob)
+	void  setHoverEffect(float hoverHeight, float bobAmplitude = 0.1f, float bobSpeed = 1.0f, float duration = -1.0f);
+	void  clearHoverEffect();
+	float getHoverHeight() const;
+	float getHoverBobAmplitude() const;
+	float getHoverBobSpeed() const;
+
+	// Follow Target (hover + follow another object, matching rotation)
+	void   setFollowTargetEffect(uint64 targetNetworkId, float followDistance, float followSpeed,
+	                             float hoverHeight = 1.0f, float bobAmplitude = 0.05f, float duration = -1.0f);
+	void   clearFollowTargetEffect();
+	uint64 getFollowTargetId() const;
+	float  getFollowDistance() const;
+	float  getFollowSpeed() const;
+	float  getFollowHoverHeight() const;
+	float  getFollowBobAmplitude() const;
+
 	// Easing
 	void setEasing(EaseType easeType, float easeDuration);
 
@@ -121,6 +140,8 @@ protected:
 	virtual void updateBounceEffect(float elapsedTime);
 	virtual void updateWobbleEffect(float elapsedTime);
 	virtual void updateOrbitEffect(float elapsedTime);
+	virtual void updateHoverEffect(float elapsedTime);
+	virtual void updateFollowTargetEffect(float elapsedTime);
 
 private:
 
@@ -181,6 +202,26 @@ private:
 	float  m_orbitDuration;
 	float  m_orbitElapsed;
 	bool   m_orbitEffectActive;
+
+	// Hover
+	float  m_hoverHeight;
+	float  m_hoverBobAmplitude;
+	float  m_hoverBobSpeed;
+	float  m_hoverBobPhase;
+	float  m_hoverDuration;
+	float  m_hoverElapsed;
+	bool   m_hoverEffectActive;
+
+	// Follow Target
+	uint64 m_followTargetId;
+	float  m_followDistance;
+	float  m_followSpeed;
+	float  m_followHoverHeight;
+	float  m_followBobAmplitude;
+	float  m_followBobPhase;
+	float  m_followDuration;
+	float  m_followElapsed;
+	bool   m_followTargetEffectActive;
 
 	// Easing
 	EaseType m_easeType;
