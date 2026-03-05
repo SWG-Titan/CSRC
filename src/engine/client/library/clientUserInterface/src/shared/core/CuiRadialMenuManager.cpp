@@ -64,6 +64,7 @@
 #include "sharedCollision/CollideParameters.h"
 #include "sharedCollision/CollisionInfo.h"
 #include "sharedFoundation/Clock.h"
+#include "sharedFoundation/ConstCharCrcString.h"
 #include "sharedFoundation/Crc.h"
 #include "sharedFoundation/GameControllerMessage.h"
 #include "sharedFoundation/Production.h"

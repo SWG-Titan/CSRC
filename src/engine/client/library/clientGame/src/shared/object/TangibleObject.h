@@ -89,6 +89,7 @@ public:
 		C_locked               = 0x10000000,
 		C_magicPaintingUrl     = 0x20000000,
 		C_magicVideoPlayer     = 0x40000000,
+		C_magicTangibleDynamic = 0x80000000,    //   Set programmatically by TangibleDynamics system.  Do not set this in the template.
 	};
 
 public:

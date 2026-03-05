@@ -14,6 +14,7 @@
 #include "clientGame/ClientCombatActionInfo.h"
 #include "clientGame/ClientCombatPlaybackManager.h"
 #include "clientGame/ClientObject.h"
+#include "clientGame/ClientTangibleDynamics.h"
 #include "clientGame/ConfigClientGame.h"
 #include "clientGame/ContainerInterface.h"
 #include "clientGame/CreatureObject.h"
@@ -22,6 +23,7 @@
 #include "clientGame/GameNetwork.h"
 #include "clientGame/ObjectAttributeManager.h"
 #include "clientGame/ProsePackageManagerClient.h"
+#include "clientGame/TangibleObject.h"
 #include "clientGame/WeaponObject.h"
 #include "clientSkeletalAnimation/SkeletalAnimationDebugging.h"
 #include "clientSkeletalAnimation/SkeletalAppearance2.h"
@@ -761,6 +763,108 @@ void ClientController::handleMessage (const int message, const float value, cons
 			bool  animationIsAdd;
 			appearance->getAnimationResolver().playAction(CrcLowerString(actionName.c_str()), animationId, animationIsAdd, NULL);
 
+			return;
+		}
+
+	case CM_tangibleDynamicsData:
+		{
+			// Receive dynamics force parameters from the server and apply to ClientTangibleDynamics
+			typedef MessageQueueGenericValueType<std::string> MsgType;
+			const MsgType * const msg = safe_cast<const MsgType *>(data);
+			if (msg)
+			{
+				Object * const ownerObject = getOwner();
+				if (!ownerObject)
+					return;
+
+				TangibleObject * const tangible = dynamic_cast<TangibleObject *>(ownerObject);
+				if (!tangible)
+					return;
+
+				ClientTangibleDynamics * ctd = dynamic_cast<ClientTangibleDynamics *>(ownerObject->getDynamics());
+				if (!ctd)
+				{
+					ctd = new ClientTangibleDynamics(ownerObject);
+					ownerObject->setDynamics(ctd);
+				}
+
+				// Parse the packed string: "channel:param1,param2,...|channel:param1,param2,..."
+				// Channels: P=push, S=spin, B=breathing, N=bounce, W=wobble, O=orbit, E=easing, X=clearAll
+				std::string const & packed = msg->getValue();
+
+				if (packed == "X")
+				{
+					ctd->clearAllForces();
+					return;
+				}
+
+				// Tokenize by '|'
+				size_t pos = 0;
+				while (pos < packed.size())
+				{
+					size_t const delim = packed.find('|', pos);
+					std::string const token = packed.substr(pos, (delim == std::string::npos) ? std::string::npos : (delim - pos));
+					pos = (delim == std::string::npos) ? packed.size() : (delim + 1);
+
+					if (token.empty() || token.size() < 2 || token[1] != ':')
+						continue;
+
+					char const channel = token[0];
+					std::string const params = token.substr(2);
+
+					// Parse comma-separated floats
+					std::vector<float> v;
+					{
+						size_t p2 = 0;
+						while (p2 < params.size())
+						{
+							size_t const comma = params.find(',', p2);
+							std::string const val = params.substr(p2, (comma == std::string::npos) ? std::string::npos : (comma - p2));
+							v.push_back(static_cast<float>(atof(val.c_str())));
+							p2 = (comma == std::string::npos) ? params.size() : (comma + 1);
+						}
+					}
+
+					switch (channel)
+					{
+					case 'P': // Push: vx,vy,vz,duration,space,drag
+						if (v.size() >= 6)
+						{
+							if (v[5] > 0.0f)
+								ctd->setPushForceWithDrag(Vector(v[0], v[1], v[2]), v[5], v[3], static_cast<ClientTangibleDynamics::MovementSpace>(static_cast<int>(v[4])));
+							else
+								ctd->setPushForce(Vector(v[0], v[1], v[2]), v[3], static_cast<ClientTangibleDynamics::MovementSpace>(static_cast<int>(v[4])));
+						}
+						break;
+					case 'S': // Spin: yaw,pitch,roll,duration
+						if (v.size() >= 4)
+							ctd->setSpinForce(Vector(v[0], v[1], v[2]), v[3]);
+						break;
+					case 'B': // Breathing: min,max,speed,duration
+						if (v.size() >= 4)
+							ctd->setBreathingEffect(v[0], v[1], v[2], v[3]);
+						break;
+					case 'N': // Bounce: gravity,elasticity,velocity,duration
+						if (v.size() >= 4)
+							ctd->setBounceEffect(v[0], v[1], v[2], v[3]);
+						break;
+					case 'W': // Wobble: ampX,ampY,ampZ,freqX,freqY,freqZ,duration
+						if (v.size() >= 7)
+							ctd->setWobbleEffect(Vector(v[0], v[1], v[2]), Vector(v[3], v[4], v[5]), v[6]);
+						break;
+					case 'O': // Orbit: cx,cy,cz,radius,speed,duration
+						if (v.size() >= 6)
+							ctd->setOrbitEffect(Vector(v[0], v[1], v[2]), v[3], v[4], v[5]);
+						break;
+					case 'E': // Easing: type,duration
+						if (v.size() >= 2)
+							ctd->setEasing(static_cast<ClientTangibleDynamics::EaseType>(static_cast<int>(v[0])), v[1]);
+						break;
+					default:
+						break;
+					}
+				}
+			}
 			return;
 		}
 

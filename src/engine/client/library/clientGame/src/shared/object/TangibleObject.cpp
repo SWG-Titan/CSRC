@@ -13,6 +13,7 @@
 #include "clientGame/ClientCommandQueue.h"
 #include "clientGame/ClientDataFile.h"
 #include "clientGame/ClientSynchronizedUi.h"
+#include "clientGame/ClientTangibleDynamics.h"
 #include "clientGame/ClientTangibleObjectTemplate.h"
 #include "clientGame/ClientWorld.h"
 #include "clientGame/ContainerInterface.h"
@@ -3476,6 +3477,30 @@ void TangibleObject::handleConditionModified (int oldCondition, int newCondition
 	bool const newWingsOpened = newCondition & C_wingsOpened;
 	if (newWingsOpened != oldWingsOpened)
 		setChildWingsOpened(newWingsOpened);
+
+	//-- TangibleDynamics: create or destroy ClientTangibleDynamics based on condition
+	{
+		bool const oldDynamic = (oldCondition & C_magicTangibleDynamic) != 0;
+		bool const newDynamic = (newCondition & C_magicTangibleDynamic) != 0;
+		if (newDynamic && !oldDynamic)
+		{
+			// Condition just set — attach ClientTangibleDynamics if we don't already have one
+			if (!getDynamics() || !dynamic_cast<ClientTangibleDynamics*>(getDynamics()))
+			{
+				setDynamics(new ClientTangibleDynamics(this));
+			}
+		}
+		else if (!newDynamic && oldDynamic)
+		{
+			// Condition just cleared — remove dynamics
+			ClientTangibleDynamics* const ctd = dynamic_cast<ClientTangibleDynamics*>(getDynamics());
+			if (ctd)
+			{
+				ctd->clearAllForces();
+				setDynamics(NULL);
+			}
+		}
+	}
 
 	//-- Make sure we get an alter
 	if (isInWorld())

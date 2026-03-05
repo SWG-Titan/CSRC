@@ -123,6 +123,10 @@ namespace RenderWorldNamespace
 
 	RenderWorld::CellPropertyList                ms_visibleCellList;
 
+	// Deferred DPVS cell destruction to avoid crash when ship is packed (dpvs.dll access violation)
+	std::vector<DPVS::Cell *>                   ms_pendingDestroyDpvsCells;
+	void                  flushPendingDestroyDpvsCells();
+
 	void                  remove();
 	void                  clearVisibleCells();
 	void                  inWorldAddDpvsObject(Object *object, DPVS::Object *dpvsObject);
@@ -260,6 +264,8 @@ void RenderWorld::install()
 void RenderWorld::remove()
 {
 	clearVisibleCells();
+
+	flushPendingDestroyDpvsCells();
 
 	ms_defaultModel->release();
 	ms_defaultModel = NULL;
@@ -675,7 +681,19 @@ DPVS::Cell *RenderWorldNamespace::createDpvsCell(CellProperty *owner)
 
 void RenderWorldNamespace::destroyDpvsCell(DPVS::Cell *dpvsCell)
 {
-	dpvsCell->release();
+	if (dpvsCell)
+		ms_pendingDestroyDpvsCells.push_back(dpvsCell);
+}
+
+// ----------------------------------------------------------------------
+
+void RenderWorldNamespace::flushPendingDestroyDpvsCells()
+{
+	for (std::vector<DPVS::Cell *>::iterator i = ms_pendingDestroyDpvsCells.begin(); i != ms_pendingDestroyDpvsCells.end(); ++i)
+	{
+		(*i)->release();
+	}
+	ms_pendingDestroyDpvsCells.clear();
 }
 
 // ----------------------------------------------------------------------
@@ -854,6 +872,9 @@ else \
 void RenderWorld::drawScene(const RenderWorldCamera &camera)
 {
 	DEBUG_FATAL(!ms_installed, ("RenderWorld not installed"));
+
+	// Flush deferred DPVS cell destruction from previous frame to avoid dpvs.dll crash when ship interior cells are destroyed (e.g. Land Ship)
+	flushPendingDestroyDpvsCells();
 
 	NP_PROFILER_AUTO_BLOCK_DEFINE("RenderWorld::drawScene setup");
 

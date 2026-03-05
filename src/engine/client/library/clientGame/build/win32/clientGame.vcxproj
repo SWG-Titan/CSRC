@@ -528,6 +528,11 @@
     <ClCompile Include="..\..\src\shared\dynamics\ProjectileDynamics.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Optimized|Win32'">MaxSpeed</Optimization>
     </ClCompile>
+    <ClCompile Include="..\..\src\shared\dynamics\ClientTangibleDynamics.cpp">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Optimized|Win32'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
+    </ClCompile>
     <ClCompile Include="..\..\src\shared\dynamics\ShipWeaponBarrelDynamics.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Optimized|Win32'">MaxSpeed</Optimization>
     </ClCompile>
@@ -1300,6 +1305,7 @@
     <ClInclude Include="..\..\src\shared\deadReckoning\FollowCreatureController.h" />
     <ClInclude Include="..\..\src\shared\deadReckoning\WanderCreatureController.h" />
     <ClInclude Include="..\..\src\shared\dynamics\ProjectileDynamics.h" />
+    <ClInclude Include="..\..\src\shared\dynamics\ClientTangibleDynamics.h" />
     <ClInclude Include="..\..\src\shared\dynamics\ShipWeaponBarrelDynamics.h" />
     <ClInclude Include="..\..\src\shared\dynamics\WingDynamics.h" />
     <ClInclude Include="..\..\src\shared\event\ClientEventManager.h" />
