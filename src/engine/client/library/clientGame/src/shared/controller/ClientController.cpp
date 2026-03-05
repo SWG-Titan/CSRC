@@ -795,6 +795,7 @@ void ClientController::handleMessage (const int message, const float value, cons
 				if (packed == "X")
 				{
 					ctd->clearAllForces();
+					ownerObject->scheduleForAlter();
 					return;
 				}
 
@@ -864,6 +865,9 @@ void ClientController::handleMessage (const int message, const float value, cons
 						break;
 					}
 				}
+
+				// Schedule for alter to ensure smooth frame-by-frame updates
+				ownerObject->scheduleForAlter();
 			}
 			return;
 		}

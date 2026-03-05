@@ -13,6 +13,7 @@
 
 #include "sharedMath/Vector.h"
 #include "sharedObject/Object.h"
+#include "sharedObject/AlterResult.h"
 #include "sharedMath/Transform.h"
 
 #include <cmath>
@@ -411,8 +412,8 @@ float ClientTangibleDynamics::alter(float elapsedTime)
 		if (m_orbitEffectActive)     updateOrbitEffect(elapsedTime);
 	}
 
-	// Return 0 (alter next frame) if any force active
-	return (m_activeForceMask != FM_none) ? 0.0f : baseAlterResult;
+	// Return cms_alterNextFrame (0.0f) to ensure we get called every frame when forces are active
+	return (m_activeForceMask != FM_none) ? AlterResult::cms_alterNextFrame : baseAlterResult;
 }
 
 // ======================================================================
