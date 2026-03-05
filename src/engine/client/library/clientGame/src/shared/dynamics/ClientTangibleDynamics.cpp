@@ -21,12 +21,12 @@
 
 namespace ClientTangibleDynamicsNamespace
 {
-	static float const PI         = 3.14159265358979323846f;
-	static float const PI_TIMES_2 = PI * 2.0f;
 	static float const s_bounceMinVelocity = 0.05f;
 }
 
 using namespace ClientTangibleDynamicsNamespace;
+
+// Use global PI and PI_TIMES_2 from FloatMath.h (included via FirstClientGame.h)
 
 // ======================================================================
 // EASING
