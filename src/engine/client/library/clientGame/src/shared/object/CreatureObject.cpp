@@ -579,7 +579,12 @@ CreatureObject::CreatureObject(const SharedCreatureObjectTemplate * const newTem
 	m_initAppearanceWearables(false),
 	m_verifyAppearanceTimer(10.0f),
 	m_dupedCreaturesDirty(false),
-	m_decoyOrigin(NetworkId::cms_invalid)
+	m_decoyOrigin(NetworkId::cms_invalid),
+	m_mountedTangibleObjectId(NetworkId::cms_invalid),
+	m_mountedTangibleOffsetX(0.0f),
+	m_mountedTangibleOffsetY(0.0f),
+	m_mountedTangibleOffsetZ(0.0f),
+	m_mountedTangibleLockOrientation(true)
 {
 	++ms_numberOfInstances;
 
@@ -789,6 +794,12 @@ void CreatureObject::createDefaultController()
 
 float CreatureObject::alter (float deltaTime)
 {
+	//-- Update tangible object mount position first (for seamless movement)
+	if (isMountedOnTangibleObject())
+	{
+		updateTangibleObjectMountPosition(deltaTime);
+	}
+
 	//-- hovering vehicles should not render, only their saddles should render
 	if (getGameObjectType () == SharedObjectTemplate::GOT_vehicle_hover || getGameObjectType() == SharedObjectTemplate::GOT_vehicle_hover_ai)
 	{
@@ -6912,3 +6923,121 @@ void CreatureObject::appearanceWearablesOnChanged ()
 		}
 	}
 }
+
+// ======================================================================
+// TANGIBLE OBJECT MOUNTING
+// ======================================================================
+
+/**
+ * Mount this creature on a tangible object for seamless position locking
+ * The creature's position will be updated every frame to follow the tangible object
+ * @param lockOrientation If true, player's rotation will match the mounted object (true riding)
+ */
+void CreatureObject::mountOnTangibleObject(NetworkId const & tangibleObjectId, float offsetX, float offsetY, float offsetZ, bool lockOrientation)
+{
+	m_mountedTangibleObjectId = tangibleObjectId;
+	m_mountedTangibleOffsetX = offsetX;
+	m_mountedTangibleOffsetY = offsetY;
+	m_mountedTangibleOffsetZ = offsetZ;
+	m_mountedTangibleLockOrientation = lockOrientation;
+
+	DEBUG_REPORT_LOG(true, ("CreatureObject::mountOnTangibleObject: creature %s mounted on tangible %s with offset (%.2f, %.2f, %.2f), lockOrientation=%s\n",
+		getNetworkId().getValueString().c_str(),
+		tangibleObjectId.getValueString().c_str(),
+		offsetX, offsetY, offsetZ,
+		lockOrientation ? "true" : "false"));
+
+	// Schedule for alter to ensure position updates
+	scheduleForAlter();
+}
+
+/**
+ * Dismount this creature from a tangible object
+ */
+void CreatureObject::dismountFromTangibleObject()
+{
+	DEBUG_REPORT_LOG(true, ("CreatureObject::dismountFromTangibleObject: creature %s dismounted from tangible %s\n",
+		getNetworkId().getValueString().c_str(),
+		m_mountedTangibleObjectId.getValueString().c_str()));
+
+	m_mountedTangibleObjectId = NetworkId::cms_invalid;
+	m_mountedTangibleOffsetX = 0.0f;
+	m_mountedTangibleOffsetY = 0.0f;
+	m_mountedTangibleOffsetZ = 0.0f;
+	m_mountedTangibleLockOrientation = true;
+}
+
+/**
+ * Check if this creature is mounted on a tangible object
+ */
+bool CreatureObject::isMountedOnTangibleObject() const
+{
+	return m_mountedTangibleObjectId.isValid();
+}
+
+/**
+ * Get the NetworkId of the tangible object this creature is mounted on
+ */
+NetworkId CreatureObject::getMountedTangibleObjectId() const
+{
+	return m_mountedTangibleObjectId;
+}
+
+/**
+ * Update the creature's position and orientation to match the mounted tangible object
+ * Called from alter() for smooth frame-by-frame updates
+ */
+void CreatureObject::updateTangibleObjectMountPosition(float elapsedTime)
+{
+	UNREF(elapsedTime);
+
+	if (!isMountedOnTangibleObject())
+		return;
+
+	// Find the tangible object
+	Object * const obj = NetworkIdManager::getObjectById(m_mountedTangibleObjectId);
+	if (!obj)
+	{
+		// Object no longer exists - auto dismount
+		dismountFromTangibleObject();
+		return;
+	}
+
+	// Get the tangible object's current transform (position + rotation)
+	Transform const & tangibleTransform = obj->getTransform_o2w();
+	Vector const tangiblePos = tangibleTransform.getPosition_p();
+
+	Vector newPos;
+
+	if (m_mountedTangibleLockOrientation)
+	{
+		// Calculate seat offset in the object's local space, then transform to world space
+		// This ensures the player stays in the correct position relative to the object's rotation
+		Vector localOffset(m_mountedTangibleOffsetX, m_mountedTangibleOffsetY, m_mountedTangibleOffsetZ);
+		Vector worldOffset = tangibleTransform.rotate_l2p(localOffset);
+
+		// Calculate final world position
+		newPos.x = tangiblePos.x + worldOffset.x;
+		newPos.y = tangiblePos.y + worldOffset.y;
+		newPos.z = tangiblePos.z + worldOffset.z;
+
+		// Lock our orientation to match the mounted object's rotation
+		// This gives a true "riding" experience where the player faces the same direction
+		Transform newTransform(tangibleTransform);
+		newTransform.setPosition_p(newPos);
+		setTransform_o2w(newTransform);
+	}
+	else
+	{
+		// Simple world-space offset (player keeps their own orientation)
+		newPos.x = tangiblePos.x + m_mountedTangibleOffsetX;
+		newPos.y = tangiblePos.y + m_mountedTangibleOffsetY;
+		newPos.z = tangiblePos.z + m_mountedTangibleOffsetZ;
+
+		// Only update position, not rotation
+		setPosition_w(newPos);
+	}
+}
+
+// ======================================================================
+

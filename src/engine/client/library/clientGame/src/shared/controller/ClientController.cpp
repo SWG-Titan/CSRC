@@ -917,6 +917,10 @@ void ClientController::handleMessage (const int message, const float value, cons
 						if (v.size() >= 6)
 							ctd->setConveyorEffect(Vector(v[0], v[1], v[2]), v[3], v[4], v[5]);
 						break;
+					case 'R': // Carousel: centerX,centerY,centerZ,radius,rotationSpeed,verticalAmplitude,verticalSpeed,duration
+						if (v.size() >= 8)
+							ctd->setCarouselEffect(Vector(v[0], v[1], v[2]), v[3], v[4], v[5], v[6], v[7]);
+						break;
 					case 'E': // Easing: type,duration
 						if (v.size() >= 2)
 							ctd->setEasing(static_cast<ClientTangibleDynamics::EaseType>(static_cast<int>(v[0])), v[1]);

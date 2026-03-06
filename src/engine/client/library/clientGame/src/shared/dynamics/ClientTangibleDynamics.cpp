@@ -166,6 +166,15 @@ ClientTangibleDynamics::ClientTangibleDynamics(Object* owner) :
 	m_conveyorDuration(-1.0f),
 	m_conveyorElapsed(0.0f),
 	m_conveyorEffectActive(false),
+	m_carouselCenter(Vector::zero),
+	m_carouselRadius(3.0f),
+	m_carouselRotationSpeed(1.0f),
+	m_carouselAngle(0.0f),
+	m_carouselVerticalAmplitude(0.0f),
+	m_carouselVerticalSpeed(1.0f),
+	m_carouselDuration(-1.0f),
+	m_carouselElapsed(0.0f),
+	m_carouselEffectActive(false),
 	m_easeType(ET_none),
 	m_easeDuration(0.5f),
 	m_activeForceMask(FM_none)
@@ -673,6 +682,7 @@ void ClientTangibleDynamics::clearAllForces()
 	clearShakeEffect();
 	clearFloatEffect();
 	clearConveyorEffect();
+	clearCarouselEffect();
 }
 
 int  ClientTangibleDynamics::getActiveForceMask() const          { return m_activeForceMask; }
@@ -701,6 +711,7 @@ float ClientTangibleDynamics::alter(float elapsedTime)
 		if (m_shakeEffectActive)       updateShakeEffect(elapsedTime);
 		if (m_floatEffectActive)       updateFloatEffect(elapsedTime);
 		if (m_conveyorEffectActive)    updateConveyorEffect(elapsedTime);
+		if (m_carouselEffectActive)    updateCarouselEffect(elapsedTime);
 	}
 
 	// Return cms_alterNextFrame (0.0f) to ensure we get called every frame when forces are active
@@ -1202,20 +1213,177 @@ void ClientTangibleDynamics::updateConveyorEffect(float elapsedTime)
 	float const distanceDelta = m_conveyorSpeed * elapsedTime;
 	m_conveyorTravelDistance += distanceDelta;
 
-	// Handle wrap-around if wrapDistance is set
-	if (m_conveyorWrapDistance > 0.0f && m_conveyorTravelDistance >= m_conveyorWrapDistance)
+	// Calculate position along conveyor belt loop
+	// The belt forms a loop: forward on top, curves down at end,
+	// travels back underneath, curves up at start, repeats
+
+	if (m_conveyorWrapDistance > 0.0f)
 	{
-		// Reset travel distance (wraps back to origin)
-		m_conveyorTravelDistance = fmod(m_conveyorTravelDistance, m_conveyorWrapDistance);
+		// Belt geometry:
+		// - Top surface: travels from origin forward to wrapDistance
+		// - End curve: semicircle going down at the far end
+		// - Bottom surface: travels back underneath toward origin
+		// - Start curve: semicircle going up at origin
+
+		// Total path length = 2 * wrapDistance + 2 * PI * radius
+		// We use a small radius for the end curves (e.g., 0.5m)
+		float const curveRadius = 0.5f;
+		float const curveLength = PI * curveRadius; // semicircle arc length
+		float const topLength = m_conveyorWrapDistance;
+		float const bottomLength = m_conveyorWrapDistance;
+		float const totalCycleLength = topLength + curveLength + bottomLength + curveLength;
+
+		// Get position within current cycle
+		float const cyclePos = fmod(m_conveyorTravelDistance, totalCycleLength);
+
+		Vector newPos = m_conveyorOrigin;
+
+		if (cyclePos < topLength)
+		{
+			// Phase 1: Moving forward on top surface
+			float const t = cyclePos;
+			newPos.x += m_conveyorDirection.x * t;
+			newPos.y += m_conveyorDirection.y * t;
+			newPos.z += m_conveyorDirection.z * t;
+		}
+		else if (cyclePos < topLength + curveLength)
+		{
+			// Phase 2: Curving down at far end (semicircle)
+			float const curveT = cyclePos - topLength;
+			float const angle = (curveT / curveLength) * PI; // 0 to PI
+
+			// Position at end of top surface
+			newPos.x += m_conveyorDirection.x * topLength;
+			newPos.y += m_conveyorDirection.y * topLength;
+			newPos.z += m_conveyorDirection.z * topLength;
+
+			// Add semicircle offset (curves down in Y)
+			// cos(0)=1, cos(PI)=-1, so we go from 0 to -2*radius in Y
+			newPos.y -= curveRadius * (1.0f - cos(angle));
+
+			// Also move slightly forward then back as we curve
+			float const forwardOffset = curveRadius * sin(angle);
+			newPos.x += m_conveyorDirection.x * forwardOffset;
+			newPos.z += m_conveyorDirection.z * forwardOffset;
+		}
+		else if (cyclePos < topLength + curveLength + bottomLength)
+		{
+			// Phase 3: Moving backward underneath
+			float const t = cyclePos - topLength - curveLength;
+			float const backwardT = bottomLength - t; // goes from wrapDistance back to 0
+
+			newPos.x += m_conveyorDirection.x * backwardT;
+			newPos.y += m_conveyorDirection.y * backwardT;
+			newPos.z += m_conveyorDirection.z * backwardT;
+
+			// Drop down below the surface (2 * curveRadius below origin)
+			newPos.y -= curveRadius * 2.0f;
+		}
+		else
+		{
+			// Phase 4: Curving up at origin (semicircle)
+			float const curveT = cyclePos - topLength - curveLength - bottomLength;
+			float const angle = (curveT / curveLength) * PI; // 0 to PI
+
+			// Start at origin level but below
+			// cos(0)=-1, cos(PI)=1, so we go from -2*radius back up to 0
+			newPos.y -= curveRadius * (1.0f + cos(angle));
+
+			// Also move slightly backward then forward as we curve up
+			float const backwardOffset = curveRadius * sin(angle);
+			newPos.x -= m_conveyorDirection.x * backwardOffset;
+			newPos.z -= m_conveyorDirection.z * backwardOffset;
+		}
+
+		owner->setPosition_w(newPos);
+	}
+	else
+	{
+		// No wrap - just move in direction forever
+		Vector newPos;
+		newPos.x = m_conveyorOrigin.x + m_conveyorDirection.x * m_conveyorTravelDistance;
+		newPos.y = m_conveyorOrigin.y + m_conveyorDirection.y * m_conveyorTravelDistance;
+		newPos.z = m_conveyorOrigin.z + m_conveyorDirection.z * m_conveyorTravelDistance;
+		owner->setPosition_w(newPos);
+	}
+}
+
+// ----------------------------------------------------------------------
+
+void ClientTangibleDynamics::setCarouselEffect(const Vector& center, float radius, float rotationSpeed, float verticalAmplitude, float verticalSpeed, float duration)
+{
+	Object* const owner = getOwner();
+
+	m_carouselCenter = center;
+	m_carouselRadius = radius;
+	m_carouselRotationSpeed = rotationSpeed;
+	m_carouselVerticalAmplitude = verticalAmplitude;
+	m_carouselVerticalSpeed = verticalSpeed;
+
+	// Calculate initial angle from object's current position
+	if (owner)
+	{
+		Vector const pos = owner->getPosition_w();
+		float const dx = pos.x - center.x;
+		float const dz = pos.z - center.z;
+		m_carouselAngle = atan2(dz, dx);
+	}
+	else
+	{
+		m_carouselAngle = 0.0f;
 	}
 
-	// Calculate new position along conveyor path
-	Vector newPos;
-	newPos.x = m_conveyorOrigin.x + m_conveyorDirection.x * m_conveyorTravelDistance;
-	newPos.y = m_conveyorOrigin.y + m_conveyorDirection.y * m_conveyorTravelDistance;
-	newPos.z = m_conveyorOrigin.z + m_conveyorDirection.z * m_conveyorTravelDistance;
+	m_carouselDuration = duration;
+	m_carouselElapsed = 0.0f;
+	m_carouselEffectActive = true;
+	recalculateMode();
+}
 
-	owner->setPosition_w(newPos);
+void ClientTangibleDynamics::clearCarouselEffect()
+{
+	m_carouselCenter = Vector::zero;
+	m_carouselRadius = 3.0f;
+	m_carouselRotationSpeed = 1.0f;
+	m_carouselAngle = 0.0f;
+	m_carouselVerticalAmplitude = 0.0f;
+	m_carouselVerticalSpeed = 1.0f;
+	m_carouselDuration = -1.0f;
+	m_carouselElapsed = 0.0f;
+	m_carouselEffectActive = false;
+	recalculateMode();
+}
+
+Vector ClientTangibleDynamics::getCarouselCenter() const        { return m_carouselCenter; }
+float  ClientTangibleDynamics::getCarouselRadius() const        { return m_carouselRadius; }
+float  ClientTangibleDynamics::getCarouselRotationSpeed() const { return m_carouselRotationSpeed; }
+
+void ClientTangibleDynamics::updateCarouselEffect(float elapsedTime)
+{
+	Object* const owner = getOwner();
+	if (owner == NULL) { clearCarouselEffect(); return; }
+
+	if (m_carouselDuration >= 0.0f)
+	{
+		m_carouselElapsed += elapsedTime;
+		if (m_carouselElapsed >= m_carouselDuration) { clearCarouselEffect(); return; }
+	}
+
+	// Update rotation angle
+	m_carouselAngle += m_carouselRotationSpeed * elapsedTime;
+
+	// Calculate position on rotating platform
+	float const newX = m_carouselCenter.x + m_carouselRadius * cos(m_carouselAngle);
+	float const newZ = m_carouselCenter.z + m_carouselRadius * sin(m_carouselAngle);
+
+	// Calculate vertical position (ferris wheel effect)
+	float newY = m_carouselCenter.y;
+	if (m_carouselVerticalAmplitude > 0.0f)
+	{
+		// Object goes up as it rotates - sinusoidal based on angle
+		newY += m_carouselVerticalAmplitude * sin(m_carouselAngle);
+	}
+
+	owner->setPosition_w(Vector(newX, newY, newZ));
 }
 
 // ======================================================================
@@ -1237,6 +1405,7 @@ void ClientTangibleDynamics::recalculateMode()
 	if (m_shakeEffectActive)       m_activeForceMask |= FM_shake;
 	if (m_floatEffectActive)       m_activeForceMask |= FM_float;
 	if (m_conveyorEffectActive)    m_activeForceMask |= FM_conveyor;
+	if (m_carouselEffectActive)    m_activeForceMask |= FM_carousel;
 }
 
 // ======================================================================

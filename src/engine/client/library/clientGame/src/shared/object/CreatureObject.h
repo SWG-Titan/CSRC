@@ -615,9 +615,23 @@ public:
 	void onMountRiderMounted();
 	void onMountRiderDismounted();
 
+	// Tangible Object Mounting: lock player position to a tangible object for seamless movement
+	void mountOnTangibleObject(NetworkId const & tangibleObjectId, float offsetX, float offsetY, float offsetZ, bool lockOrientation = true);
+	void dismountFromTangibleObject();
+	bool isMountedOnTangibleObject() const;
+	NetworkId getMountedTangibleObjectId() const;
+	void updateTangibleObjectMountPosition(float elapsedTime);
+
 	void setupAlternateSharedCreatureObjectTemplate(CrcString const &templateName);
 
 private:
+
+	// Tangible mount state
+	NetworkId m_mountedTangibleObjectId;
+	float     m_mountedTangibleOffsetX;
+	float     m_mountedTangibleOffsetY;
+	float     m_mountedTangibleOffsetZ;
+	bool      m_mountedTangibleLockOrientation;
 
 	// Mounts: called on mount when it becomes mountable/non-mountable.
 	void onJustBecameMountable();

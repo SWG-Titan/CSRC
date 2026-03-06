@@ -2351,6 +2351,68 @@ void PlayerCreatureController::handleMessage (const int message, const float val
 		}
 		break;
 
+	case CM_mountTangibleObject:
+		{
+			// Handle mount/dismount on tangible object for seamless movement
+			typedef MessageQueueGenericValueType<std::string> MsgType;
+			MsgType const * const msg = dynamic_cast<MsgType const *>(data);
+			if (msg)
+			{
+				std::string const & packed = msg->getValue();
+				CreatureObject * const creature = dynamic_cast<CreatureObject *>(getOwner());
+				if (creature)
+				{
+					if (!packed.empty() && packed[0] == 'M')
+					{
+						// Mount: "M:objectId,offsetX,offsetY,offsetZ,lockOrientation"
+						size_t colonPos = packed.find(':');
+						if (colonPos != std::string::npos)
+						{
+							std::string params = packed.substr(colonPos + 1);
+							size_t comma1 = params.find(',');
+							if (comma1 != std::string::npos)
+							{
+								std::string objectIdStr = params.substr(0, comma1);
+								std::string offsets = params.substr(comma1 + 1);
+
+								size_t comma2 = offsets.find(',');
+								size_t comma3 = offsets.find(',', comma2 + 1);
+								size_t comma4 = offsets.find(',', comma3 + 1);
+
+								if (comma2 != std::string::npos && comma3 != std::string::npos)
+								{
+									float offsetX = static_cast<float>(atof(offsets.substr(0, comma2).c_str()));
+									float offsetY = static_cast<float>(atof(offsets.substr(comma2 + 1, comma3 - comma2 - 1).c_str()));
+
+									float offsetZ;
+									bool lockOrientation = true; // default to true
+
+									if (comma4 != std::string::npos)
+									{
+										offsetZ = static_cast<float>(atof(offsets.substr(comma3 + 1, comma4 - comma3 - 1).c_str()));
+										lockOrientation = (atoi(offsets.substr(comma4 + 1).c_str()) != 0);
+									}
+									else
+									{
+										offsetZ = static_cast<float>(atof(offsets.substr(comma3 + 1).c_str()));
+									}
+
+									NetworkId tangibleId(objectIdStr);
+									creature->mountOnTangibleObject(tangibleId, offsetX, offsetY, offsetZ, lockOrientation);
+								}
+							}
+						}
+					}
+					else if (!packed.empty() && packed[0] == 'D')
+					{
+						// Dismount
+						creature->dismountFromTangibleObject();
+					}
+				}
+			}
+		}
+		break;
+
 	default:
 		break;
 	}
