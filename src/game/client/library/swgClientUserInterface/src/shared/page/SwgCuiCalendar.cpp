@@ -9,12 +9,15 @@
 
 #include "swgClientUserInterface/FirstSwgClientUserInterface.h"
 #include "swgClientUserInterface/SwgCuiCalendar.h"
+#include "swgClientUserInterface/SwgCuiCalendarEventDetails.h"
 
 #include "clientGame/Game.h"
 #include "clientGame/GameNetwork.h"
+#include "clientGame/PlayerObject.h"
 #include "clientUserInterface/CuiManager.h"
 #include "clientUserInterface/CuiMediatorFactory.h"
 #include "clientUserInterface/CuiMessageBox.h"
+#include "sharedDebug/DebugFlags.h"
 #include "sharedMessageDispatch/Transceiver.h"
 #include "sharedNetworkMessages/CalendarMessages.h"
 #include "swgClientUserInterface/SwgCuiMediatorTypes.h"
@@ -22,6 +25,7 @@
 #include "UIButton.h"
 #include "UIData.h"
 #include "UIDataSource.h"
+#include "UIImage.h"
 #include "UIList.h"
 #include "UIPage.h"
 #include "UIText.h"
@@ -31,12 +35,30 @@
 
 //======================================================================
 
+int SwgCuiCalendar::ms_selectedYear  = 2026;
+int SwgCuiCalendar::ms_selectedMonth = 3;
+int SwgCuiCalendar::ms_selectedDay   = 6;
+
 namespace
 {
 	const char * const s_monthNames[] = {
 		"January", "February", "March", "April", "May", "June",
 		"July", "August", "September", "October", "November", "December"
 	};
+
+	const char * const s_eventTypeNames[] = { "Staff", "Guild", "City", "Server" };
+
+	UIColor getEventTypeColor(int eventType)
+	{
+		switch (eventType)
+		{
+			case 0: return UIColor(255, 215, 0);   // Staff - Gold
+			case 1: return UIColor(0, 255, 0);     // Guild - Green
+			case 2: return UIColor(0, 191, 255);   // City - Blue
+			case 3: return UIColor(255, 69, 0);    // Server - Red/Orange
+			default: return UIColor(255, 255, 255);
+		}
+	}
 
 	int getDaysInMonth(int year, int month)
 	{
@@ -91,37 +113,52 @@ m_listEvents        (0),
 m_dataEvents        (0),
 m_buttonViewDetails (0),
 m_buttonDeleteEvent (0),
+m_pageDetail        (0),
+m_textDetailTitle   (0),
+m_textDetailDesc    (0),
+m_textDetailTime    (0),
+m_textDetailType    (0),
+m_imageDetailImage  (0),
+m_buttonDetailClose (0),
 m_currentYear       (2026),
 m_currentMonth      (3),
 m_selectedDay       (6),
 m_cachedEvents      (),
-m_callback          (0)
+m_selectedDayEvents ()
 {
 	for (int i = 0; i < 42; ++i)
 	{
 		m_dayButtons[i] = 0;
 	}
 
-	getCodeDataObject(TUIButton, m_buttonPrevMonth,   "header.btnPrevMonth", true);
-	getCodeDataObject(TUIButton, m_buttonNextMonth,   "header.btnNextMonth", true);
-	getCodeDataObject(TUIButton, m_buttonToday,       "header.btnToday", true);
-	getCodeDataObject(TUIButton, m_buttonCreate,      "header.btnCreate", true);
-	getCodeDataObject(TUIButton, m_buttonSettings,    "header.btnSettings", true);
-	getCodeDataObject(TUIButton, m_buttonClose,       "btnClose", true);
-	getCodeDataObject(TUIText,   m_textMonthYear,     "header.lblMonthYear", true);
+	getCodeDataObject(TUIButton, m_buttonPrevMonth,   "header.btnPrevMonth", false);
+	getCodeDataObject(TUIButton, m_buttonNextMonth,   "header.btnNextMonth", false);
+	getCodeDataObject(TUIButton, m_buttonToday,       "header.btnToday", false);
+	getCodeDataObject(TUIButton, m_buttonCreate,      "header.btnCreate", false);
+	getCodeDataObject(TUIButton, m_buttonSettings,    "header.btnSettings", false);
+	getCodeDataObject(TUIButton, m_buttonClose,       "btnClose", false);
+	getCodeDataObject(TUIText,   m_textMonthYear,     "header.lblMonthYear", false);
 
-	getCodeDataObject(TUIText,       m_textSelectedDate,  "eventPanel.lblSelectedDate", true);
-	getCodeDataObject(TUIList,       m_listEvents,        "eventPanel.lstEvents", true);
-	getCodeDataObject(TUIDataSource, m_dataEvents,        "eventPanel.dataEvents", true);
-	getCodeDataObject(TUIButton,     m_buttonViewDetails, "eventPanel.btnViewDetails", true);
-	getCodeDataObject(TUIButton,     m_buttonDeleteEvent, "eventPanel.btnDeleteEvent", true);
+	getCodeDataObject(TUIText,       m_textSelectedDate,  "eventPanel.lblSelectedDate", false);
+	getCodeDataObject(TUIList,       m_listEvents,        "eventPanel.lstEvents", false);
+	getCodeDataObject(TUIDataSource, m_dataEvents,        "eventPanel.dataEvents", false);
+	getCodeDataObject(TUIButton,     m_buttonViewDetails, "eventPanel.btnViewDetails", false);
+	getCodeDataObject(TUIButton,     m_buttonDeleteEvent, "eventPanel.btnDeleteEvent", false);
+
+	getCodeDataObject(TUIPage,   m_pageDetail,        "detailPanel", false);
+	getCodeDataObject(TUIText,   m_textDetailTitle,   "detailPanel.lblDetailTitle", false);
+	getCodeDataObject(TUIText,   m_textDetailDesc,    "detailPanel.lblDetailDesc", false);
+	getCodeDataObject(TUIText,   m_textDetailTime,    "detailPanel.lblDetailTime", false);
+	getCodeDataObject(TUIText,   m_textDetailType,    "detailPanel.lblDetailType", false);
+	getCodeDataObject(TUIImage,  m_imageDetailImage,  "detailPanel.imgDetailImage", false);
+	getCodeDataObject(TUIButton, m_buttonDetailClose, "detailPanel.btnDetailClose", false);
 
 	char buttonName[64];
 	for (int i = 0; i < 42; ++i)
 	{
 		int dayNum = i + 1;
 		snprintf(buttonName, sizeof(buttonName), "calendarGrid.day%02d", dayNum);
-		getCodeDataObject(TUIButton, m_dayButtons[i], buttonName, true);
+		getCodeDataObject(TUIButton, m_dayButtons[i], buttonName, false);
 	}
 
 	time_t now = time(0);
@@ -132,15 +169,16 @@ m_callback          (0)
 		m_currentMonth = timeinfo->tm_mon + 1;
 		m_selectedDay = timeinfo->tm_mday;
 	}
+
+	ms_selectedYear  = m_currentYear;
+	ms_selectedMonth = m_currentMonth;
+	ms_selectedDay   = m_selectedDay;
 }
 
 //----------------------------------------------------------------------
 
 SwgCuiCalendar::~SwgCuiCalendar()
 {
-	delete m_callback;
-	m_callback = 0;
-
 	m_buttonPrevMonth   = 0;
 	m_buttonNextMonth   = 0;
 	m_buttonToday       = 0;
@@ -153,6 +191,13 @@ SwgCuiCalendar::~SwgCuiCalendar()
 	m_dataEvents        = 0;
 	m_buttonViewDetails = 0;
 	m_buttonDeleteEvent = 0;
+	m_pageDetail        = 0;
+	m_textDetailTitle   = 0;
+	m_textDetailDesc    = 0;
+	m_textDetailTime    = 0;
+	m_textDetailType    = 0;
+	m_imageDetailImage  = 0;
+	m_buttonDetailClose = 0;
 
 	for (int i = 0; i < 42; ++i)
 	{
@@ -164,6 +209,11 @@ SwgCuiCalendar::~SwgCuiCalendar()
 
 void SwgCuiCalendar::performActivate()
 {
+	connectToMessage("CalendarEventsResponseMessage");
+	connectToMessage("CalendarEventNotificationMessage");
+	connectToMessage("CalendarDeleteEventResponseMessage");
+	connectToMessage("CalendarCreateEventResponseMessage");
+
 	if (m_buttonPrevMonth)   m_buttonPrevMonth->AddCallback(this);
 	if (m_buttonNextMonth)   m_buttonNextMonth->AddCallback(this);
 	if (m_buttonToday)       m_buttonToday->AddCallback(this);
@@ -172,6 +222,7 @@ void SwgCuiCalendar::performActivate()
 	if (m_buttonClose)       m_buttonClose->AddCallback(this);
 	if (m_buttonViewDetails) m_buttonViewDetails->AddCallback(this);
 	if (m_buttonDeleteEvent) m_buttonDeleteEvent->AddCallback(this);
+	if (m_buttonDetailClose) m_buttonDetailClose->AddCallback(this);
 
 	for (int i = 0; i < 42; ++i)
 	{
@@ -182,9 +233,10 @@ void SwgCuiCalendar::performActivate()
 	if (m_listEvents)
 		m_listEvents->AddCallback(this);
 
-	// Request events from server
-	requestEvents();
+	if (m_pageDetail)
+		m_pageDetail->SetVisible(false);
 
+	requestEvents();
 	updateCalendarDisplay();
 }
 
@@ -192,6 +244,11 @@ void SwgCuiCalendar::performActivate()
 
 void SwgCuiCalendar::performDeactivate()
 {
+	disconnectFromMessage("CalendarEventsResponseMessage");
+	disconnectFromMessage("CalendarEventNotificationMessage");
+	disconnectFromMessage("CalendarDeleteEventResponseMessage");
+	disconnectFromMessage("CalendarCreateEventResponseMessage");
+
 	if (m_buttonPrevMonth)   m_buttonPrevMonth->RemoveCallback(this);
 	if (m_buttonNextMonth)   m_buttonNextMonth->RemoveCallback(this);
 	if (m_buttonToday)       m_buttonToday->RemoveCallback(this);
@@ -200,6 +257,7 @@ void SwgCuiCalendar::performDeactivate()
 	if (m_buttonClose)       m_buttonClose->RemoveCallback(this);
 	if (m_buttonViewDetails) m_buttonViewDetails->RemoveCallback(this);
 	if (m_buttonDeleteEvent) m_buttonDeleteEvent->RemoveCallback(this);
+	if (m_buttonDetailClose) m_buttonDetailClose->RemoveCallback(this);
 
 	for (int i = 0; i < 42; ++i)
 	{
@@ -232,12 +290,13 @@ void SwgCuiCalendar::OnButtonPressed(UIWidget *context)
 	}
 	else if (context == m_buttonCreate)
 	{
-		// Open event editor - no server notification needed until event is created
+		ms_selectedYear  = m_currentYear;
+		ms_selectedMonth = m_currentMonth;
+		ms_selectedDay   = m_selectedDay;
 		CuiMediatorFactory::activateInWorkspace(CuiMediatorTypes::WS_CalendarEventEditor);
 	}
 	else if (context == m_buttonSettings)
 	{
-		// Open settings
 		CuiMediatorFactory::activateInWorkspace(CuiMediatorTypes::WS_CalendarSettings);
 	}
 	else if (context == m_buttonClose)
@@ -246,22 +305,25 @@ void SwgCuiCalendar::OnButtonPressed(UIWidget *context)
 	}
 	else if (context == m_buttonViewDetails)
 	{
-		// Show event details from cached data
-		// Display in a message box or dedicated panel
+		showEventDetails();
 	}
 	else if (context == m_buttonDeleteEvent)
 	{
-		// Find selected event and send delete message
 		if (m_listEvents)
 		{
 			int selectedRow = m_listEvents->GetLastSelectedRow();
-			if (selectedRow >= 0 && selectedRow < static_cast<int>(m_cachedEvents.size()))
+			if (selectedRow >= 0 && selectedRow < static_cast<int>(m_selectedDayEvents.size()))
 			{
-				CalendarEventData const & evt = m_cachedEvents[selectedRow];
+				CalendarEventData const & evt = m_selectedDayEvents[static_cast<size_t>(selectedRow)];
 				CalendarDeleteEventMessage msg(evt.eventId);
 				GameNetwork::send(msg, true);
 			}
 		}
+	}
+	else if (context == m_buttonDetailClose)
+	{
+		if (m_pageDetail)
+			m_pageDetail->SetVisible(false);
 	}
 	else
 	{
@@ -366,6 +428,10 @@ void SwgCuiCalendar::updateCalendarDisplay()
 		}
 	}
 
+	ms_selectedYear  = m_currentYear;
+	ms_selectedMonth = m_currentMonth;
+	ms_selectedDay   = m_selectedDay;
+
 	refreshEventList();
 }
 
@@ -437,27 +503,73 @@ void SwgCuiCalendar::refreshEventList()
 		m_listEvents->Clear();
 	}
 
-	// Populate list from cached events for the selected day
+	m_selectedDayEvents.clear();
+
 	for (std::vector<CalendarEventData>::const_iterator it = m_cachedEvents.begin(); it != m_cachedEvents.end(); ++it)
 	{
 		CalendarEventData const & evt = *it;
 
-		// Filter to selected day
 		if (evt.year == m_currentYear && evt.month == m_currentMonth && evt.day == m_selectedDay)
 		{
+			m_selectedDayEvents.push_back(evt);
+
 			if (m_listEvents)
 			{
-				m_listEvents->AddRow(Unicode::narrowToWide(evt.title), evt.eventId);
+				char timeStr[16];
+				snprintf(timeStr, sizeof(timeStr), "%02d:%02d", evt.hour, evt.minute);
+
+				// Add type indicator prefix for visual identification
+				const char * typePrefix = "";
+				switch (evt.eventType)
+				{
+					case 0: typePrefix = "[S] "; break; // Staff
+					case 1: typePrefix = "[G] "; break; // Guild
+					case 2: typePrefix = "[C] "; break; // City
+					case 3: typePrefix = "[E] "; break; // Server/Event
+					default: typePrefix = "";
+				}
+
+				std::string displayText = std::string(typePrefix) + timeStr + " - " + evt.title;
+				m_listEvents->AddRow(Unicode::narrowToWide(displayText), evt.eventId);
 			}
 		}
 	}
+
+	// Show delete button only for admins
+	if (m_buttonDeleteEvent)
+	{
+		m_buttonDeleteEvent->SetVisible(PlayerObject::isAdmin());
+	}
+}
+
+//----------------------------------------------------------------------
+
+void SwgCuiCalendar::showEventDetails()
+{
+	if (!m_listEvents)
+		return;
+
+	int selectedRow = m_listEvents->GetLastSelectedRow();
+	if (selectedRow < 0 || selectedRow >= static_cast<int>(m_selectedDayEvents.size()))
+		return;
+
+	CalendarEventData const & evt = m_selectedDayEvents[static_cast<size_t>(selectedRow)];
+
+	// Use the new details popup
+	SwgCuiCalendarEventDetails::showDetails(evt);
 }
 
 //----------------------------------------------------------------------
 
 void SwgCuiCalendar::requestEvents()
 {
-	// Send request to server for events in current month
+	if (!GameNetwork::isConnectedToConnectionServer())
+	{
+		REPORT_LOG(true, ("SwgCuiCalendar::requestEvents: NOT connected to connection server\n"));
+		return;
+	}
+
+	REPORT_LOG(true, ("SwgCuiCalendar::requestEvents: requesting year=%d month=%d\n", m_currentYear, m_currentMonth));
 	CalendarGetEventsMessage msg(m_currentYear, m_currentMonth);
 	GameNetwork::send(msg, true);
 }
@@ -466,25 +578,42 @@ void SwgCuiCalendar::requestEvents()
 
 void SwgCuiCalendar::receiveMessage(MessageDispatch::Emitter const & /*source*/, MessageDispatch::MessageBase const & message)
 {
+	REPORT_LOG(true, ("SwgCuiCalendar::receiveMessage: received message type=[%s]\n", message.getType() ? "known" : "unknown"));
+
 	if (message.isType("CalendarEventsResponseMessage"))
 	{
-		Archive::ReadIterator ri = dynamic_cast<const GameNetworkMessage &>(message).getByteStream().begin();
+		REPORT_LOG(true, ("SwgCuiCalendar::receiveMessage: CalendarEventsResponseMessage\n"));
+		Archive::ReadIterator ri = static_cast<const GameNetworkMessage &>(message).getByteStream().begin();
 		CalendarEventsResponseMessage const msg(ri);
 		onEventsResponse(msg.getEvents());
 	}
 	else if (message.isType("CalendarEventNotificationMessage"))
 	{
-		Archive::ReadIterator ri = dynamic_cast<const GameNetworkMessage &>(message).getByteStream().begin();
+		REPORT_LOG(true, ("SwgCuiCalendar::receiveMessage: CalendarEventNotificationMessage\n"));
+		Archive::ReadIterator ri = static_cast<const GameNetworkMessage &>(message).getByteStream().begin();
 		CalendarEventNotificationMessage const msg(ri);
 		onEventNotification(msg.getNotificationType(), msg.getEventData());
 	}
 	else if (message.isType("CalendarDeleteEventResponseMessage"))
 	{
-		Archive::ReadIterator ri = dynamic_cast<const GameNetworkMessage &>(message).getByteStream().begin();
+		REPORT_LOG(true, ("SwgCuiCalendar::receiveMessage: CalendarDeleteEventResponseMessage\n"));
+		Archive::ReadIterator ri = static_cast<const GameNetworkMessage &>(message).getByteStream().begin();
 		CalendarDeleteEventResponseMessage const msg(ri);
+		REPORT_LOG(true, ("SwgCuiCalendar: delete response success=%d\n", msg.getSuccess() ? 1 : 0));
 		if (msg.getSuccess())
 		{
-			// Refresh events
+			requestEvents();
+		}
+	}
+	else if (message.isType("CalendarCreateEventResponseMessage"))
+	{
+		REPORT_LOG(true, ("SwgCuiCalendar::receiveMessage: CalendarCreateEventResponseMessage\n"));
+		Archive::ReadIterator ri = static_cast<const GameNetworkMessage &>(message).getByteStream().begin();
+		CalendarCreateEventResponseMessage const msg(ri);
+		REPORT_LOG(true, ("SwgCuiCalendar: create response success=%d eventId=[%s] error=[%s]\n",
+			msg.getSuccess() ? 1 : 0, msg.getEventId().c_str(), msg.getErrorMessage().c_str()));
+		if (msg.getSuccess())
+		{
 			requestEvents();
 		}
 	}
@@ -494,6 +623,7 @@ void SwgCuiCalendar::receiveMessage(MessageDispatch::Emitter const & /*source*/,
 
 void SwgCuiCalendar::onEventsResponse(std::vector<CalendarEventData> const & events)
 {
+	REPORT_LOG(true, ("SwgCuiCalendar::onEventsResponse: received %d events\n", static_cast<int>(events.size())));
 	m_cachedEvents = events;
 	refreshEventList();
 	updateCalendarDisplay();
@@ -503,22 +633,40 @@ void SwgCuiCalendar::onEventsResponse(std::vector<CalendarEventData> const & eve
 
 void SwgCuiCalendar::onEventNotification(int notificationType, CalendarEventData const & eventData)
 {
-	// Handle notification - refresh the event list
+	UNREF(eventData);
 	switch (notificationType)
 	{
-		case 0: // Created
-		case 1: // Updated
-		case 2: // Deleted
-			// Refresh from server
+		case 0:
+		case 1:
+		case 2:
 			requestEvents();
 			break;
 
-		case 3: // Started
-		case 4: // Ended
-			// Show a notification to the user
+		case 3:
+		case 4:
 			break;
 	}
 }
 
-//======================================================================
+//----------------------------------------------------------------------
+
+int SwgCuiCalendar::getSelectedYear()
+{
+	return ms_selectedYear;
+}
+
+//----------------------------------------------------------------------
+
+int SwgCuiCalendar::getSelectedMonth()
+{
+	return ms_selectedMonth;
+}
+
+//----------------------------------------------------------------------
+
+int SwgCuiCalendar::getSelectedDay()
+{
+	return ms_selectedDay;
+}
+
 //======================================================================

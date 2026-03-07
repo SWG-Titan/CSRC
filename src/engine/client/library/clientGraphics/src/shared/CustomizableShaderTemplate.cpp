@@ -205,7 +205,7 @@ public:
 
 public:
 
-	bool applyCustomization(const IntVariableFactoryVector &intVariableFactoryVector, const IntVector &intValues, StaticShader &shader) const;
+	bool applyCustomization(const IntVariableFactoryVector &intVariableFactoryVector, const IntVector &intValues, StaticShader &shader, const PackedArgbVector *directColors = 0) const;
 
 private:
 
@@ -973,7 +973,7 @@ CustomizableShaderTemplate::TextureFactorIntOperation *CustomizableShaderTemplat
 
 // ======================================================================
 
-bool CustomizableShaderTemplate::TextureFactorIntOperation::applyCustomization(const IntVariableFactoryVector &intVariableFactoryVector, const IntVector &intValues, StaticShader &shader) const
+bool CustomizableShaderTemplate::TextureFactorIntOperation::applyCustomization(const IntVariableFactoryVector &intVariableFactoryVector, const IntVector &intValues, StaticShader &shader, const PackedArgbVector *directColors) const
 {
 	VALIDATE_RANGE_INCLUSIVE_EXCLUSIVE(0, m_variableIndex, static_cast<int>(intValues.size()));
 	VALIDATE_RANGE_INCLUSIVE_EXCLUSIVE(0, m_variableIndex, static_cast<int>(intVariableFactoryVector.size()));
@@ -982,7 +982,20 @@ bool CustomizableShaderTemplate::TextureFactorIntOperation::applyCustomization(c
 	if (!shader.hasTextureFactor(m_tfactorTag))
 		return false;
 
-	//-- fetch the palette
+	//-- Check for direct color override first
+	if (directColors && m_variableIndex < static_cast<int>(directColors->size()))
+	{
+		const PackedArgb &directColor = (*directColors)[static_cast<size_t>(m_variableIndex)];
+		// A non-zero alpha means a valid direct color override is set
+		if (directColor.getA() != 0)
+		{
+			DEBUG_REPORT_LOG(ms_debugLogChanges, ("|- setting direct color tfactor (r=%u,g=%u,b=%u,a=%u)\n", directColor.getR(), directColor.getG(), directColor.getB(), directColor.getA()));
+			shader.setTextureFactor(m_tfactorTag, directColor.getArgb());
+			return true;
+		}
+	}
+
+	//-- Fall back to palette lookup
 	const PaletteColorVariableFactory *const pcvFactory = safe_cast<const PaletteColorVariableFactory*>(intVariableFactoryVector[static_cast<size_t>(m_variableIndex)]);
 	NOT_NULL(pcvFactory);
 
@@ -1243,7 +1256,7 @@ bool CustomizableShaderTemplate::isIntVariablePrivate(int index) const
 
 // ----------------------------------------------------------------------
 
-bool CustomizableShaderTemplate::applyShaderSettings(const IntVector &intValues, StaticShader &shader) const
+bool CustomizableShaderTemplate::applyShaderSettings(const IntVector &intValues, StaticShader &shader, const PackedArgbVector *directColors) const
 {
 	NOT_NULL(m_intVariableFactoryVector);
 
@@ -1278,7 +1291,7 @@ bool CustomizableShaderTemplate::applyShaderSettings(const IntVector &intValues,
 		for (TextureFactorIntOperationVector::const_iterator it = m_textureFactorIntOperationVector->begin(); it != endIt; ++it)
 		{
 			NOT_NULL(*it);
-			ok = (*it)->applyCustomization(*m_intVariableFactoryVector, intValues, shader) && ok;
+			ok = (*it)->applyCustomization(*m_intVariableFactoryVector, intValues, shader, directColors) && ok;
 		}
 	}
 

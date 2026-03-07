@@ -53,7 +53,7 @@ namespace DetailAppearanceNamespace
 	bool  ms_drawTestShape         = false;
 	bool  ms_drawWriteShape        = false;
 	bool  ms_forceLowDetailLevels  = false;
-	bool  ms_forceHighDetailLevels = false;
+	bool  ms_forceHighDetailLevels = true;
 	bool  ms_enableDetailLevelStretch = true;
 	bool  ms_fadeInEnabled         = true;
 	bool  ms_crossFadeEnabled      = false;
@@ -249,10 +249,16 @@ DetailAppearance::DetailAppearance(const DetailAppearanceTemplate *detailAppeara
 		}
 	}
 
+	// Preload highest detail level (last index) for best visual quality
+	// Also preload index 0 which is needed for the DPVS test shape
 	IGNORE_RETURN (getAppearance (0));
+	if (count > 1)
+	{
+		IGNORE_RETURN (getAppearance (count - 1));
+	}
 	if (DataLint::isEnabled () || ConfigClientObject::getPreloadDetailLevels ())
 	{
-		for (int i = 1; i < count; ++i)
+		for (int i = 1; i < count - 1; ++i)
 			IGNORE_RETURN (getAppearance (i));
 	}
 
@@ -392,11 +398,12 @@ int DetailAppearance::_chooseDetailLevel() const
 		return m_currentDetailLevel;
 	}
 
-	// handle forced low lod
+	// handle forced low lod - lowest detail is at index 0, not N-1!
+	// In this engine: index 0 = farthest/lowest detail, index N-1 = closest/highest detail
 	if (ms_forceLowDetailLevels)
 	{
 		const Appearance *appearance = getAppearance(0);
-		if (appearance->isLoaded())
+		if (appearance && appearance->isLoaded())
 		{
 			return 0;
 		}
@@ -406,15 +413,21 @@ int DetailAppearance::_chooseDetailLevel() const
 	const DetailAppearanceTemplate *at = getDetailAppearanceTemplate();
 	const int numberOfDetailLevels = at->getDetailLevelCount();
 
-	// handle forced high lod
+	// handle forced high lod - highest detail is at index (numberOfDetailLevels - 1), not 0!
+	// In this engine: index 0 = farthest/lowest detail, index N-1 = closest/highest detail
 	if (ms_forceHighDetailLevels)
 	{
-		const Appearance *appearance = getAppearance(numberOfDetailLevels  - 1);
-		if (appearance->isLoaded())
+		const int highestDetailLevel = numberOfDetailLevels - 1;
+		// Always request highest detail LOD to be loaded and use it
+		// getAppearance() triggers async loading if not already loaded
+		const Appearance *appearance = getAppearance(highestDetailLevel);
+		if (appearance && appearance->isLoaded())
 		{
-			return numberOfDetailLevels - 1;
+			return highestDetailLevel;
 		}
-		return -1;
+		// If not loaded yet, still return highest detail to indicate we want it
+		// The rendering system will handle the async load
+		return highestDetailLevel;
 	}
 
 	// get the distance from the camera to the object
@@ -519,8 +532,8 @@ int DetailAppearance::_chooseDetailLevel() const
 		appearance = NULL;
 
 		// it wasn't loaded, so now try to find one that is.  search from the current detail level, both higher and lower, looking for something loaded
-		const int numberOfDetailLevels = getDetailAppearanceTemplate()->getDetailLevelCount();
-		for (int offset = 1; offset < numberOfDetailLevels; ++offset)
+		const int numberOfDetailLevels2 = getDetailAppearanceTemplate()->getDetailLevelCount();
+		for (int offset = 1; offset < numberOfDetailLevels2; ++offset)
 		{
 			if (detailLevel - offset >= 0)
 			{
@@ -533,7 +546,7 @@ int DetailAppearance::_chooseDetailLevel() const
 				appearance = NULL;
 			}
 
-			if (detailLevel + offset < numberOfDetailLevels)
+			if (detailLevel + offset < numberOfDetailLevels2)
 			{
 				appearance = m_appearanceList [detailLevel + offset];
 				if (appearance && appearance->isLoaded())
@@ -894,15 +907,20 @@ void DetailAppearance::_alterShowLodZero()
 {
 	if (++m_alters > 2)
 	{
-		Appearance * a = _getAppearance(0);
-		if (a && a->isLoaded())
+		// Show highest detail level (last index), not index 0 which is lowest detail
+		const int highestDetailLevel = m_appearanceListSize - 1;
+		if (highestDetailLevel >= 0)
 		{
-			m_currentDetailLevel = 0;
+			Appearance * a = _getAppearance(highestDetailLevel);
+			if (a && a->isLoaded())
+			{
+				m_currentDetailLevel = highestDetailLevel;
 
-			_endAppearanceFade(a, true);
-			_updateLodSettings(m_currentDetailLevel);
+				_endAppearanceFade(a, true);
+				_updateLodSettings(m_currentDetailLevel);
 
-			_setDpvsWriteShape();
+				_setDpvsWriteShape();
+			}
 		}
 	}
 }

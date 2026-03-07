@@ -43,6 +43,7 @@
 	<include>ui_largeloading.inc</include>
 	<include>ui_structure_placement.inc</include>
 	<include>ui_pda.inc</include>
+	<include>ui_calendar.inc</include>
 	<include>ui_space.inc</include>
 	<include>ui_hud_space.inc</include>
 	<include>ui_ground_hud.inc</include>
@@ -60,6 +61,8 @@
 	<include>ui_conversation.inc</include>
 	<include>ui_scripted.inc</include>
 	<include>ui_messagebox.inc</include>
+	<include>ui_gm_sethue.inc</include>
+	<include>ui_color_wheel.inc</include>
 	<include>ui_backdrop_default.inc</include>
 	<include>ui_start.inc</include>
 	<include>ui_grid_style.inc</include>

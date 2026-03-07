@@ -311,6 +311,7 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Optimized|Win32'">MaxSpeed</Optimization>
     </ClCompile>
     <ClCompile Include="..\..\src\shared\page\SwgCuiCalendar.cpp" />
+    <ClCompile Include="..\..\src\shared\page\SwgCuiCalendarEventDetails.cpp" />
     <ClCompile Include="..\..\src\shared\page\SwgCuiCalendarEventEditor.cpp" />
     <ClCompile Include="..\..\src\shared\page\SwgCuiCalendarSettings.cpp" />
     <ClCompile Include="..\..\src\shared\page\SwgCuiCharacterSheet.cpp">
@@ -966,6 +967,7 @@
     <ClInclude Include="..\..\src\shared\page\SwgCuiBuffDisplay.h" />
     <ClInclude Include="..\..\src\shared\page\SwgCuiButtonBar.h" />
     <ClInclude Include="..\..\src\shared\page\SwgCuiCalendar.h" />
+    <ClInclude Include="..\..\src\shared\page\SwgCuiCalendarEventDetails.h" />
     <ClInclude Include="..\..\src\shared\page\SwgCuiCalendarEventEditor.h" />
     <ClInclude Include="..\..\src\shared\page\SwgCuiCalendarSettings.h" />
     <ClInclude Include="..\..\src\shared\page\SwgCuiCharacterSheet.h" />

@@ -14,21 +14,18 @@
 
 #include "clientUserInterface/CuiMediator.h"
 #include "sharedMessageDispatch/Receiver.h"
+#include "sharedNetworkMessages/CalendarMessages.h"
 #include "UIEventCallback.h"
 
 #include <vector>
+#include <string>
 
 class UIPage;
 class UIButton;
 class UIText;
 class UIList;
 class UIDataSource;
-struct CalendarEventData;
-
-namespace MessageDispatch
-{
-	class Callback;
-}
+class UIImage;
 
 // ======================================================================
 
@@ -55,6 +52,7 @@ public:
 	void                     navigateMonth(int delta);
 	void                     goToToday();
 	void                     refreshEventList();
+	void                     showEventDetails();
 
 	// Network message handlers
 	void                     onEventsResponse(std::vector<CalendarEventData> const & events);
@@ -62,6 +60,11 @@ public:
 
 	// Request events from server
 	void                     requestEvents();
+
+	// Static accessors for passing selected date to event editor
+	static int               getSelectedYear();
+	static int               getSelectedMonth();
+	static int               getSelectedDay();
 
 private:
 	virtual                 ~SwgCuiCalendar ();
@@ -86,15 +89,27 @@ private:
 	UIButton *               m_buttonViewDetails;
 	UIButton *               m_buttonDeleteEvent;
 
+	// Detail panel
+	UIPage *                 m_pageDetail;
+	UIText *                 m_textDetailTitle;
+	UIText *                 m_textDetailDesc;
+	UIText *                 m_textDetailTime;
+	UIText *                 m_textDetailType;
+	UIImage *                m_imageDetailImage;
+	UIButton *               m_buttonDetailClose;
+
 	int                      m_currentYear;
 	int                      m_currentMonth;
 	int                      m_selectedDay;
 
 	// Cached events from server
 	std::vector<CalendarEventData> m_cachedEvents;
+	// Filtered events for selected day
+	std::vector<CalendarEventData> m_selectedDayEvents;
 
-	// Message callback
-	MessageDispatch::Callback * m_callback;
+	static int               ms_selectedYear;
+	static int               ms_selectedMonth;
+	static int               ms_selectedDay;
 };
 
 //======================================================================

@@ -20,6 +20,7 @@
 #include "sharedObject/CustomizationIdManager.h"
 #include "sharedObject/CustomizationVariable.h"
 #include "sharedObject/Object.h"
+#include "sharedObject/PaletteColorCustomizationVariable.h"
 #include "UnicodeUtils.h"
 
 #include <map>
@@ -647,6 +648,10 @@ void CustomizationData::loadLocalDataFromString(const std::string &stringData)
 				loadLocalDataFromString_2(stringData);
 				break;
 
+			case 3:
+				loadLocalDataFromString_3(stringData);
+				break;
+
 			default:
 			{
 				Object const &object = getOwnerObject();
@@ -746,6 +751,15 @@ void CustomizationData::loadLocalDataFromString_1(const std::string &stringData)
 void CustomizationData::loadLocalDataFromString_2(const std::string &stringData)
 {
 	// Version 2 of the data has the string encoded as utf8
+	loadLocalDataFromString_1( Unicode::wideToNarrow( Unicode::utf8ToWide( stringData ) ) );
+}
+
+// ----------------------------------------------------------------------
+
+void CustomizationData::loadLocalDataFromString_3(const std::string &stringData)
+{
+	// Version 3 uses the same string encoding as version 2 (utf8)
+	// The binary format includes direct color data which is handled by restoreFromByteVector_3
 	loadLocalDataFromString_1( Unicode::wideToNarrow( Unicode::utf8ToWide( stringData ) ) );
 }
 
@@ -1154,9 +1168,18 @@ void CustomizationData::saveToByteVector(ByteVector &data, bool persistRemoteDat
 	CustomizationVariableConstVector  variables;
 	iterateOverConstVariables(collectPersistedVariablesCallback, &variables, persistRemoteData);
 
+	//-- Count direct color variables
+	int directColorCount = 0;
+	for (size_t i = 0; i < variables.size(); ++i)
+	{
+		PaletteColorCustomizationVariable const * palVar = dynamic_cast<PaletteColorCustomizationVariable const *>(variables[i].second);
+		if (palVar && palVar->hasDirectColor())
+			++directColorCount;
+	}
+
 	//-- Write header data.
-	// version 1.
-	data.push_back(2);
+	// Use version 3 if we have direct colors, otherwise version 2 for backward compatibility
+	data.push_back(directColorCount > 0 ? 3 : 2);
 
 	// Write # variables.
 	int const variableCount = static_cast<int>(variables.size());
@@ -1194,6 +1217,31 @@ void CustomizationData::saveToByteVector(ByteVector &data, bool persistRemoteDat
 		//-- Write variable data.
 		variable->saveToByteVector(data);
 	}
+
+	//-- For version 3, append direct color data
+	if (directColorCount > 0)
+	{
+		// Write count of direct color entries
+		data.push_back(static_cast<byte>(directColorCount));
+
+		// Write each direct color: variableId (1 byte) + R (1 byte) + G (1 byte) + B (1 byte)
+		for (int i = 0; i < variableCount; ++i)
+		{
+			PaletteColorCustomizationVariable const * palVar = dynamic_cast<PaletteColorCustomizationVariable const *>(variables[static_cast<CustomizationVariableConstVector::size_type>(i)].second);
+			if (palVar && palVar->hasDirectColor())
+			{
+				std::string const &variableName = variables[static_cast<CustomizationVariableConstVector::size_type>(i)].first;
+				int variableId = -1;
+				CustomizationIdManager::mapStringToId(variableName.c_str(), variableId);
+
+				PackedArgb const & color = palVar->getDirectColor();
+				data.push_back(static_cast<byte>(variableId));
+				data.push_back(static_cast<byte>(color.getR()));
+				data.push_back(static_cast<byte>(color.getG()));
+				data.push_back(static_cast<byte>(color.getB()));
+			}
+		}
+	}
 }
 
 // ----------------------------------------------------------------------
@@ -1221,6 +1269,10 @@ bool CustomizationData::restoreFromByteVector(ByteVector const &data)
 
 		case 2:
 			returnValue = restoreFromByteVector_2(data);
+			break;
+
+		case 3:
+			returnValue = restoreFromByteVector_3(data);
 			break;
 
 		default:
@@ -1321,6 +1373,115 @@ bool CustomizationData::restoreFromByteVector_2(ByteVector const &data)
 	// (we use utf8 to store the string in an objvar but the version 1
 	//  string had "characters" that were incompatible with utf8)
 	return restoreFromByteVector_1(data);
+}
+
+// ----------------------------------------------------------------------
+
+bool CustomizationData::restoreFromByteVector_3(ByteVector const &data)
+{
+	Object const &object = getOwnerObject();
+
+	// First restore the regular palette data using version 1 logic
+	// (version 3 format: version(1) + variableCount(1) + variables... + directColorCount(1) + directColors...)
+
+	int const dataSize = static_cast<int>(data.size());
+	if (dataSize < 2)
+	{
+		WARNING(true, ("object id [%s], template [%s] tried to restore customization data from corrupt version 3 data.", object.getNetworkId().getValueString().c_str(), object.getObjectTemplateName()));
+		return false;
+	}
+
+	// Get variable count
+	int const variableCount = static_cast<int>(data[1]);
+
+	// Calculate where regular variable data ends
+	// Each variable: combinedId(1) + data(1 or 2)
+	int currentIndex = 2;
+	std::string variableName;
+
+	for (int i = 0; i < variableCount; ++i)
+	{
+		if (currentIndex >= dataSize)
+		{
+			WARNING(true, ("object id [%s], template [%s] version 3 data truncated while reading variables.", object.getNetworkId().getValueString().c_str(), object.getObjectTemplateName()));
+			return false;
+		}
+
+		byte const combinedVariableId = data[static_cast<ByteVector::size_type>(currentIndex)];
+		++currentIndex;
+
+		int const variableSize = ((combinedVariableId & 0x80) != 0) ? 2 : 1;
+		int const variableId = combinedVariableId & 0x7f;
+
+		// Lookup variable name
+		bool const foundMapping = CustomizationIdManager::mapIdToString(variableId, variableName);
+		if (!foundMapping)
+		{
+			WARNING(true, ("object id [%s], template [%s] references unmapped variable id=[%d], skipping.", object.getNetworkId().getValueString().c_str(), object.getObjectTemplateName(), variableId));
+			currentIndex += variableSize;
+			continue;
+		}
+
+		// Get variable for name
+		CustomizationVariable *const variable = findVariable(variableName);
+		if (!variable)
+		{
+			WARNING(true, ("object id [%s], template [%s] references undeclared variable [%s], ignoring.", object.getNetworkId().getValueString().c_str(), object.getObjectTemplateName(), variableName.c_str()));
+			currentIndex += variableSize;
+			continue;
+		}
+
+		// Restore variable data
+		bool const restoreSuccess = variable->restoreFromByteVector(data, currentIndex, variableSize);
+		if (!restoreSuccess)
+		{
+			WARNING(true, ("object id [%s], template [%s] variable [%s] restore failed.", object.getNetworkId().getValueString().c_str(), object.getObjectTemplateName(), variableName.c_str()));
+		}
+
+		currentIndex += variableSize;
+	}
+
+	// Now read direct color data if present
+	if (currentIndex < dataSize)
+	{
+		int const directColorCount = static_cast<int>(data[static_cast<ByteVector::size_type>(currentIndex)]);
+		++currentIndex;
+
+		// Each direct color: variableId(1) + R(1) + G(1) + B(1) = 4 bytes
+		for (int i = 0; i < directColorCount; ++i)
+		{
+			if (currentIndex + 4 > dataSize)
+			{
+				WARNING(true, ("object id [%s], template [%s] version 3 data truncated while reading direct colors.", object.getNetworkId().getValueString().c_str(), object.getObjectTemplateName()));
+				break;
+			}
+
+			int const variableId = static_cast<int>(data[static_cast<ByteVector::size_type>(currentIndex)]);
+			uint8 const r = data[static_cast<ByteVector::size_type>(currentIndex + 1)];
+			uint8 const g = data[static_cast<ByteVector::size_type>(currentIndex + 2)];
+			uint8 const b = data[static_cast<ByteVector::size_type>(currentIndex + 3)];
+			currentIndex += 4;
+
+			// Lookup variable name
+			bool const foundMapping = CustomizationIdManager::mapIdToString(variableId, variableName);
+			if (!foundMapping)
+			{
+				WARNING(true, ("object id [%s], template [%s] direct color references unmapped variable id=[%d], skipping.", object.getNetworkId().getValueString().c_str(), object.getObjectTemplateName(), variableId));
+				continue;
+			}
+
+			// Get variable and set direct color
+			CustomizationVariable *const variable = findVariable(variableName);
+			PaletteColorCustomizationVariable *const palVar = dynamic_cast<PaletteColorCustomizationVariable *>(variable);
+			if (palVar)
+			{
+				PackedArgb color(255, r, g, b);
+				palVar->setDirectColor(color);
+			}
+		}
+	}
+
+	return true;
 }
 
 // ======================================================================

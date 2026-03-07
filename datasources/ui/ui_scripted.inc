@@ -22584,4 +22584,363 @@ parent.compBg.location=location'
 				/>
 			</Page>
 		</Page>
+
+		<!-- Enhanced Color Picker for /setHue GM command -->
+		<Page
+			AutoSizePaletteCells='true'
+			Location='300,100'
+			MinimumSize='340,480'
+			Name='GMSetHue'
+			RStyleDefault='rs_default'
+			ScrollExtent='340,480'
+			Size='340,480'
+			UserMovable='true'
+			Visible='false'
+		>
+			<Data
+				buttonCancel='buttonCancel'
+				buttonclose='bg.mmc.close'
+				buttonRevert='buttonRevert'
+				buttonToggleMode='buttonToggleMode'
+				Name='CodeData'
+				pageColorWheel='content.pageColorWheel'
+				pagePaletteGrid='content.pagePaletteGrid'
+				pageMatchedColor='htmlRow.pageMatchedColor'
+				pageSample='htmlRow.pageSample'
+				pageWheel='content.pageColorWheel.pageWheel'
+				cursorWheel='content.pageColorWheel.pageWheel.cursorWheel'
+				sampleElement='content.pagePaletteGrid.sampleElement'
+				sliderR='content.pageColorWheel.sliders.sliderR'
+				sliderG='content.pageColorWheel.sliders.sliderG'
+				sliderB='content.pageColorWheel.sliders.sliderB'
+				textR='content.pageColorWheel.sliders.textR'
+				textG='content.pageColorWheel.sliders.textG'
+				textB='content.pageColorWheel.sliders.textB'
+				text='header.textTitle'
+				textboxHtml='htmlRow.textboxHtml'
+				volumePage='content.pagePaletteGrid.volumePage'
+			/>
+
+			<!-- Title Bar -->
+			<Page
+				BackgroundColor='#1A3A4A'
+				BackgroundOpacity='0.95'
+				Name='bg'
+				PackLocation='nfn,nfn'
+				PackSize='a,f'
+				RStyleDefault='/Styles.New.fatFrameInside_palW.rs_default'
+				ScrollExtent='340,28'
+				Size='340,28'
+			>
+				<Text
+					Font='bold_14'
+					LocalText='Color Picker'
+					Location='10,4'
+					Name='caption'
+					PackLocation='nfn,nfn'
+					PackSize='a,f'
+					PalText='header'
+					ScrollExtent='220,20'
+					Size='220,20'
+					TextColor='#97FFFF'
+				>Color Picker</Text>
+				<Page
+					Location='318,6'
+					Name='mmc'
+					PackLocation='fff,nfn'
+					PackSize='f,f'
+					ScrollExtent='16,16'
+					Size='16,16'
+				>
+					<Button
+						BackgroundOpacity='0.80'
+						IsCancelButton='true'
+						Name='close'
+						PackLocation='fff,cfc'
+						PackSize='f,f'
+						ScrollExtent='16,16'
+						Size='16,16'
+						Style='/Styles.Frame.buttonClose.style'
+					/>
+				</Page>
+			</Page>
+
+			<!-- Mode Toggle and Title -->
+			<Page
+				Location='10,32'
+				Name='header'
+				PackLocation='nfn,nfn'
+				PackSize='a,f'
+				ScrollExtent='320,28'
+				Size='320,28'
+			>
+				<Button
+					LocalText='Palette Mode'
+					Location='0,2'
+					Name='buttonToggleMode'
+					ScrollExtent='100,22'
+					Size='100,22'
+					Style='/Styles.New.buttons.hud.style'
+				>Palette Mode</Button>
+				<Text
+					Font='bold_11'
+					LocalText=''
+					Location='110,5'
+					Name='textTitle'
+					PackLocation='nfn,nfn'
+					PackSize='a,f'
+					ScrollExtent='200,18'
+					Size='200,18'
+					TextColor='#AADDFF'
+				/>
+			</Page>
+
+			<!-- Main Content Area -->
+			<Page
+				BackgroundColor='#0A1A2A'
+				BackgroundOpacity='0.85'
+				Location='10,62'
+				Name='content'
+				PackLocation='nfn,nfn'
+				PackSize='a,a'
+				RStyleDefault='/Styles.New.whiteOutline.rs_default'
+				ScrollExtent='320,310'
+				Size='320,310'
+			>
+				<!-- Color Wheel Mode -->
+				<Page
+					BackgroundOpacity='0.00'
+					Location='0,0'
+					Name='pageColorWheel'
+					PackLocation='nfn,nfn'
+					PackSize='a,a'
+					ScrollExtent='320,310'
+					Size='320,310'
+					Visible='true'
+				>
+					<!-- Color Wheel Image -->
+					<Page
+						AbsorbsInput='true'
+						BackgroundOpacity='0.00'
+						GetsInput='true'
+						Location='10,5'
+						Name='pageWheel'
+						ScrollExtent='300,150'
+						Size='300,150'
+					>
+						<Image
+							Location='75,0'
+							Name='imgWheel'
+							ScrollExtent='150,150'
+							Size='150,150'
+							SourceResource='ui_color_wheel'
+							SourceRect='0,0,256,256'
+							Stretch='true'
+						/>
+						<!-- Cursor indicator -->
+						<Page
+							BackgroundColor='#FFFFFF'
+							BackgroundOpacity='1.00'
+							Location='150,75'
+							Name='cursorWheel'
+							ScrollExtent='8,8'
+							Size='8,8'
+						/>
+					</Page>
+
+					<!-- RGB Sliders -->
+					<Page
+						Location='10,160'
+						Name='sliders'
+						ScrollExtent='300,140'
+						Size='300,140'
+					>
+						<!-- Red Slider -->
+						<Text Font='bold_11' LocalText='R:' Location='0,8' Name='labelR' ScrollExtent='20,16' Size='20,16' TextColor='#FF6666'>R:</Text>
+						<Page BackgroundColor='#330000' BackgroundOpacity='1.00' Location='25,5' Size='220,20'/>
+						<Page BackgroundColor='#FF0000' BackgroundOpacity='0.50' Location='25,5' Size='220,20' Name='sliderRBg'/>
+						<Sliderbar Location='25,5' Name='sliderR' ScrollExtent='220,20' Size='220,20' Style='/Styles.New.Slider.default.horizontal.style_test' UpperLimit='255' Value='255'/>
+						<Text Font='bold_11' LocalText='255' Location='250,8' Name='textR' ScrollExtent='45,16' Size='45,16' TextAlignment='Right' TextColor='#FFFFFF'>255</Text>
+
+						<!-- Green Slider -->
+						<Text Font='bold_11' LocalText='G:' Location='0,33' Name='labelG' ScrollExtent='20,16' Size='20,16' TextColor='#66FF66'>G:</Text>
+						<Page BackgroundColor='#003300' BackgroundOpacity='1.00' Location='25,30' Size='220,20'/>
+						<Page BackgroundColor='#00FF00' BackgroundOpacity='0.50' Location='25,30' Size='220,20' Name='sliderGBg'/>
+						<Sliderbar Location='25,30' Name='sliderG' ScrollExtent='220,20' Size='220,20' Style='/Styles.New.Slider.default.horizontal.style_test' UpperLimit='255' Value='255'/>
+						<Text Font='bold_11' LocalText='255' Location='250,33' Name='textG' ScrollExtent='45,16' Size='45,16' TextAlignment='Right' TextColor='#FFFFFF'>255</Text>
+
+						<!-- Blue Slider -->
+						<Text Font='bold_11' LocalText='B:' Location='0,58' Name='labelB' ScrollExtent='20,16' Size='20,16' TextColor='#6666FF'>B:</Text>
+						<Page BackgroundColor='#000033' BackgroundOpacity='1.00' Location='25,55' Size='220,20'/>
+						<Page BackgroundColor='#0000FF' BackgroundOpacity='0.50' Location='25,55' Size='220,20' Name='sliderBBg'/>
+						<Sliderbar Location='25,55' Name='sliderB' ScrollExtent='220,20' Size='220,20' Style='/Styles.New.Slider.default.horizontal.style_test' UpperLimit='255' Value='255'/>
+						<Text Font='bold_11' LocalText='255' Location='250,58' Name='textB' ScrollExtent='45,16' Size='45,16' TextAlignment='Right' TextColor='#FFFFFF'>255</Text>
+
+						<!-- Quick Color Palette -->
+						<Text Font='bold_11' LocalText='Quick Colors:' Location='0,88' Name='labelQuick' ScrollExtent='85,16' Size='85,16' TextColor='#888888'>Quick Colors:</Text>
+						<Button BackgroundColor='#FF0000' BackgroundOpacity='1.00' Location='90,85' Name='btnQuickRed' ScrollExtent='22,22' Size='22,22' Style='/Styles.New.buttons.hud.style'/>
+						<Button BackgroundColor='#FF8000' BackgroundOpacity='1.00' Location='114,85' Name='btnQuickOrange' ScrollExtent='22,22' Size='22,22' Style='/Styles.New.buttons.hud.style'/>
+						<Button BackgroundColor='#FFFF00' BackgroundOpacity='1.00' Location='138,85' Name='btnQuickYellow' ScrollExtent='22,22' Size='22,22' Style='/Styles.New.buttons.hud.style'/>
+						<Button BackgroundColor='#00FF00' BackgroundOpacity='1.00' Location='162,85' Name='btnQuickGreen' ScrollExtent='22,22' Size='22,22' Style='/Styles.New.buttons.hud.style'/>
+						<Button BackgroundColor='#00FFFF' BackgroundOpacity='1.00' Location='186,85' Name='btnQuickCyan' ScrollExtent='22,22' Size='22,22' Style='/Styles.New.buttons.hud.style'/>
+						<Button BackgroundColor='#0000FF' BackgroundOpacity='1.00' Location='210,85' Name='btnQuickBlue' ScrollExtent='22,22' Size='22,22' Style='/Styles.New.buttons.hud.style'/>
+						<Button BackgroundColor='#FF00FF' BackgroundOpacity='1.00' Location='234,85' Name='btnQuickMagenta' ScrollExtent='22,22' Size='22,22' Style='/Styles.New.buttons.hud.style'/>
+						<Button BackgroundColor='#FFFFFF' BackgroundOpacity='1.00' Location='258,85' Name='btnQuickWhite' ScrollExtent='22,22' Size='22,22' Style='/Styles.New.buttons.hud.style'/>
+						<Button BackgroundColor='#808080' BackgroundOpacity='1.00' Location='282,85' Name='btnQuickGray' ScrollExtent='22,22' Size='22,22' Style='/Styles.New.buttons.hud.style'/>
+
+						<!-- Second row of quick colors -->
+						<Button BackgroundColor='#800000' BackgroundOpacity='1.00' Location='90,109' Name='btnQuickDarkRed' ScrollExtent='22,22' Size='22,22' Style='/Styles.New.buttons.hud.style'/>
+						<Button BackgroundColor='#804000' BackgroundOpacity='1.00' Location='114,109' Name='btnQuickBrown' ScrollExtent='22,22' Size='22,22' Style='/Styles.New.buttons.hud.style'/>
+						<Button BackgroundColor='#808000' BackgroundOpacity='1.00' Location='138,109' Name='btnQuickOlive' ScrollExtent='22,22' Size='22,22' Style='/Styles.New.buttons.hud.style'/>
+						<Button BackgroundColor='#008000' BackgroundOpacity='1.00' Location='162,109' Name='btnQuickDarkGreen' ScrollExtent='22,22' Size='22,22' Style='/Styles.New.buttons.hud.style'/>
+						<Button BackgroundColor='#008080' BackgroundOpacity='1.00' Location='186,109' Name='btnQuickTeal' ScrollExtent='22,22' Size='22,22' Style='/Styles.New.buttons.hud.style'/>
+						<Button BackgroundColor='#000080' BackgroundOpacity='1.00' Location='210,109' Name='btnQuickNavy' ScrollExtent='22,22' Size='22,22' Style='/Styles.New.buttons.hud.style'/>
+						<Button BackgroundColor='#800080' BackgroundOpacity='1.00' Location='234,109' Name='btnQuickPurple' ScrollExtent='22,22' Size='22,22' Style='/Styles.New.buttons.hud.style'/>
+						<Button BackgroundColor='#404040' BackgroundOpacity='1.00' Location='258,109' Name='btnQuickDarkGray' ScrollExtent='22,22' Size='22,22' Style='/Styles.New.buttons.hud.style'/>
+						<Button BackgroundColor='#000000' BackgroundOpacity='1.00' Location='282,109' Name='btnQuickBlack' ScrollExtent='22,22' Size='22,22' Style='/Styles.New.buttons.hud.style'/>
+					</Page>
+				</Page>
+
+				<!-- Palette Grid Mode (hidden by default) -->
+				<Page
+					BackgroundOpacity='0.00'
+					Location='0,0'
+					Name='pagePaletteGrid'
+					PackLocation='nfn,nfn'
+					PackSize='a,a'
+					ScrollExtent='320,310'
+					Size='320,310'
+					Visible='false'
+				>
+					<Image
+						BackgroundColor='#FFFFFF'
+						BackgroundOpacity='1.00'
+						GetsInput='true'
+						Location='8,8'
+						Name='sampleElement'
+						ScrollExtent='16,16'
+						Size='16,16'
+						Visible='false'
+					/>
+					<VolumePage
+						BackgroundColor='#333333'
+						BackgroundTint='#666666'
+						CellCount='14,14'
+						CellPadding='1,1'
+						CellSize='20,20'
+						Location='8,8'
+						MinimumScrollExtent='96,96'
+						Name='volumePage'
+						PackLocation='nfn,nfn'
+						PackSize='a,a'
+						RStyleMouseOverSelected='/Styles.New.whitebox.rs_default'
+						ScrollExtent='304,294'
+						Selectable='true'
+						Size='304,294'
+					/>
+				</Page>
+			</Page>
+
+			<!-- HTML Color Input Row -->
+			<Page
+				Location='10,376'
+				Name='htmlRow'
+				PackLocation='nfn,fff'
+				ScrollExtent='320,36'
+				Size='320,36'
+			>
+				<Text
+					Font='bold_12'
+					LocalText='HTML:'
+					Location='0,10'
+					Name='labelHtml'
+					ScrollExtent='45,18'
+					Size='45,18'
+					TextColor='#AADDFF'
+				>HTML:</Text>
+				<Textbox
+					BackgroundColor='#1A2A3A'
+					BackgroundOpacity='1.00'
+					Font='bold_16'
+					LocalText='#FFFFFF'
+					Location='48,5'
+					MaxLength='7'
+					Name='textboxHtml'
+					RStyleDefault='/Styles.New.whiteOutline.rs_default'
+					ScrollExtent='90,26'
+					Size='90,26'
+					TextColor='#FFFFFF'
+				>#FFFFFF</Textbox>
+
+				<Text
+					Font='bold_11'
+					LocalText='Color:'
+					Location='148,10'
+					Name='labelColor'
+					ScrollExtent='40,18'
+					Size='40,18'
+					TextColor='#AAAAAA'
+				>Color:</Text>
+				<Page
+					BackgroundColor='#FFFFFF'
+					BackgroundOpacity='1.00'
+					BackgroundTint='#FFFFFF'
+					Location='190,5'
+					Name='pageSample'
+					RStyleDefault='/Styles.New.whiteOutline.rs_default'
+					ScrollExtent='55,26'
+					Size='55,26'
+				/>
+
+				<Text
+					Font='bold_11'
+					LocalText='='
+					Location='250,10'
+					Name='labelMatch'
+					ScrollExtent='15,18'
+					Size='15,18'
+					TextColor='#666666'
+				>=</Text>
+				<Page
+					BackgroundColor='#FFFFFF'
+					BackgroundOpacity='1.00'
+					BackgroundTint='#FFFFFF'
+					Location='268,5'
+					Name='pageMatchedColor'
+					RStyleDefault='/Styles.New.whiteOutline.rs_default'
+					ScrollExtent='45,26'
+					Size='45,26'
+				/>
+			</Page>
+
+			<!-- Action Buttons -->
+			<Button
+				LocalText='[@revert]'
+				Location='10,420'
+				Name='buttonRevert'
+				PackLocation='nfn,fff'
+				ScrollExtent='100,28'
+				Size='100,28'
+				Style='/Styles.New.buttons.hud.style'
+			>@revert</Button>
+			<Button
+				LocalText='[@ui:ok]'
+				Location='120,420'
+				Name='buttonOK'
+				PackLocation='cfc,fff'
+				ScrollExtent='100,28'
+				Size='100,28'
+				Style='/Styles.New.buttons.hud.style'
+			>@ui:ok</Button>
+			<Button
+				IsCancelButton='true'
+				LocalText='[@cancel]'
+				Location='230,420'
+				Name='buttonCancel'
+				PackLocation='fff,fff'
+				ScrollExtent='100,28'
+				Size='100,28'
+				Style='/Styles.New.buttons.hud.style'
+			>@cancel</Button>
+		</Page>
 	</Page>

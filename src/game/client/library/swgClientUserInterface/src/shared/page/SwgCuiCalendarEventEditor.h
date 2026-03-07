@@ -13,6 +13,7 @@
 //======================================================================
 
 #include "clientUserInterface/CuiMediator.h"
+#include "sharedNetworkMessages/CalendarMessages.h"
 #include "UIEventCallback.h"
 
 class UIPage;
@@ -41,6 +42,11 @@ public:
 	virtual void                  performDeactivate         ();
 
 	void                          setDefaultDate            (int year, int month, int day);
+	void                          setEventData              (CalendarEventData const & eventData);
+	void                          clearEventData            ();
+
+	static SwgCuiCalendarEventEditor * getInstance          ();
+	static void                   editEvent                 (CalendarEventData const & eventData);
 
 private:
 	virtual                      ~SwgCuiCalendarEventEditor ();
@@ -51,6 +57,7 @@ private:
 	void                          updateRecurrenceVisibility();
 	void                          updateServerEventVisibility();
 	void                          createEvent();
+	void                          populateFromEventData     ();
 
 private:
 	UITextbox *                   m_textTitle;
@@ -65,8 +72,14 @@ private:
 	UICheckbox *                  m_checkRecurring;
 	UIPage *                      m_pageRecurrence;
 	UIComboBox *                  m_comboRecurrence;
+	UIComboBox *                  m_comboImage;
 	UIButton *                    m_buttonCreate;
 	UIButton *                    m_buttonCancel;
+
+	CalendarEventData             m_editingEvent;
+	bool                          m_isEditing;
+
+	static SwgCuiCalendarEventEditor * ms_instance;
 };
 
 //======================================================================

@@ -3875,85 +3875,14 @@ void SkeletalAppearance2::notifyMeshGeneratorModified()
 
 int SkeletalAppearance2::calculateDisplayLodIndex(float diameterScreenFraction, int previousLodIndex) const
 {
+	UNREF(diameterScreenFraction);
+	UNREF(previousLodIndex);
+
+	// ALWAYS return highest detail LOD (0) for best visual quality
 	if (m_maxAvailableDetailLevelIndex < 0)
 		return m_maxAvailableDetailLevelIndex;
 
-	if (m_userControlledDetailLevel)
-	{
-		// Don't modify the display LOD index when the user is directly controlling detail levels.
-		return m_displayLodIndex;
-	}
-
-	//-- Adjust diameter for LOD bias.
-	if (ms_lodBias > 0.0f)
-		diameterScreenFraction *= ms_lodBias;
-
-	int tryLodIndex = ((previousLodIndex >= 0) && (previousLodIndex <= m_maxAvailableDetailLevelIndex)) ? previousLodIndex : m_maxAvailableDetailLevelIndex;
-
-	if (tryLodIndex < 0)
-		return 0;
-
-	int const maxLodIndex = std::min(cs_maxLodCount - 1, m_maxAvailableDetailLevelIndex);
-	tryLodIndex = std::min (maxLodIndex, tryLodIndex);
-
-	//-- Start with try lod index.
-	while ((tryLodIndex >= 0) && (tryLodIndex <= maxLodIndex))
-	{
-		VALIDATE_RANGE_INCLUSIVE_INCLUSIVE(0, tryLodIndex, maxLodIndex);
-
-		// Check screen fraction fits within existing lod.
-		if ((diameterScreenFraction <= s_lodInfoArray[tryLodIndex].maxScreenFraction) && (diameterScreenFraction >= s_lodInfoArray[tryLodIndex].minScreenFraction)) //lint !e676 // possible -1 array subscript // wrong.
-		{
-			// This lod will work.
-			break;
-		}
-		else if (diameterScreenFraction <= s_lodInfoArray[tryLodIndex].minScreenFraction)  //lint !e676 // possible -1 array subscript // wrong.
-		{
-			// try next lower-detail lod index.
-			++tryLodIndex;
-		}
-		else
-		{
-			// try next greater-detail lod index
-			--tryLodIndex;
-		}
-	}
-
-	//-- If global maximum LOD index is enabled, make sure we never _try_ to render at a lower-density (larger numbered) detail level index.
-	if (s_maximumDesiredDetailLevelEnabled && (tryLodIndex > s_maximumDesiredDetailLevelIndex))
-		tryLodIndex = s_maximumDesiredDetailLevelIndex;
-
-	int const sizeBasedLodIndex = clamp(0, tryLodIndex, maxLodIndex);
-
-	if (s_uiContextEnabled || !CharacterLodManager::isEnabled())
-	{
-		//-- Don't adjust the detail level beyond appropriate lod selection for screen size
-		//   if we're in UI context or if the lod manager is disabled.
-		return sizeBasedLodIndex;
-	}
-	else
-	{
-		//-- Add character to list of characters that should be planned for next frame.
-		SkeletalAppearance2 *const nonConstAppearance = const_cast<SkeletalAppearance2*>(this);
-		Object *const owner = nonConstAppearance->getOwner();
-
-		if (owner)
-			CharacterLodManager::addCharacter(owner);
-
-		if (m_plannedLodSetFrameNumber + 2 < Os::getNumberOfUpdates())
-		{
-			//-- This appearance doesn't appear to have a planned lod set in the last frame.
-			//   There's a +2 because the texture rendering can cause another frame to slip in between
-			//   the two frames.
-			return sizeBasedLodIndex;
-		}
-
-		//-- Start trying to render character at the LOD planned by the character LOD planner.
-		//   Use the screen-based Lod index if it is a lower-density detail index.  In other words,
-		//   don't draw something at a higher level just because we would let it happen by plan ---
-		//   only do so if necessary.
-		return std::max(m_plannedLodIndex, sizeBasedLodIndex);
-	}
+	return 0;
 }
 
 // ----------------------------------------------------------------------

@@ -15,6 +15,7 @@
 #include "clientGraphics/Graphics.h"
 #include "clientGraphics/ShaderPrimitiveSorter.h"
 #include "clientObject/DetailAppearance.h"
+#include "sharedMath/Sphere.h"
 #include "sharedObject/Object.h"
 #include "sharedObject/Appearance.h"
 #include "sharedDebug/DebugFlags.h"
@@ -191,7 +192,7 @@ void LODManager::beginFrame(Camera const * camera)
 		ms_screenHeight = static_cast<float>(Graphics::getCurrentRenderTargetHeight());
 
 		// Calculate tan(FOV/2) for screen coverage calculation
-		float const fov = camera->getFieldOfView();
+		float const fov = camera->getHorizontalFieldOfView();
 		ms_tanHalfFOV = tan(fov * 0.5f);
 	}
 
@@ -226,32 +227,8 @@ int LODManager::selectLOD(Object const * object)
 	if (!object)
 		return -2;  // Invalid object, use fallback
 
-	// Auto-initialize frame state from ShaderPrimitiveSorter if not already in frame
-	if (!ms_inFrame)
-	{
-		// Try to get camera from ShaderPrimitiveSorter (it's available during rendering)
-		Camera const * const camera = &ShaderPrimitiveSorter::getCurrentCamera();
-		if (camera)
-		{
-			// Start a new implicit frame
-			ms_camera = camera;
-			ms_cameraPosition = camera->getPosition_w();
-			ms_screenWidth = static_cast<float>(Graphics::getCurrentRenderTargetWidth());
-			ms_screenHeight = static_cast<float>(Graphics::getCurrentRenderTargetHeight());
-
-			float const fov = camera->getFieldOfView();
-			ms_tanHalfFOV = (fov > 0.0f) ? tan(fov * 0.5f) : 1.0f;
-
-			ms_inFrame = true;
-			++ms_frameNumber;
-		}
-		else
-		{
-			return -2;  // No camera available, use fallback
-		}
-	}
-
-	return selectLOD(object, object->getAppearance());
+	Appearance const * const appearance = object->getAppearance();
+	return selectLOD(object, appearance);
 }
 
 // ----------------------------------------------------------------------
@@ -261,27 +238,11 @@ int LODManager::selectLOD(Object const * object, Appearance const * appearance)
 	if (!object)
 		return -2;  // Invalid object, use fallback
 
-	// Auto-initialize frame state if needed
+	// Auto-initialize if not in frame (for calls outside main render loop)
 	if (!ms_inFrame)
 	{
-		Camera const * const camera = &ShaderPrimitiveSorter::getCurrentCamera();
-		if (camera)
-		{
-			ms_camera = camera;
-			ms_cameraPosition = camera->getPosition_w();
-			ms_screenWidth = static_cast<float>(Graphics::getCurrentRenderTargetWidth());
-			ms_screenHeight = static_cast<float>(Graphics::getCurrentRenderTargetHeight());
-
-			float const fov = camera->getFieldOfView();
-			ms_tanHalfFOV = (fov > 0.0f) ? tan(fov * 0.5f) : 1.0f;
-
-			ms_inFrame = true;
-			++ms_frameNumber;
-		}
-		else
-		{
-			return -2;  // No camera available, use fallback
-		}
+		// Return -2 to signal fallback to distance-based selection
+		return -2;
 	}
 
 	++ms_stats.objectsProcessed;
@@ -390,10 +351,29 @@ int LODManager::selectLOD(Object const * object, Appearance const * appearance)
 
 int LODManager::selectLODForPosition(Vector const & position, float boundingRadius, int maxLOD)
 {
+	if (!ms_inFrame)
+		return 0;
+
 	float const distance = (position - ms_cameraPosition).magnitude();
 	float const coverage = calculateScreenCoverage(position, boundingRadius);
 
-	return selectLODHybrid(distance, coverage, maxLOD);
+	// Check minimum coverage threshold
+	if (coverage < ms_minimumCoverage)
+		return -1;  // Signal to cull
+
+	// Select LOD based on mode
+	switch (ms_selectionMode)
+	{
+	case SM_distance:
+		return selectLODByDistance(distance, maxLOD);
+
+	case SM_screenCoverage:
+		return selectLODByCoverage(coverage, maxLOD);
+
+	case SM_hybrid:
+	default:
+		return selectLODHybrid(distance, coverage, maxLOD);
+	}
 }
 
 // ----------------------------------------------------------------------
@@ -636,35 +616,44 @@ void LODManager::resetStatistics()
 
 int LODManager::selectLODByDistance(float distance, int maxLOD)
 {
-	for (int lod = 0; lod < maxLOD && lod < static_cast<int>(ms_lodDistances.size()); ++lod)
+	// Find appropriate LOD level based on distance thresholds
+	// In this engine: index 0 = farthest/lowest detail, maxLOD = closest/highest detail
+	// Closer objects should return higher indices
+	for (int i = maxLOD; i > 0; --i)
 	{
-		if (distance < ms_lodDistances[lod])
-			return lod;
+		int thresholdIndex = maxLOD - i;
+		if (thresholdIndex < static_cast<int>(ms_lodDistances.size()) && distance < ms_lodDistances[thresholdIndex])
+			return i;
 	}
-	return maxLOD;
+	return 0;  // Farthest away, use lowest detail
 }
 
 // ----------------------------------------------------------------------
 
 int LODManager::selectLODByCoverage(float coverage, int maxLOD)
 {
-	for (int lod = 0; lod < maxLOD && lod < static_cast<int>(ms_lodCoverages.size()); ++lod)
+	// Find appropriate LOD level based on screen coverage thresholds
+	// In this engine: index 0 = smallest coverage/lowest detail, maxLOD = largest coverage/highest detail
+	// Larger screen coverage should return higher indices (higher detail)
+	for (int i = maxLOD; i > 0; --i)
 	{
-		if (coverage > ms_lodCoverages[lod])
-			return lod;
+		int thresholdIndex = maxLOD - i;
+		if (thresholdIndex < static_cast<int>(ms_lodCoverages.size()) && coverage >= ms_lodCoverages[thresholdIndex])
+			return i;
 	}
-	return maxLOD;
+	return 0;  // Smallest coverage, use lowest detail
 }
-
 // ----------------------------------------------------------------------
 
 int LODManager::selectLODHybrid(float distance, float coverage, int maxLOD)
 {
-	// Use whichever metric suggests higher detail (lower LOD number)
+	// Hybrid mode: use the more conservative (higher detail) of distance and coverage
+	// In this engine: higher index = higher detail
 	int const distanceLOD = selectLODByDistance(distance, maxLOD);
 	int const coverageLOD = selectLODByCoverage(coverage, maxLOD);
 
-	return std::min(distanceLOD, coverageLOD);
+	// Return the higher LOD index (higher detail)
+	return std::max(distanceLOD, coverageLOD);
 }
 
 // ----------------------------------------------------------------------

@@ -13,5 +13,4 @@
 	<include>ui_styles.inc</include>
 	<include>ui_effectors.inc</include>
 	<include>ui_textstylemanager.inc</include>
-	<include>ui_calendar.inc</include>
 </Page>

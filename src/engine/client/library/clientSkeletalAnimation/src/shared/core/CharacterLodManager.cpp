@@ -203,10 +203,7 @@ void CharacterLodManager::planNextFrame(Vector const &cameraPosition_w)
 	//-- Remove all characters from the list submitted this frame.
 	s_characters.removeAll(false);
 
-	//-- Assign SkeletalAppearance2 LOD indices by proximity to camera.
-	int  currentAssignedLodIndex = s_firstAssignableLodIndex;
-	int  assignedCount           = 0;
-
+	//-- ALWAYS assign LOD index 0 (highest detail) to all characters for best visual quality
 	FloatObjectMap::iterator const endIt = s_charactersByDistanceSquared.end();
 	for (FloatObjectMap::iterator it = s_charactersByDistanceSquared.begin(); it != endIt; ++it)
 	{
@@ -217,16 +214,10 @@ void CharacterLodManager::planNextFrame(Vector const &cameraPosition_w)
 		SkeletalAppearance2 *const appearance = baseAppearance->asSkeletalAppearance2();
 		if (appearance)
 		{
-			++assignedCount;
-
-			//-- Assign the lod index for this appearance.
-			appearance->setPlannedLodIndex(std::min(currentAssignedLodIndex, appearance->getDetailLevelCount() - 1));
-			appearance->setEveryOtherFrameSkinningEnabled(assignedCount >= s_everyOtherFrameSkinningCharacterCount);
-			appearance->setForceHardSkinningEnabled(assignedCount >= s_hardSkinningCharacterCount);
-
-			//-- Transition to next lod index assignment as necessary.
-			if ((currentAssignedLodIndex < cs_characterLodSumEntryCount) && (assignedCount >= s_characterLodSumTable[currentAssignedLodIndex]))
-				++currentAssignedLodIndex;
+			//-- Always use highest detail LOD (index 0)
+			appearance->setPlannedLodIndex(0);
+			appearance->setEveryOtherFrameSkinningEnabled(false);
+			appearance->setForceHardSkinningEnabled(false);
 		}
 	}
 

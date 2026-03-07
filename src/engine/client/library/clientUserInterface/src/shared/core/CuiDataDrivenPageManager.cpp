@@ -17,6 +17,7 @@
 
 #include "clientGame/Game.h"
 #include "clientGame/GameNetwork.h"
+#include "clientUserInterface/CuiColorPicker.h"
 #include "clientUserInterface/CuiDataDrivenPage.h"
 #include "clientUserInterface/CuiDataDrivenPageCountdownTimer.h"
 #include "clientUserInterface/CuiDataDrivenPageVideoPlayer.h"

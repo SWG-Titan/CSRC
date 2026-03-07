@@ -63,7 +63,9 @@ namespace Archive
 		get(source, target.recurrenceType);
 		get(source, target.broadcastStart);
 		get(source, target.active);
-		get(source, target.creatorId);
+		std::string creatorIdStr;
+		get(source, creatorIdStr);
+		target.creatorId = NetworkId(creatorIdStr);
 	}
 
 	void put(ByteStream & target, CalendarEventData const & source)
@@ -85,7 +87,7 @@ namespace Archive
 		put(target, source.recurrenceType);
 		put(target, source.broadcastStart);
 		put(target, source.active);
-		put(target, source.creatorId);
+		put(target, source.creatorId.getValueString());
 	}
 }
 
@@ -143,24 +145,84 @@ CalendarEventsResponseMessage::~CalendarEventsResponseMessage()
 
 CalendarCreateEventMessage::CalendarCreateEventMessage(CalendarEventData const & eventData) :
 	GameNetworkMessage("CalendarCreateEventMessage"),
-	m_eventData(eventData)
+	m_title(eventData.title),
+	m_description(eventData.description),
+	m_eventType(eventData.eventType),
+	m_year(eventData.year),
+	m_month(eventData.month),
+	m_day(eventData.day),
+	m_hour(eventData.hour),
+	m_minute(eventData.minute),
+	m_duration(eventData.duration),
+	m_guildId(eventData.guildId),
+	m_cityId(eventData.cityId),
+	m_serverEventKey(eventData.serverEventKey),
+	m_recurring(eventData.recurring),
+	m_recurrenceType(eventData.recurrenceType),
+	m_broadcastStart(eventData.broadcastStart)
 {
+	addVariable(m_title);
+	addVariable(m_description);
+	addVariable(m_eventType);
+	addVariable(m_year);
+	addVariable(m_month);
+	addVariable(m_day);
+	addVariable(m_hour);
+	addVariable(m_minute);
+	addVariable(m_duration);
+	addVariable(m_guildId);
+	addVariable(m_cityId);
+	addVariable(m_serverEventKey);
+	addVariable(m_recurring);
+	addVariable(m_recurrenceType);
+	addVariable(m_broadcastStart);
 }
 
 CalendarCreateEventMessage::CalendarCreateEventMessage(Archive::ReadIterator & source) :
 	GameNetworkMessage("CalendarCreateEventMessage")
 {
-	Archive::get(source, m_eventData);
+	addVariable(m_title);
+	addVariable(m_description);
+	addVariable(m_eventType);
+	addVariable(m_year);
+	addVariable(m_month);
+	addVariable(m_day);
+	addVariable(m_hour);
+	addVariable(m_minute);
+	addVariable(m_duration);
+	addVariable(m_guildId);
+	addVariable(m_cityId);
+	addVariable(m_serverEventKey);
+	addVariable(m_recurring);
+	addVariable(m_recurrenceType);
+	addVariable(m_broadcastStart);
+	unpack(source);
 }
 
 CalendarCreateEventMessage::~CalendarCreateEventMessage()
 {
 }
 
-void CalendarCreateEventMessage::pack(Archive::ByteStream & target) const
+CalendarEventData CalendarCreateEventMessage::getEventData() const
 {
-	GameNetworkMessage::pack(target);
-	Archive::put(target, m_eventData);
+	CalendarEventData d;
+	d.title          = m_title.get();
+	d.description    = m_description.get();
+	d.eventType      = m_eventType.get();
+	d.year           = m_year.get();
+	d.month          = m_month.get();
+	d.day            = m_day.get();
+	d.hour           = m_hour.get();
+	d.minute         = m_minute.get();
+	d.duration       = m_duration.get();
+	d.guildId        = m_guildId.get();
+	d.cityId         = m_cityId.get();
+	d.serverEventKey = m_serverEventKey.get();
+	d.recurring      = m_recurring.get();
+	d.recurrenceType = m_recurrenceType.get();
+	d.broadcastStart = m_broadcastStart.get();
+	d.active         = false;
+	return d;
 }
 
 // ======================================================================
@@ -245,27 +307,97 @@ CalendarDeleteEventResponseMessage::~CalendarDeleteEventResponseMessage()
 CalendarEventNotificationMessage::CalendarEventNotificationMessage(int32 type, CalendarEventData const & eventData) :
 	GameNetworkMessage("CalendarEventNotificationMessage"),
 	m_notificationType(type),
-	m_eventData(eventData)
+	m_eventId(eventData.eventId),
+	m_title(eventData.title),
+	m_description(eventData.description),
+	m_eventType(eventData.eventType),
+	m_year(eventData.year),
+	m_month(eventData.month),
+	m_day(eventData.day),
+	m_hour(eventData.hour),
+	m_minute(eventData.minute),
+	m_duration(eventData.duration),
+	m_guildId(eventData.guildId),
+	m_cityId(eventData.cityId),
+	m_serverEventKey(eventData.serverEventKey),
+	m_recurring(eventData.recurring),
+	m_recurrenceType(eventData.recurrenceType),
+	m_broadcastStart(eventData.broadcastStart),
+	m_active(eventData.active),
+	m_creatorId(eventData.creatorId.getValueString())
 {
 	addVariable(m_notificationType);
+	addVariable(m_eventId);
+	addVariable(m_title);
+	addVariable(m_description);
+	addVariable(m_eventType);
+	addVariable(m_year);
+	addVariable(m_month);
+	addVariable(m_day);
+	addVariable(m_hour);
+	addVariable(m_minute);
+	addVariable(m_duration);
+	addVariable(m_guildId);
+	addVariable(m_cityId);
+	addVariable(m_serverEventKey);
+	addVariable(m_recurring);
+	addVariable(m_recurrenceType);
+	addVariable(m_broadcastStart);
+	addVariable(m_active);
+	addVariable(m_creatorId);
 }
 
 CalendarEventNotificationMessage::CalendarEventNotificationMessage(Archive::ReadIterator & source) :
 	GameNetworkMessage("CalendarEventNotificationMessage")
 {
 	addVariable(m_notificationType);
+	addVariable(m_eventId);
+	addVariable(m_title);
+	addVariable(m_description);
+	addVariable(m_eventType);
+	addVariable(m_year);
+	addVariable(m_month);
+	addVariable(m_day);
+	addVariable(m_hour);
+	addVariable(m_minute);
+	addVariable(m_duration);
+	addVariable(m_guildId);
+	addVariable(m_cityId);
+	addVariable(m_serverEventKey);
+	addVariable(m_recurring);
+	addVariable(m_recurrenceType);
+	addVariable(m_broadcastStart);
+	addVariable(m_active);
+	addVariable(m_creatorId);
 	unpack(source);
-	Archive::get(source, m_eventData);
 }
 
 CalendarEventNotificationMessage::~CalendarEventNotificationMessage()
 {
 }
 
-void CalendarEventNotificationMessage::pack(Archive::ByteStream & target) const
+CalendarEventData CalendarEventNotificationMessage::getEventData() const
 {
-	GameNetworkMessage::pack(target);
-	Archive::put(target, m_eventData);
+	CalendarEventData d;
+	d.eventId        = m_eventId.get();
+	d.title          = m_title.get();
+	d.description    = m_description.get();
+	d.eventType      = m_eventType.get();
+	d.year           = m_year.get();
+	d.month          = m_month.get();
+	d.day            = m_day.get();
+	d.hour           = m_hour.get();
+	d.minute         = m_minute.get();
+	d.duration       = m_duration.get();
+	d.guildId        = m_guildId.get();
+	d.cityId         = m_cityId.get();
+	d.serverEventKey = m_serverEventKey.get();
+	d.recurring      = m_recurring.get();
+	d.recurrenceType = m_recurrenceType.get();
+	d.broadcastStart = m_broadcastStart.get();
+	d.active         = m_active.get();
+	d.creatorId      = NetworkId(m_creatorId.get());
+	return d;
 }
 
 // ======================================================================

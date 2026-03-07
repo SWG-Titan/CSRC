@@ -117,6 +117,7 @@ namespace CuiMediatorTypes
 	// Calendar System
 	MAKE_MEDIATOR_TYPE (WS_Calendar);
 	MAKE_MEDIATOR_TYPE (WS_CalendarEventEditor);
+	MAKE_MEDIATOR_TYPE (WS_CalendarEventDetails);
 	MAKE_MEDIATOR_TYPE (WS_CalendarSettings);
 
 	//space

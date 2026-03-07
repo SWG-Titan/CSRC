@@ -47,6 +47,7 @@
 #include "swgClientUserInterface/SwgCuiBuffBuilderBuffee.h"
 #include "swgClientUserInterface/SwgCuiBuffBuilderBuffer.h"
 #include "swgClientUserInterface/SwgCuiCalendar.h"
+#include "swgClientUserInterface/SwgCuiCalendarEventDetails.h"
 #include "swgClientUserInterface/SwgCuiCalendarEventEditor.h"
 #include "swgClientUserInterface/SwgCuiCalendarSettings.h"
 #include "swgClientUserInterface/SwgCuiChatRooms.h"
@@ -274,9 +275,10 @@ void SwgCuiMediatorFactorySetup::install ()
 	MAKE_SWG_CTOR_WS (DecoratorCameraPanel,           "/GroundHUD.DecoratorCameraPanel");
 
 	// Calendar System
-	MAKE_SWG_CTOR_WS (Calendar,                       "/Script.CalendarSystem.calendarWindow");
-	MAKE_SWG_CTOR_WS (CalendarEventEditor,            "/Script.CalendarEventEditor.eventEditor");
-	MAKE_SWG_CTOR_WS (CalendarSettings,               "/Script.CalendarSettings.settingsWindow");
+	MAKE_SWG_CTOR_WS (Calendar,                       "/CalendarSystem.calendarWindow");
+	MAKE_SWG_CTOR_WS (CalendarEventEditor,            "/CalendarEventEditor.eventEditor");
+	MAKE_SWG_CTOR_WS (CalendarEventDetails,           "/CalendarEventDetails.detailsWindow");
+	MAKE_SWG_CTOR_WS (CalendarSettings,               "/CalendarSettings.settingsWindow");
 
 	//space
 	MAKE_SWG_CTOR_WS (SpaceConversation,              "/space.convo");

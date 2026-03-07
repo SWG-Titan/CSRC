@@ -106,16 +106,28 @@ public:
 	explicit CalendarCreateEventMessage(Archive::ReadIterator & source);
 	~CalendarCreateEventMessage();
 
-	CalendarEventData const & getEventData() const { return m_eventData; }
-
-	void pack(Archive::ByteStream & target) const;
+	CalendarEventData getEventData() const;
 
 private:
 	CalendarCreateEventMessage();
 	CalendarCreateEventMessage(CalendarCreateEventMessage const &);
 	CalendarCreateEventMessage & operator=(CalendarCreateEventMessage const &);
 
-	CalendarEventData m_eventData;
+	Archive::AutoVariable<std::string> m_title;
+	Archive::AutoVariable<std::string> m_description;
+	Archive::AutoVariable<int32>       m_eventType;
+	Archive::AutoVariable<int32>       m_year;
+	Archive::AutoVariable<int32>       m_month;
+	Archive::AutoVariable<int32>       m_day;
+	Archive::AutoVariable<int32>       m_hour;
+	Archive::AutoVariable<int32>       m_minute;
+	Archive::AutoVariable<int32>       m_duration;
+	Archive::AutoVariable<int32>       m_guildId;
+	Archive::AutoVariable<int32>       m_cityId;
+	Archive::AutoVariable<std::string> m_serverEventKey;
+	Archive::AutoVariable<bool>        m_recurring;
+	Archive::AutoVariable<int32>       m_recurrenceType;
+	Archive::AutoVariable<bool>        m_broadcastStart;
 };
 
 // ======================================================================
@@ -207,18 +219,33 @@ public:
 	explicit CalendarEventNotificationMessage(Archive::ReadIterator & source);
 	~CalendarEventNotificationMessage();
 
-	int32                     getNotificationType() const { return m_notificationType.get(); }
-	CalendarEventData const & getEventData() const        { return m_eventData; }
-
-	void pack(Archive::ByteStream & target) const;
+	int32             getNotificationType() const { return m_notificationType.get(); }
+	CalendarEventData getEventData() const;
 
 private:
 	CalendarEventNotificationMessage();
 	CalendarEventNotificationMessage(CalendarEventNotificationMessage const &);
 	CalendarEventNotificationMessage & operator=(CalendarEventNotificationMessage const &);
 
-	Archive::AutoVariable<int32> m_notificationType;
-	CalendarEventData            m_eventData;
+	Archive::AutoVariable<int32>       m_notificationType;
+	Archive::AutoVariable<std::string> m_eventId;
+	Archive::AutoVariable<std::string> m_title;
+	Archive::AutoVariable<std::string> m_description;
+	Archive::AutoVariable<int32>       m_eventType;
+	Archive::AutoVariable<int32>       m_year;
+	Archive::AutoVariable<int32>       m_month;
+	Archive::AutoVariable<int32>       m_day;
+	Archive::AutoVariable<int32>       m_hour;
+	Archive::AutoVariable<int32>       m_minute;
+	Archive::AutoVariable<int32>       m_duration;
+	Archive::AutoVariable<int32>       m_guildId;
+	Archive::AutoVariable<int32>       m_cityId;
+	Archive::AutoVariable<std::string> m_serverEventKey;
+	Archive::AutoVariable<bool>        m_recurring;
+	Archive::AutoVariable<int32>       m_recurrenceType;
+	Archive::AutoVariable<bool>        m_broadcastStart;
+	Archive::AutoVariable<bool>        m_active;
+	Archive::AutoVariable<std::string> m_creatorId;
 };
 
 // ======================================================================

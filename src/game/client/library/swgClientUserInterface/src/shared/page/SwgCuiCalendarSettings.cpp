@@ -38,16 +38,16 @@ m_buttonApply     (0),
 m_buttonReset     (0),
 m_buttonClose     (0)
 {
-	getCodeDataObject(TUITextbox, m_textTexture,   "textureSection.txtTexture", true);
-	getCodeDataObject(TUITextbox, m_textRectX,     "rectSection.txtRectX", true);
-	getCodeDataObject(TUITextbox, m_textRectY,     "rectSection.txtRectY", true);
-	getCodeDataObject(TUITextbox, m_textRectW,     "rectSection.txtRectW", true);
-	getCodeDataObject(TUITextbox, m_textRectH,     "rectSection.txtRectH", true);
-	getCodeDataObject(TUIImage,   m_imagePreview,  "previewSection.previewPane.imgPreview", true);
-	getCodeDataObject(TUIButton,  m_buttonPreview, "rectSection.btnPreview", true);
-	getCodeDataObject(TUIButton,  m_buttonApply,   "btnApply", true);
-	getCodeDataObject(TUIButton,  m_buttonReset,   "btnReset", true);
-	getCodeDataObject(TUIButton,  m_buttonClose,   "btnClose", true);
+	getCodeDataObject(TUITextbox, m_textTexture,   "textureSection.txtTexture", false);
+	getCodeDataObject(TUITextbox, m_textRectX,     "rectSection.txtRectX", false);
+	getCodeDataObject(TUITextbox, m_textRectY,     "rectSection.txtRectY", false);
+	getCodeDataObject(TUITextbox, m_textRectW,     "rectSection.txtRectW", false);
+	getCodeDataObject(TUITextbox, m_textRectH,     "rectSection.txtRectH", false);
+	getCodeDataObject(TUIImage,   m_imagePreview,  "previewSection.previewPane.imgPreview", false);
+	getCodeDataObject(TUIButton,  m_buttonPreview, "rectSection.btnPreview", false);
+	getCodeDataObject(TUIButton,  m_buttonApply,   "btnApply", false);
+	getCodeDataObject(TUIButton,  m_buttonReset,   "btnReset", false);
+	getCodeDataObject(TUIButton,  m_buttonClose,   "btnClose", false);
 }
 
 //----------------------------------------------------------------------
@@ -114,11 +114,7 @@ void SwgCuiCalendarSettings::OnButtonPressed(UIWidget *context)
 
 void SwgCuiCalendarSettings::loadSettings()
 {
-	// Request settings from server via network message
-	CalendarGetSettingsMessage msg;
-	GameNetwork::send(msg, true);
-
-	// Set defaults until server responds
+	// Set defaults
 	if (m_textTexture) m_textTexture->SetText(Unicode::narrowToWide("ui_calendar_bg.dds"));
 	if (m_textRectX)   m_textRectX->SetText(Unicode::narrowToWide("0"));
 	if (m_textRectY)   m_textRectY->SetText(Unicode::narrowToWide("0"));
@@ -146,8 +142,11 @@ void SwgCuiCalendarSettings::applySettings()
 	int srcH = atoi(Unicode::wideToNarrow(rectHW).c_str());
 
 	// Send settings message to server
-	CalendarApplySettingsMessage msg(texture, srcX, srcY, srcW, srcH);
-	GameNetwork::send(msg, true);
+	if (GameNetwork::isConnectedToConnectionServer())
+	{
+		CalendarApplySettingsMessage msg(texture, srcX, srcY, srcW, srcH);
+		GameNetwork::send(msg, true);
+	}
 }
 
 //----------------------------------------------------------------------
@@ -162,8 +161,11 @@ void SwgCuiCalendarSettings::resetSettings()
 	if (m_textRectH)   m_textRectH->SetText(Unicode::narrowToWide("512"));
 
 	// Send reset (apply defaults) to server
-	CalendarApplySettingsMessage msg("ui_calendar_bg.dds", 0, 0, 512, 512);
-	GameNetwork::send(msg, true);
+	if (GameNetwork::isConnectedToConnectionServer())
+	{
+		CalendarApplySettingsMessage msg("ui_calendar_bg.dds", 0, 0, 512, 512);
+		GameNetwork::send(msg, true);
+	}
 }
 
 //----------------------------------------------------------------------
