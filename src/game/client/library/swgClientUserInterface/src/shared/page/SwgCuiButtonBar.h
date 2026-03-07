@@ -93,6 +93,7 @@ private:
 	UIButton *			 m_questBuilderButton;
 	UIButton *           m_gcwInfoButton;
 	UIButton *           m_decoratorSpawnButton;
+	UIButton *           m_calendarButton;
 
 	UIEffector *         m_effectorNewMail;
 	UIEffector *         m_effectorInventoryFull;

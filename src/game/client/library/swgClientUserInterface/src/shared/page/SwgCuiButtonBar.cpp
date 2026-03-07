@@ -132,6 +132,7 @@ m_appearanceButton(0),
 m_questBuilderButton(0),
 m_gcwInfoButton(0),
 m_decoratorSpawnButton(0),
+m_calendarButton(0),
 m_effectingExpertise(false),
 m_effectorExpertise(0),
 m_effectingMenu(false),
@@ -168,6 +169,7 @@ m_opacityCallback      (0)
 	getCodeDataObject (TUIButton,     m_questBuilderButton,		 "buttonQuestBuilder");
 	getCodeDataObject (TUIButton,     m_gcwInfoButton,           "buttonGCW");
 	getCodeDataObject (TUIButton,     m_decoratorSpawnButton,    "buttonDecoratorSpawn", true);
+	getCodeDataObject (TUIButton,     m_calendarButton,          "buttonCalendar",       true);
 
 
 	getCodeDataObject (TUIEffector,   m_effectorNewMail,         "effectorNewMail");
@@ -208,6 +210,8 @@ m_opacityCallback      (0)
 		registerMediatorObject (*m_roadmapButton, true);
 	if (m_decoratorSpawnButton)
 		registerMediatorObject (*m_decoratorSpawnButton, true);
+	if (m_calendarButton)
+		registerMediatorObject (*m_calendarButton, true);
 
 	getPage ().SetContextCapable (true, true);
 
@@ -668,6 +672,13 @@ void SwgCuiButtonBar::toggleMenu()
 			}
 		}
 
+		// Show calendar button (always visible)
+		if(m_calendarButton)
+		{
+			m_calendarButton->GetParentWidget()->SetVisible(true);
+			++m_numberButtons;
+		}
+
 		m_buttonsComposite->Pack();
 		m_buttonsComposite->Pack();
 
@@ -717,6 +728,14 @@ void SwgCuiButtonBar::OnButtonPressed   (UIWidget * context)
 			{
 				CuiActionManager::performAction(CuiActions::decoratorSpawn, Unicode::emptyString);
 			}
+			m_mouseoverPage->SetVisible(false);
+			m_buttonsComposite->SetVisible(false);
+			CuiManager::requestPointer(false);
+		}
+		else if (context == m_calendarButton)
+		{
+			// Open the calendar
+			CuiMediatorFactory::activateInWorkspace(CuiMediatorTypes::WS_Calendar);
 			m_mouseoverPage->SetVisible(false);
 			m_buttonsComposite->SetVisible(false);
 			CuiManager::requestPointer(false);

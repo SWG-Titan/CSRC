@@ -114,6 +114,11 @@ namespace CuiMediatorTypes
 	MAKE_MEDIATOR_TYPE (WS_AirspeederPanel);
 	MAKE_MEDIATOR_TYPE (WS_DecoratorCameraPanel);
 
+	// Calendar System
+	MAKE_MEDIATOR_TYPE (WS_Calendar);
+	MAKE_MEDIATOR_TYPE (WS_CalendarEventEditor);
+	MAKE_MEDIATOR_TYPE (WS_CalendarSettings);
+
 	//space
 	MAKE_MEDIATOR_TYPE (WS_ShipTargetInfo);
 	MAKE_MEDIATOR_TYPE (WS_ShipSelfInfo);

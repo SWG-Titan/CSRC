@@ -24,6 +24,7 @@
 			buttoncommunity='buttonsComposite.buttonCommunityComposite.community'
 			buttonDatapad='buttonsComposite.buttonDatapadComposite.datapad'
 			buttonDecoratorSpawn='buttonsComposite.buttonDecoratorSpawnComposite.decoratorSpawn'
+			buttonCalendar='buttonsComposite.buttonCalendarComposite.calendar'
 			buttoninventory='buttonsComposite.buttonInventoryComposite.inventory'
 			buttonJournal='buttonsComposite.buttonJournalComposite.buttonJournal'
 			buttonmail='buttonsComposite.buttonMailComposite.mail'
@@ -555,6 +556,43 @@
 			</Composite>
 			<Composite
 				Location='0,264'
+				MaximumSize='150,22'
+				MinimumSize='150,22'
+				Name='buttonCalendarComposite'
+				Orientation='Horizontal'
+				ScrollExtent='150,22'
+				Size='150,22'
+			>
+				<Text
+					Font='bold_16'
+					LocalText='Calendar'
+					MaximumSize='128,22'
+					MinimumSize='128,22'
+					Name='buttonCalendarText'
+					ScrollExtent='128,34'
+					Size='128,22'
+					TextAlignmentVertical='Center'
+				>Calendar</Text>
+				<Button
+					BackgroundColor='#FFFFFF'
+					BackgroundOpacity='0.90'
+					ContextToParent='true'
+					Dragable='true'
+					DragType='command'
+					Icon='/Styles.Icon.UIv2.CMD_uiJournal'
+					IconShrink='true'
+					IconStretch='true'
+					Location='128,0'
+					MaximumSize='22,22'
+					MinimumSize='22,22'
+					Name='calendar'
+					ScrollExtent='22,22'
+					Size='22,22'
+					Style='/Styles.buttons.buttonBar.all.style'
+				></Button>
+			</Composite>
+			<Composite
+				Location='0,286'
 				MaximumSize='150,22'
 				MinimumSize='150,22'
 				Name='buttonMenuComposite'
