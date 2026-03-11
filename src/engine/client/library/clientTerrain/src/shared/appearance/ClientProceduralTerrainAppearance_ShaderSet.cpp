@@ -17,6 +17,7 @@
 #include "clientGraphics/SystemVertexBuffer.h"
 #include "clientObject/ShadowBlobManager.h"
 #include "clientObject/ReticleManager.h"
+#include "clientTerrain/CityTerrainLayerManager.h"
 #include "clientTerrain/ClientTerrainSorter.h"
 #include "clientTerrain/ConfigClientTerrain.h"
 #include "sharedCollision/CollisionInfo.h"
@@ -599,7 +600,27 @@ void ClientProceduralTerrainAppearance::ShaderSet::render (const Camera* camera,
 				continue;
 #endif
 
-			ClientTerrainSorter::queue (shader, primitive);
+			// Check for city terrain shader override
+			const Shader * effectiveShader = shader;
+			float blendWeight = 0.0f;
+			const Shader * overrideShader = 0;
+
+			Vector const & center = primitiveSphere.getCenter();
+			if (CityTerrainLayerManager::getShaderOverride(center.x, center.z, overrideShader, blendWeight))
+			{
+				if (blendWeight >= 0.5f && overrideShader)
+				{
+					effectiveShader = overrideShader;
+					static bool s_loggedOnce = false;
+					if (!s_loggedOnce)
+					{
+						REPORT_LOG(true, ("[Titan] ShaderSet::render: applied shader override at (%.1f,%.1f) blend=%.2f\n", center.x, center.z, blendWeight));
+						s_loggedOnce = true;
+					}
+				}
+			}
+
+			ClientTerrainSorter::queue (effectiveShader, primitive);
 
 			if (cloudShader && dot3Terrain)
 				ClientTerrainSorter::queue (cloudShader, primitive);

@@ -325,7 +325,11 @@ void ServerCommander::setObjectTransform(ClientObject* obj, const Transform& tra
 
 		if (!(obj->getNetworkId() < NetworkId::cms_invalid) || BuildoutAreaSupport::setObjectTransform(*obj, transform))
 		{
+			// Handle cell transitions properly for interior objects
+			CellProperty::setPortalTransitionsEnabled(false);
 			obj->setTransform_o2p(transform);
+			CellProperty::setPortalTransitionsEnabled(true);
+
 			Controller * const controller = obj->getController();
 			if (controller)
 			{
@@ -349,7 +353,43 @@ void ServerCommander::setObjectTransform(ClientObject* obj, const Transform& tra
 			ModificationHistory::getInstance().addModification(new TransformModification(*obj, transform));
 		}
 		ClientController * controller = dynamic_cast<ClientController*>(obj->getController());
-		controller->sendTransform(transform);
+		if (controller)
+		{
+			// For interior objects, we need to send transform with proper parent cell handling
+			CellProperty const * const parentCell = obj->getParentCell();
+			if (parentCell && parentCell != CellProperty::getWorldCellProperty())
+			{
+				// Object is in interior cell - send with parent
+				controller->sendTransformUsingParent(transform, parentCell->getOwner().getNetworkId(), true);
+			}
+			else
+			{
+				controller->sendTransform(transform);
+			}
+		}
+		else
+		{
+			// Fallback: use command-based transform update
+			char buf[1024];
+			const Vector& pos = transform.getPosition_p();
+			Quaternion q(transform);
+
+			CellProperty const * const parentCell = obj->getParentCell();
+			if (parentCell && parentCell != CellProperty::getWorldCellProperty())
+			{
+				IGNORE_RETURN(_snprintf(buf, 1024, "object cellMoveTranslateRotate %s %s %f %f %f %f %f %f %f",
+					obj->getNetworkId().getValueString().c_str(),
+					parentCell->getOwner().getNetworkId().getValueString().c_str(),
+					pos.x, pos.y, pos.z, q.w, q.x, q.y, q.z));
+			}
+			else
+			{
+				IGNORE_RETURN(_snprintf(buf, 1024, "object moveTranslateRotate %s %f %f %f %f %f %f %f",
+					obj->getNetworkId().getValueString().c_str(),
+					pos.x, pos.y, pos.z, q.w, q.x, q.y, q.z));
+			}
+			issueCommand(buf);
+		}
 	}
 }
 

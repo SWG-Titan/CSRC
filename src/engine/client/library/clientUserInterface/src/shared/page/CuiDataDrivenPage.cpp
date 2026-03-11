@@ -280,11 +280,13 @@ CuiDataDrivenPage::SubscribedPropertyMap CuiDataDrivenPage::getSubscribedPropert
 {
 	const UIPage & p = getPage();
 	std::map<SubscribedProperty, Unicode::String> result;
+	REPORT_LOG(true, ("CuiDataDrivenPage::getSubscribedPropertyValues: checking %d subscribed properties\n", m_subscribedProperties->size()));
 	for(std::vector<SubscribedProperty>::iterator i = m_subscribedProperties->begin(); i != m_subscribedProperties->end(); ++i)
 	{
 		const SubscribedProperty & prop = *i;
 
 		const std::string object = prop.uiObjectName.c_str();
+		REPORT_LOG(true, ("CuiDataDrivenPage::getSubscribedPropertyValues: looking for widget '%s' property '%s'\n", prop.uiObjectName.c_str(), prop.propertyName.c_str()));
 		UIBaseObject * uiobject = NULL;
 		if(object.empty())
 			uiobject = &(getPage());
@@ -294,7 +296,14 @@ CuiDataDrivenPage::SubscribedPropertyMap CuiDataDrivenPage::getSubscribedPropert
 		{
 			Unicode::String s;
 			if (uiobject->GetProperty(UILowerString (prop.propertyName), s))
+			{
+				REPORT_LOG(true, ("CuiDataDrivenPage::getSubscribedPropertyValues: found value '%s'\n", Unicode::wideToNarrow(s).c_str()));
 				result[prop] = s;
+			}
+			else
+			{
+				REPORT_LOG(true, ("CuiDataDrivenPage::getSubscribedPropertyValues: property '%s' not found on widget\n", prop.propertyName.c_str()));
+			}
 		}
 		else
 			WARNING (true, ("Bad page name '%s' in CuiDataDrivenPage::getSubscribedPropertyValue", prop.uiObjectName.c_str ()));
@@ -317,6 +326,8 @@ void CuiDataDrivenPage::onEvent(int eventType, UIWidget const * widget)
 	//This function sends appropriate notifications to items listed in the event suscription map.
 	//It also handles the special legacy cases of the SET_onClosedOK and SET_onClosedCancel events
 
+	REPORT_LOG(true, ("CuiDataDrivenPage::onEvent: eventType=%d, widget=%p, isActive=%d\n", eventType, widget, isActive() ? 1 : 0));
+
 	if (!isActive())
 	{
 		if ((eventType != SuiEventType::SET_onClosedOk) && (eventType != SuiEventType::SET_onClosedCancel))
@@ -329,29 +340,52 @@ void CuiDataDrivenPage::onEvent(int eventType, UIWidget const * widget)
 	std::string relativePath;
 	if (widget)
 		getPage().GetPathTo(relativePath, widget);
+
+	REPORT_LOG(true, ("CuiDataDrivenPage::onEvent: relativePath='%s', m_subscribedEvents size=%d\n", relativePath.c_str(), m_subscribedEvents ? m_subscribedEvents->size() : -1));
+
 	SuiEventSubscription const targetEventSubscription(eventType, relativePath);
 	EventSubscriptionMap::const_iterator const i =  m_subscribedEvents->find(targetEventSubscription);
 	if (i != m_subscribedEvents->end())
 	{
+		REPORT_LOG(true, ("CuiDataDrivenPage::onEvent: found subscription, collecting properties\n"));
 		EventSubscriptionData const & eventSubscriptionData  = i->second;
 		SubscribedPropertyVector const & subscribedProperties = eventSubscriptionData.subscribedPropertyVector;
 		
+		REPORT_LOG(true, ("CuiDataDrivenPage::onEvent: subscribedProperties size=%d\n", subscribedProperties.size()));
+
 		SuiEventNotification eventNotification(getClientPageId(), eventSubscriptionData.eventSubscriptionIndex, subscribedProperties.size());
 		SubscribedPropertyVector::const_iterator spi;
 		for (spi = subscribedProperties.begin(); spi != subscribedProperties.end(); ++spi)
 		{
 			SubscribedProperty const & subscribedProperty = *spi;
 
+			REPORT_LOG(true, ("CuiDataDrivenPage::onEvent: looking for widget '%s' property '%s'\n", subscribedProperty.uiObjectName.c_str(), subscribedProperty.propertyName.c_str()));
+
 			UIString value;
-			UIBaseObject const * const uiObject = getPage().GetObjectFromPath (subscribedProperty.uiObjectName.c_str ());					
-			if (uiObject && uiObject->GetProperty(UILowerString(subscribedProperty.propertyName), value))
+			UIBaseObject const * const uiObject = getPage().GetObjectFromPath (subscribedProperty.uiObjectName.c_str ());
+			if (uiObject)
 			{
-				eventNotification.addSubscribedProperty(value);
+				if (uiObject->GetProperty(UILowerString(subscribedProperty.propertyName), value))
+				{
+					REPORT_LOG(true, ("CuiDataDrivenPage::onEvent: found value '%s'\n", Unicode::wideToNarrow(value).c_str()));
+					eventNotification.addSubscribedProperty(value);
+				}
+				else
+				{
+					REPORT_LOG(true, ("CuiDataDrivenPage::onEvent: property not found on widget\n"));
+				}
 			}
-		}		
+			else
+			{
+				REPORT_LOG(true, ("CuiDataDrivenPage::onEvent: widget not found\n"));
+			}
+		}
 		GameNetwork::send(eventNotification, true);
 	}
-	
+	else
+	{
+		REPORT_LOG(true, ("CuiDataDrivenPage::onEvent: no subscription found for eventType=%d relativePath='%s'\n", eventType, relativePath.c_str()));
+	}
 }
 
 //-----------------------------------------------------------------
@@ -629,14 +663,18 @@ void CuiDataDrivenPage::executeCommand(SuiCommand const & command)
 			command.getPropertySubscriptionsForEvent(widgetProperties);
 			SuiCommand::WidgetPropertyVector::iterator widgetPropertiesIterator;
 
+			REPORT_LOG(true, ("CuiDataDrivenPage SCT_subscribeToEvent: received %d property subscriptions\n", widgetProperties.size()));
+
 			SubscribedPropertyVector subscribedPropertyVector;
 			subscribedPropertyVector.reserve(widgetProperties.size());
 			
 			for(widgetPropertiesIterator = widgetProperties.begin(); widgetPropertiesIterator != widgetProperties.end(); ++widgetPropertiesIterator)
 			{
 				SuiWidgetProperty &widgetProperty = *widgetPropertiesIterator;
+				REPORT_LOG(true, ("CuiDataDrivenPage SCT_subscribeToEvent: BEFORE expandTokens widget='%s' property='%s'\n", widgetProperty.widgetName.c_str(), widgetProperty.propertyName.c_str()));
 				expandTokens(widgetProperty.widgetName);
 				expandTokens(widgetProperty.propertyName);
+				REPORT_LOG(true, ("CuiDataDrivenPage SCT_subscribeToEvent: AFTER expandTokens widget='%s' property='%s'\n", widgetProperty.widgetName.c_str(), widgetProperty.propertyName.c_str()));
 				SubscribedProperty subscribedProperty(widgetProperty.widgetName, widgetProperty.propertyName);
 				subscribedPropertyVector.push_back(subscribedProperty);
 			}								

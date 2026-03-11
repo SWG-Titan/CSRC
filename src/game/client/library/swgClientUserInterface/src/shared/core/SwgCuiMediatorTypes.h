@@ -120,6 +120,13 @@ namespace CuiMediatorTypes
 	MAKE_MEDIATOR_TYPE (WS_CalendarEventDetails);
 	MAKE_MEDIATOR_TYPE (WS_CalendarSettings);
 
+	// KOTOR-style cinematic conversation (ground only)
+	MAKE_MEDIATOR_TYPE (WS_CinematicConversation);
+
+	// City Terrain Painter
+	MAKE_MEDIATOR_TYPE (WS_CityTerrainPainter);
+	MAKE_MEDIATOR_TYPE (WS_Terraforming);
+
 	//space
 	MAKE_MEDIATOR_TYPE (WS_ShipTargetInfo);
 	MAKE_MEDIATOR_TYPE (WS_ShipSelfInfo);

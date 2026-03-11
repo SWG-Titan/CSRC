@@ -13,6 +13,7 @@
 #include "clientGraphics/RenderWorld.h"
 #include "clientGraphics/ShaderPrimitiveSorter.h"
 #include "clientTerrain/CelestialObject.h"
+#include "clientTerrain/CityTerrainLayerManager.h"
 #include "clientTerrain/ClientDynamicRadialFloraManager.h"
 #include "clientTerrain/ClientGlobalWaterManager2.h"
 #include "clientTerrain/ClientProceduralTerrainAppearance.h"
@@ -98,6 +99,7 @@ void SetupClientTerrain::install()
 	PlanetAppearanceTemplate::install();
 	StarAppearance::install();
 	SkyBoxAppearance::install();
+	CityTerrainLayerManager::install();
 
 	//-- setup below water hook
 	ShaderPrimitiveSorter::setBelowTransparentWaterFunctionAndPhases(belowTransparentWaterFunction, ShaderPrimitiveSorter::getPhase(TAG_ALPH), ShaderPrimitiveSorter::getPhase(TAG_WBLW), ShaderPrimitiveSorter::getPhase(TAG_WABV));

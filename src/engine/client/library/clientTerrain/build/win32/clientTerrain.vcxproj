@@ -241,6 +241,9 @@
     <ClCompile Include="..\..\src\shared\appearance\StarAppearance.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Optimized|Win32'">MaxSpeed</Optimization>
     </ClCompile>
+    <ClCompile Include="..\..\src\shared\core\CityTerrainLayerManager.cpp">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Optimized|Win32'">MaxSpeed</Optimization>
+    </ClCompile>
     <ClCompile Include="..\..\src\shared\core\ConfigClientTerrain.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Optimized|Win32'">MaxSpeed</Optimization>
     </ClCompile>
@@ -311,6 +314,7 @@
     <ClInclude Include="..\..\src\shared\appearance\SkyBoxAppearance.h" />
     <ClInclude Include="..\..\src\shared\appearance\SpaceEnvironment.h" />
     <ClInclude Include="..\..\src\shared\appearance\StarAppearance.h" />
+    <ClInclude Include="..\..\src\shared\core\CityTerrainLayerManager.h" />
     <ClInclude Include="..\..\src\shared\core\ConfigClientTerrain.h" />
     <ClInclude Include="..\..\src\shared\core\FirstClientTerrain.h" />
     <ClInclude Include="..\..\src\shared\core\SetupClientTerrain.h" />

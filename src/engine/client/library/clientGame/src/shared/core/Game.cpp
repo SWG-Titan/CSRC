@@ -47,6 +47,7 @@
 #include "clientGame/QuestJournalManager.h"
 #include "clientGame/ResourceIconManager.h"
 #include "clientGame/RoadmapManager.h"
+#include "clientGame/RtCameraManager.h"
 #include "clientGame/SetTextureTest.h"
 #include "clientGame/ShadowVolumeTest.h"
 #include "clientGame/ShipObject.h"
@@ -1200,6 +1201,9 @@ void Game::runGameLoopOnce(bool presentToWindow, HWND hwnd, int width, int heigh
 
 		NP_PROFILER_NAMED_AUTO_BLOCK_TRANSFER(profilerMainLoop, "texture baking");
 		TextureRendererManager::alter(elapsedTime);
+
+		// Render RT Camera feeds to textures before main scene begins
+		RtCameraManager::renderFeeds();
 
 		NP_PROFILER_NAMED_AUTO_BLOCK_TRANSFER(profilerMainLoop, "draw");
 		if (!isOver())

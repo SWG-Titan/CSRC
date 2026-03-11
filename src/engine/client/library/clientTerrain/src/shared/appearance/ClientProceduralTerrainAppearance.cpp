@@ -30,6 +30,7 @@
 #include "clientTerrain/ClientProceduralTerrainAppearance_ShaderCache.h"
 #include "clientTerrain/ClientStaticRadialFloraManager.h"
 #include "clientTerrain/ClientTerrainSorter.h"
+#include "clientTerrain/CityTerrainLayerManager.h"
 #include "clientTerrain/ConfigClientTerrain.h"
 #include "clientTerrain/GroundEnvironment.h"
 #include "sharedCollision/CollideParameters.h"
@@ -817,6 +818,25 @@ ClientProceduralTerrainAppearance::ClientChunk *ClientProceduralTerrainAppearanc
 	generatorChunkData.distanceBetweenPoles = distanceBetweenPoles;
 
 	terrainGenerator->generateChunk (generatorChunkData);
+
+	// Apply city terrain height modifications (for flatten regions)
+	if (CityTerrainLayerManager::isInstalled())
+	{
+		Array2d<Vector> * const vertexPositionMap = &createChunkData.createChunkBuffer->vertexPositionMap;
+		for (int pz = 0; pz < numberOfPoles; ++pz)
+		{
+			for (int px = 0; px < numberOfPoles; ++px)
+			{
+				Vector & pos = vertexPositionMap->getData(px, pz);
+				float originalHeight = pos.y;
+				float modifiedHeight = originalHeight;
+				if (CityTerrainLayerManager::getModifiedHeight(pos.x, pos.z, originalHeight, modifiedHeight))
+				{
+					pos.y = modifiedHeight;
+				}
+			}
+		}
+	}
 
 	timer.stop ();
 

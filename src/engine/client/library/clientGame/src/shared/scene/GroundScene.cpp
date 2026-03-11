@@ -60,6 +60,7 @@
 #include "clientGame/ProjectileManager.h"
 #include "clientGame/ProsePackageManagerClient.h"
 #include "clientGame/QuestJournalManager.h"
+#include "clientGame/RtCameraManager.h"
 #include "clientGame/ScreenShot360.h"
 #include "clientGame/ShipController.h"
 #include "clientGame/ShipObject.h"
@@ -2029,6 +2030,7 @@ void GroundScene::update(float elapsedTime)
 	AwayFromKeyBoardManager::alter (elapsedTime);
 	CustomerServiceManager::alter (elapsedTime);
 	LightsaberCollisionManager::alter (elapsedTime);
+	RtCameraManager::alter (elapsedTime);
 
 #ifdef _DEBUG
 	AiDebugStringManager::alter();
@@ -2348,6 +2350,7 @@ void GroundScene::draw (void) const
 
 	//-- allow shadow submissions (the ui will try to submit shadow volumes as well)
 	ShadowVolume::setAllowShadowSubmissions (true);
+
 
 	//
 	//-- render world

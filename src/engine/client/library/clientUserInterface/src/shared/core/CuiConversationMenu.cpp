@@ -17,6 +17,7 @@
 #include "clientUserInterface/CuiManager.h"
 #include "clientUserInterface/CuiMediator.h"
 #include "clientUserInterface/CuiObjectTextManager.h"
+#include "clientUserInterface/CuiPreferences.h"
 #include "clientUserInterface/CuiStringIds.h"
 #include "sharedFoundation/Clock.h"
 #include "sharedFoundation/Timer.h"
@@ -365,7 +366,9 @@ void CuiConversationMenu::Notify( UINotificationServer *, UIBaseObject *, Code  
 		m_headPointsInitialized = false;
 		m_lastUpdateSecs        = currentTimeSecs;
 		m_targetDirty           = false;
-		setValid((CuiConversationManager::getTarget() != NetworkId::cms_invalid) && !Game::isHudSceneTypeSpace());
+		// Don't show classic conversation menu when cinematic mode is enabled
+		bool const cinematicActive = CuiPreferences::getCinematicConversationEnabled();
+		setValid((CuiConversationManager::getTarget() != NetworkId::cms_invalid) && !Game::isHudSceneTypeSpace() && !cinematicActive);
 	}
 
 	if (m_responsesDirty)

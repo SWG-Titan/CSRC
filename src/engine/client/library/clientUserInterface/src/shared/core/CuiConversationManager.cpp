@@ -17,6 +17,8 @@
 #include "clientUserInterface/CuiActionManager.h"
 #include "clientUserInterface/CuiActions.h"
 #include "clientUserInterface/CuiChatBubbleManager.h"
+#include "clientUserInterface/CuiMediatorFactory.h"
+#include "clientUserInterface/CuiPreferences.h"
 #include "clientUserInterface/CuiSpatialChatManager.h"
 #include "sharedFoundation/Crc.h"
 #include "sharedFoundation/NetworkIdArchive.h"
@@ -319,6 +321,11 @@ void CuiConversationManager::setTarget (NetworkId const & id, uint32 const appea
 	if (Game::isHudSceneTypeSpace()) 
 	{
 		CuiActionManager::performAction(CuiActions::spaceConversation, Unicode::emptyString);
+	}
+	else if (id.isValid() && CuiPreferences::getCinematicConversationEnabled())
+	{
+		// Activate KOTOR-style cinematic conversation for ground
+		CuiMediatorFactory::activateInWorkspace("WS_CinematicConversation");
 	}
 }
 

@@ -21,11 +21,14 @@
 #include "clientGame/ObjectAttributeManager.h"
 #include "clientGame/ResourceTypeManager.h"
 #include "clientGame/TaskConnection.h"
+#include "clientTerrain/CityTerrainLayerManager.h"
 #include "clientUserInterface/CuiActionManager.h"
 #include "clientUserInterface/CuiActions.h"
 #include "clientUserInterface/CuiLoadingManager.h"
 #include "clientUserInterface/CuiLoginManager.h"
 #include "clientUserInterface/CuiLoginManagerAvatarInfo.h"
+#include "clientUserInterface/CuiMediatorFactory.h"
+#include "clientUserInterface/CuiMediatorTypes.h"
 #include "clientUserInterface/CuiPreferences.h"
 #include "clientUserInterface/CuiStringIds.h"
 #include "sharedDebug/InstallTimer.h"
@@ -41,6 +44,7 @@
 #include "sharedNetwork/NetworkSetupData.h"
 #include "sharedNetworkMessages/ClientCentralMessages.h"
 #include "sharedNetworkMessages/ClientLoginMessages.h"
+#include "sharedNetworkMessages/CityTerrainMessages.h"
 #include "sharedNetworkMessages/CommandChannelMessages.h"
 #include "sharedNetworkMessages/ConsoleChannelMessages.h"
 #include "sharedNetworkMessages/GenericValueTypeMessage.h"
@@ -119,6 +123,10 @@ MessageDispatch::Receiver ()
 	connectToMessage("GcwRegionsRsp");
 	connectToMessage("GcwGroupsRsp");
 	connectToMessage("OpenExamineWindow");
+	connectToMessage("OpenCityTerrainPainterMessage");
+	connectToMessage("OpenTerraformingUIMessage");
+	connectToMessage("CityTerrainModifyMessage");
+	connectToMessage("CityTerrainPaintResponseMessage");
 }
 
 //-----------------------------------------------------------------------
@@ -241,11 +249,61 @@ void GameNetwork::Listener::receiveMessage(const MessageDispatch::Emitter & , co
 		GenericValueTypeMessage<std::map<std::string, std::map<std::string, int> > > const gcwGroupsRsp(ri);
 		s_gcwScoreCategoryGroups = gcwGroupsRsp.getValue();
 	}
-	else if (message.isType("OpenExamineWindow"))
+	else if(message.isType("OpenExamineWindow"))
 	{
 		Archive::ReadIterator ri = NON_NULL (safe_cast<const GameNetworkMessage *>(&message))->getByteStream().begin();
 		GenericValueTypeMessage<NetworkId> const openExamineWindowMsg(ri);
 		CuiActionManager::performAction(CuiActions::examine, Unicode::narrowToWide(openExamineWindowMsg.getValue().getValueString()));
+	}
+	else if(message.isType("OpenCityTerrainPainterMessage"))
+	{
+		Archive::ReadIterator ri = NON_NULL (safe_cast<const GameNetworkMessage *>(&message))->getByteStream().begin();
+		GenericValueTypeMessage<int32> const msg(ri);
+		int32 cityId = msg.getValue();
+		CityTerrainLayerManager::setPendingCityId(cityId);
+		CuiMediatorFactory::activateInWorkspace("WS_CityTerrainPainter");
+	}
+	else if(message.isType("OpenTerraformingUIMessage"))
+	{
+		Archive::ReadIterator ri = NON_NULL (safe_cast<const GameNetworkMessage *>(&message))->getByteStream().begin();
+		GenericValueTypeMessage<int32> const msg(ri);
+		int32 cityId = msg.getValue();
+		CityTerrainLayerManager::setPendingCityId(cityId);
+		CuiMediatorFactory::activateInWorkspace("WS_Terraforming");
+	}
+	else if(message.isType("CityTerrainModifyMessage"))
+	{
+		Archive::ReadIterator ri = NON_NULL (safe_cast<const GameNetworkMessage *>(&message))->getByteStream().begin();
+		CityTerrainModifyMessage const msg(ri);
+
+		REPORT_LOG(true, ("[Titan] GameNetwork: received CityTerrainModifyMessage cityId=%d type=%d regionId=%s shader=%s\n",
+			msg.getCityId(), msg.getModificationType(), msg.getRegionId().c_str(), msg.getShaderTemplate().c_str()));
+
+		if (CityTerrainLayerManager::isInstalled())
+		{
+			CityTerrainLayerManager::getInstance().handleTerrainModifyMessage(
+				msg.getCityId(),
+				msg.getModificationType(),
+				msg.getRegionId(),
+				msg.getShaderTemplate(),
+				msg.getCenterX(),
+				msg.getCenterZ(),
+				msg.getRadius(),
+				msg.getEndX(),
+				msg.getEndZ(),
+				msg.getWidth(),
+				msg.getHeight(),
+				msg.getBlendDistance()
+			);
+		}
+	}
+	else if(message.isType("CityTerrainPaintResponseMessage"))
+	{
+		Archive::ReadIterator ri = NON_NULL (safe_cast<const GameNetworkMessage *>(&message))->getByteStream().begin();
+		CityTerrainPaintResponseMessage const msg(ri);
+
+		REPORT_LOG(true, ("[Titan] GameNetwork: received CityTerrainPaintResponseMessage success=%d regionId=%s error=%s\n",
+			msg.getSuccess() ? 1 : 0, msg.getRegionId().c_str(), msg.getErrorMessage().c_str()));
 	}
 }
 

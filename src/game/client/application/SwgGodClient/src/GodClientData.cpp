@@ -1413,9 +1413,12 @@ real GodClientData::getObjectDropCollisionHeight(const Object& obj) const
 
 void GodClientData::dropObjectToTerrain(Object& obj, real height) const
 {
+	// Handle interior cells properly - disable portal transitions during position change
+	CellProperty::setPortalTransitionsEnabled(false);
 	Vector v = obj.getPosition_w();
 	v.y = getObjectDropCollisionHeight(obj) + height;
 	obj.setPosition_w(v);
+	CellProperty::setPortalTransitionsEnabled(true);
 }
 
 //-----------------------------------------------------------------

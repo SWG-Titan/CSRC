@@ -320,6 +320,9 @@
     <ClCompile Include="..\..\src\shared\core\AlarmManager_Alarm.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Optimized|Win32'">MaxSpeed</Optimization>
     </ClCompile>
+    <ClCompile Include="..\..\src\shared\core\RtCameraManager.cpp">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Optimized|Win32'">MaxSpeed</Optimization>
+    </ClCompile>
     <ClCompile Include="..\..\src\shared\core\AttachmentData.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Optimized|Win32'">MaxSpeed</Optimization>
     </ClCompile>
@@ -1233,6 +1236,7 @@
     <ClInclude Include="..\..\src\shared\core\AiDebugStringManager.h" />
     <ClInclude Include="..\..\src\shared\core\AlarmManager.h" />
     <ClInclude Include="..\..\src\shared\core\AlarmManager_Alarm.h" />
+    <ClInclude Include="..\..\src\shared\core\RtCameraManager.h" />
     <ClInclude Include="..\..\src\shared\core\AttachmentData.h" />
     <ClInclude Include="..\..\src\shared\core\AuctionManagerClient.h" />
     <ClInclude Include="..\..\src\shared\core\AuctionManagerClientData.h" />

@@ -244,6 +244,10 @@ void CuiColorPicker::performActivate()
 		m_pageWheel->SetGetsInput(true);
 	}
 
+	// Register parent page to track mouse during drag
+	getPage().AddCallback(this);
+	getPage().SetGetsInput(true);
+
 	setIsUpdating(true);
 }
 
@@ -272,6 +276,9 @@ void CuiColorPicker::performDeactivate()
 	// Unregister wheel callbacks
 	if (m_pageWheel)
 		m_pageWheel->RemoveCallback(this);
+
+	// Unregister parent page callback
+	getPage().RemoveCallback(this);
 
 	if (m_buttonCancel)
 		m_buttonCancel->RemoveCallback(this);
@@ -1083,10 +1090,13 @@ void CuiColorPicker::updateRgbTextboxes()
 
 bool CuiColorPicker::OnMessage(UIWidget * context, const UIMessage & msg)
 {
-	// Handle mouse input on the color wheel image
-	if (context == m_pageWheel)
+	// Handle mouse input on the color wheel image or parent page during drag
+	bool isWheelContext = (context == m_pageWheel);
+	bool isParentDrag = (m_draggingWheel && (context == &getPage()));
+
+	if (isWheelContext || isParentDrag)
 	{
-		if (msg.Type == UIMessage::LeftMouseDown)
+		if (msg.Type == UIMessage::LeftMouseDown && isWheelContext)
 		{
 			m_draggingWheel = true;
 			handleWheelInput(msg.MouseCoords.x, msg.MouseCoords.y);
@@ -1096,7 +1106,19 @@ bool CuiColorPicker::OnMessage(UIWidget * context, const UIMessage & msg)
 		{
 			if (m_draggingWheel)
 			{
-				handleWheelInput(msg.MouseCoords.x, msg.MouseCoords.y);
+				// Convert coords to wheel-local if needed
+				UIPoint localCoords = msg.MouseCoords;
+				if (!isWheelContext && m_pageWheel)
+				{
+					UIPoint wheelScreenPos;
+					m_pageWheel->GetWorldLocation(wheelScreenPos);
+					UIPoint contextScreenPos;
+					if (context)
+						context->GetWorldLocation(contextScreenPos);
+					localCoords.x = msg.MouseCoords.x + contextScreenPos.x - wheelScreenPos.x;
+					localCoords.y = msg.MouseCoords.y + contextScreenPos.y - wheelScreenPos.y;
+				}
+				handleWheelInput(localCoords.x, localCoords.y);
 				m_draggingWheel = false;
 			}
 			return false;
@@ -1106,7 +1128,19 @@ bool CuiColorPicker::OnMessage(UIWidget * context, const UIMessage & msg)
 			// Auto-update color preview as cursor moves while dragging
 			if (m_draggingWheel)
 			{
-				handleWheelInput(msg.MouseCoords.x, msg.MouseCoords.y);
+				// Convert coords to wheel-local if needed
+				UIPoint localCoords = msg.MouseCoords;
+				if (!isWheelContext && m_pageWheel)
+				{
+					UIPoint wheelScreenPos;
+					m_pageWheel->GetWorldLocation(wheelScreenPos);
+					UIPoint contextScreenPos;
+					if (context)
+						context->GetWorldLocation(contextScreenPos);
+					localCoords.x = msg.MouseCoords.x + contextScreenPos.x - wheelScreenPos.x;
+					localCoords.y = msg.MouseCoords.y + contextScreenPos.y - wheelScreenPos.y;
+				}
+				handleWheelInput(localCoords.x, localCoords.y);
 			}
 			return false;
 		}
@@ -1282,8 +1316,9 @@ void CuiColorPicker::handleWheelInput(int x, int y)
 	// Normalized distance from center: 0.0 = dead center, 1.0 = edge
 	float dist = sqrtf(dx * dx + dy * dy) / imgRadius;
 
-	// Ignore clicks clearly outside the wheel circle (small margin for usability)
-	if (dist > 1.05f)
+	// When not dragging, ignore clicks clearly outside the wheel circle
+	// When dragging, clamp to edge to allow smooth selection at maximum saturation
+	if (!m_draggingWheel && dist > 1.05f)
 		return;
 
 	// Clamp to circle edge

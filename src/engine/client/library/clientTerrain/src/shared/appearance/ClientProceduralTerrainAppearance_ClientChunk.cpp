@@ -16,6 +16,7 @@
 #include "clientGraphics/StaticShader.h"
 #include "clientObject/ShadowBlobManager.h"
 #include "clientObject/ReticleManager.h"
+#include "clientTerrain/CityTerrainLayerManager.h"
 #include "clientTerrain/ClientProceduralTerrainAppearance_Cache.h"
 #include "clientTerrain/ClientProceduralTerrainAppearance_ShaderCache.h"
 #include "clientTerrain/ClientProceduralTerrainAppearance_ShaderData.h"
@@ -267,7 +268,19 @@ bool ClientProceduralTerrainAppearance::ClientChunk::getHeightAt (const Vector& 
 			if (m_shaderSetList[i]->getHeightAt (start, end, info))
 			{
 				if (height)
-					*height = info.getPoint().y;
+				{
+					float baseHeight = info.getPoint().y;
+					float modifiedHeight = baseHeight;
+
+					if (CityTerrainLayerManager::getModifiedHeight(pos.x, pos.z, baseHeight, modifiedHeight))
+					{
+						*height = modifiedHeight;
+					}
+					else
+					{
+						*height = baseHeight;
+					}
+				}
 
 				return true;
 			}
@@ -298,10 +311,27 @@ bool ClientProceduralTerrainAppearance::ClientChunk::getHeightAt (const Vector& 
 			if (m_shaderSetList[i]->getHeightAt (start, end, info))
 			{
 				if (height)
-					*height = info.getPoint().y;
+				{
+					float baseHeight = info.getPoint().y;
+					float modifiedHeight = baseHeight;
 
-				if (normal)
+					if (CityTerrainLayerManager::getModifiedHeight(pos.x, pos.z, baseHeight, modifiedHeight))
+					{
+						*height = modifiedHeight;
+						if (normal)
+							*normal = Vector::unitY;
+					}
+					else
+					{
+						*height = baseHeight;
+						if (normal)
+							*normal = info.getNormal();
+					}
+				}
+				else if (normal)
+				{
 					*normal = info.getNormal();
+				}
 
 				return true;
 			}
@@ -718,7 +748,15 @@ void ClientProceduralTerrainAppearance::ClientChunk::create (const ClientCreateC
 						const int iX = indexX + vid.x;
 						const int iZ = indexZ + vid.z;
 
-						const Vector position = vertexPositionMap->getData (iX, iZ);
+						Vector position = vertexPositionMap->getData (iX, iZ);
+
+						// Apply height modification from city terrain flattening
+						float modifiedHeight = position.y;
+						if (CityTerrainLayerManager::getModifiedHeight(position.x, position.z, position.y, modifiedHeight))
+						{
+							position.y = modifiedHeight;
+						}
+
 						vertexList[i] = position;
 						normalList[i] = ccd_vertexNormalMap->getData(iX, iZ);
 						colorList[i] = ccd_colorMap->getData(iX, iZ).convert();
@@ -776,8 +814,18 @@ void ClientProceduralTerrainAppearance::ClientChunk::create (const ClientCreateC
 				int x;
 				int z;
 				for (z = originOffset; z < originOffset + actualNumberOfPoles; z++)
+				{
 					for (x = originOffset; x < originOffset + actualNumberOfPoles; x++)
-						vertices.push_back (vertexPositionMap->getData (x, z));
+					{
+						Vector pos = vertexPositionMap->getData (x, z);
+						float modifiedHeight = pos.y;
+						if (CityTerrainLayerManager::getModifiedHeight(pos.x, pos.z, pos.y, modifiedHeight))
+						{
+							pos.y = modifiedHeight;
+						}
+						vertices.push_back (pos);
+					}
+				}
 			}
 
 			//-- todo index list is the same for every chunk

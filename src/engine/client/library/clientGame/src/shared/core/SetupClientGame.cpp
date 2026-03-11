@@ -133,6 +133,7 @@
 #include "clientGame/RemoteCreatureController.h"
 #include "clientGame/RemoteShipController.h"
 #include "clientGame/RoleIconManager.h"
+#include "clientGame/RtCameraManager.h"
 #include "clientGame/SaddleManager.h"
 #include "clientGame/ShipComponentPowerEffectsManagerClient.h"
 #include "clientGame/ShipController.h"
@@ -664,6 +665,7 @@ void SetupClientGame::install (const Data &data)
 		MatchMakingManager::install();
 		CustomerServiceManager::install();
 		AlarmManager::install();
+		RtCameraManager::install();
 		ChatLogManager::install();
 		ClientTextManager::install();
 		CommunityManager::install();

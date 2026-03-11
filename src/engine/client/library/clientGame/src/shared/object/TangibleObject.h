@@ -109,6 +109,10 @@ public:
 		struct RemoteStreamStartTime;
 		struct RemoteEmitterParentId;
 		struct RemoteEmitterVolume;
+		struct RtScreenLinkedCamera;
+		struct RtCameraFov;
+		struct RtCameraResolution;
+		struct RtCameraActive;
 		struct DamageTaken
 		{
 			typedef std::pair<TangibleObject *, int> Payload;
@@ -249,6 +253,10 @@ private:
 		typedef DefaultCallback<Messages::RemoteStreamStartTime, std::string> RemoteStreamStartTime;
 		typedef DefaultCallback<Messages::RemoteEmitterParentId, std::string> RemoteEmitterParentId;
 		typedef DefaultCallback<Messages::RemoteEmitterVolume, std::string> RemoteEmitterVolume;
+		typedef DefaultCallback<Messages::RtScreenLinkedCamera, std::string> RtScreenLinkedCamera;
+		typedef DefaultCallback<Messages::RtCameraFov, std::string>         RtCameraFov;
+		typedef DefaultCallback<Messages::RtCameraResolution, std::string>  RtCameraResolution;
+		typedef DefaultCallback<Messages::RtCameraActive, std::string>      RtCameraActive;
 		typedef DefaultCallback<Messages::ConditionModified, int>           ConditionModified;
 		typedef DefaultCallback<Messages::MaxHitPointsModified, int>        MaxHitPointsModified;
 	};
@@ -266,6 +274,10 @@ private:
 	friend Callbacks::RemoteStreamStartTime;
 	friend Callbacks::RemoteEmitterParentId;
 	friend Callbacks::RemoteEmitterVolume;
+	friend Callbacks::RtScreenLinkedCamera;
+	friend Callbacks::RtCameraFov;
+	friend Callbacks::RtCameraResolution;
+	friend Callbacks::RtCameraActive;
 	friend Callbacks::ConditionModified;
 	friend Callbacks::MaxHitPointsModified;
 
@@ -296,6 +308,15 @@ private:
 	void                          clearRemoteVideoStream();
 	void                          updateVideoEmitterAudio();
 	void                          clearVideoEmitterAudio();
+
+	// RT Camera System
+	void                          rtScreenLinkedCameraModified(const std::string & value);
+	void                          rtCameraFovModified(const std::string & value);
+	void                          rtCameraResolutionModified(const std::string & value);
+	void                          rtCameraActiveModified(const std::string & value);
+	void                          updateRtCameraFeed();
+	void                          clearRtCameraFeed();
+	void                          updateRtScreenTexture();
 
 	void                          updateInterestingAttachedObject(int objectCondition);
 
@@ -331,6 +352,10 @@ private:
 	Archive::AutoDeltaVariableCallback<std::string, Callbacks::RemoteStreamStartTime, TangibleObject> m_remoteStreamStartTime;
 	Archive::AutoDeltaVariableCallback<std::string, Callbacks::RemoteEmitterParentId, TangibleObject> m_remoteEmitterParentId;
 	Archive::AutoDeltaVariableCallback<std::string, Callbacks::RemoteEmitterVolume, TangibleObject> m_remoteEmitterVolume;
+	Archive::AutoDeltaVariableCallback<std::string, Callbacks::RtScreenLinkedCamera, TangibleObject> m_rtScreenLinkedCamera;
+	Archive::AutoDeltaVariableCallback<std::string, Callbacks::RtCameraFov, TangibleObject> m_rtCameraFov;
+	Archive::AutoDeltaVariableCallback<std::string, Callbacks::RtCameraResolution, TangibleObject> m_rtCameraResolution;
+	Archive::AutoDeltaVariableCallback<std::string, Callbacks::RtCameraActive, TangibleObject> m_rtCameraActive;
 	Archive::AutoDeltaVariableCallback<int,         Callbacks::DamageTaken, TangibleObject>    m_damageTaken;
 	Archive::AutoDeltaVariableCallback<int, Callbacks::MaxHitPointsModified, TangibleObject>   m_maxHitPoints;
 

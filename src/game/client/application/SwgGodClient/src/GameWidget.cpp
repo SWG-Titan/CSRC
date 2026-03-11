@@ -1947,6 +1947,13 @@ Object* GameWidget::createObjectFromTemplateAtPoint(const std::string& templateN
 	{
 		//if there's no terrain, put the object at the camera's pivot point (the crossbars)
 		result = GodClientData::getInstance().getCameraPivotPoint();
+
+		// Use player's cell when using fallback camera pivot point
+		GroundScene const * const gs = dynamic_cast<GroundScene const *>(Game::getScene());
+		if (gs && gs->getPlayer())
+		{
+			cellProperty = gs->getPlayer()->getParentCell();
+		}
 	}
 
 	if(result == Vector::zero)

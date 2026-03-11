@@ -518,7 +518,11 @@ void SwgCuiPlayerQuestConversation::onTargetChanged(bool const &)
 
 			s_conversationActive = true;
 
-			CuiConversationManager::start(n);
+			// Note: Do NOT call CuiConversationManager::start(n) here.
+			// The conversation has already been started (either by the player clicking on the NPC
+			// or by the server via OnStartNpcConversation). Calling start() again would send
+			// another npcConversationStart command to the server, causing OnStartNpcConversation
+			// to trigger again and resulting in an infinite loop.
 		}
 	}
 }
@@ -706,7 +710,10 @@ void SwgCuiPlayerQuestConversation::update(float deltaTimeSecs)
 			s_conversationHasFocus = currentNode.getType() == ConversationNode::cn_conversation;
 
 			// special case code for conversations
-			if (s_conversationHasFocus && ((currentNode.getId() != s_conversationNode.getId()) || !s_conversationActive || !isSpaceScene))
+			// Skip conversation nodes if we're not in an active conversation or not in space
+			// Note: We no longer compare against s_conversationNode.getId() because onResponsesChanged
+			// generates new IDs which would cause valid conversation nodes to be incorrectly skipped
+			if (s_conversationHasFocus && (!s_conversationActive || !isSpaceScene))
 			{
 				// set this node as the current node.
 				m_currentNodeId = currentNode.getId();
@@ -779,7 +786,12 @@ void SwgCuiPlayerQuestConversation::update(float deltaTimeSecs)
 	}
 	else
 	{
-		closeNextFrame();
+		// Only close if we're not in an active conversation
+		// When s_conversationActive is true, we may just be waiting for data from the server
+		if (!s_conversationActive)
+		{
+			closeNextFrame();
+		}
 	}
 
 	if (m_popup) 

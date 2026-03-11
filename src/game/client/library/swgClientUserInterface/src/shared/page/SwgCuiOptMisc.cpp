@@ -162,6 +162,9 @@ SwgCuiOptBase ("SwgCuiOptMisc", page)
 
 	getCodeDataObject(TUICheckbox, checkbox, "checkShowAppearanceInventory");
 	registerCheckbox(*checkbox, CuiPreferences::setShowAppearanceInventory, CuiPreferences::getShowAppearanceInventory, SwgCuiOptBase::getTrue);
+
+	getCodeDataObject(TUICheckbox, checkbox, "checkCinematicConversation");
+	registerCheckbox(*checkbox, CuiPreferences::setCinematicConversationEnabled, CuiPreferences::getCinematicConversationEnabled, SwgCuiOptBase::getFalse);
 }
 
 //----------------------------------------------------------------------

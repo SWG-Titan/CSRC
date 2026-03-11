@@ -594,6 +594,10 @@ public:
 
 	static bool  getHideCharactersOnClosedGalaxies();
 	static void  setHideCharactersOnClosedGalaxies(bool hide);
+
+	// KOTOR-style cinematic conversation mode
+	static bool  getCinematicConversationEnabled();
+	static void  setCinematicConversationEnabled(bool enabled);
 };
 
 //======================================================================

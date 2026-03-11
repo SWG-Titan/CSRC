@@ -51,6 +51,9 @@
 #include "swgClientUserInterface/SwgCuiCalendarEventEditor.h"
 #include "swgClientUserInterface/SwgCuiCalendarSettings.h"
 #include "swgClientUserInterface/SwgCuiChatRooms.h"
+#include "swgClientUserInterface/SwgCuiCinematicConversation.h"
+#include "swgClientUserInterface/SwgCuiCityTerrainPainter.h"
+#include "swgClientUserInterface/SwgCuiTerraforming.h"
 #include "swgClientUserInterface/SwgCuiClusterSelection.h"
 #include "swgClientUserInterface/SwgCuiCollections.h"
 #include "swgClientUserInterface/SwgCuiCommandBrowser.h"
@@ -279,6 +282,13 @@ void SwgCuiMediatorFactorySetup::install ()
 	MAKE_SWG_CTOR_WS (CalendarEventEditor,            "/CalendarEventEditor.eventEditor");
 	MAKE_SWG_CTOR_WS (CalendarEventDetails,           "/CalendarEventDetails.detailsWindow");
 	MAKE_SWG_CTOR_WS (CalendarSettings,               "/CalendarSettings.settingsWindow");
+
+	// KOTOR-style cinematic conversation (ground only)
+	MAKE_SWG_CTOR_WS (CinematicConversation,          "/CinematicConversation.convo");
+
+	// City Terrain Painter
+	MAKE_SWG_CTOR_WS (CityTerrainPainter,             "/GroundHUD.CityTerrainPainter.terrainPainterWindow");
+	MAKE_SWG_CTOR_WS (Terraforming,                   "/GroundHUD.TerraformingSystem.terraformingWindow");
 
 	//space
 	MAKE_SWG_CTOR_WS (SpaceConversation,              "/space.convo");

@@ -414,6 +414,9 @@ namespace
 	bool  ms_overheadMapShowBuildings = true;
 
 	bool  ms_hideCharactersOnClosedGalaxies = false;
+
+	// KOTOR-style cinematic conversation mode
+	bool  ms_cinematicConversationEnabled = false;
 }
 
 //----------------------------------------------------------------------
@@ -3685,6 +3688,20 @@ void CuiPreferences::setHideCharactersOnClosedGalaxies(bool hide)
 bool CuiPreferences::getHideCharactersOnClosedGalaxies()
 {
 	return ms_hideCharactersOnClosedGalaxies;
+}
+
+//----------------------------------------------------------------------
+
+void CuiPreferences::setCinematicConversationEnabled(bool enabled)
+{
+	ms_cinematicConversationEnabled = enabled;
+}
+
+//----------------------------------------------------------------------
+
+bool CuiPreferences::getCinematicConversationEnabled()
+{
+	return ms_cinematicConversationEnabled;
 }
 
 //======================================================================

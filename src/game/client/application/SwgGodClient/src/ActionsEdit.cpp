@@ -399,6 +399,13 @@ void ActionsEdit::internalPaste(GodClientData::ClipboardList_t& clip) const
 	if(gcd->pasteLocationKnown())
 	{
 		intersection_p = gcd->absorbPasteLocation();
+
+		// Use player's cell when paste location is pre-assigned
+		GroundScene const * const gs = dynamic_cast<GroundScene const *>(Game::getScene());
+		if (gs && gs->getPlayer())
+		{
+			cellProperty = gs->getPlayer()->getParentCell();
+		}
 	}
 	else
 	{

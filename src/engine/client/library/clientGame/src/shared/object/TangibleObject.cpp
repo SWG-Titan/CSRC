@@ -20,7 +20,9 @@
 #include "clientGame/Game.h"
 #include "clientGame/ManufactureSchematicObject.h"
 #include "clientGame/PlayerObject.h"
+#include "clientGame/RtCameraManager.h"
 #include "clientGame/SlotRuleManager.h"
+#include "clientGraphics/Camera.h"
 #include "clientGraphics/RenderWorld.h"
 #include "clientGraphics/StaticShader.h"
 #include "clientGraphics/Texture.h"
@@ -65,6 +67,7 @@
 #include <map>
 #include <vector>
 #include <cctype>
+#include <cfloat>
 #include <cstdlib>
 #include <string.h>
 
@@ -243,6 +246,73 @@ namespace TangibleObjectNamespace
 
 	typedef std::map<TangibleObject const *, RemoteImageRuntimeData> RemoteImageRuntimeDataMap;
 	RemoteImageRuntimeDataMap ms_remoteImageRuntimeDataMap;
+
+	// Media distance tracking - only render closest media objects to conserve GPU memory
+	float const cs_mediaMaxRenderDistance = 100.0f;  // Maximum distance to render any media
+	float const cs_mediaMaxRenderDistanceSquared = cs_mediaMaxRenderDistance * cs_mediaMaxRenderDistance;
+	int const cs_maxActivePaintings = 1;  // Only render 1 painting at a time
+	int const cs_maxActiveVideoPlayers = 1;  // Only render 1 video player at a time
+	int const cs_maxActiveRtScreens = 1;  // Only render 1 RT screen at a time
+
+	// Track the currently active media object (closest one)
+	TangibleObject const * ms_closestPainting = nullptr;
+	TangibleObject const * ms_closestVideoPlayer = nullptr;
+	TangibleObject const * ms_closestRtScreen = nullptr;
+	float ms_closestPaintingDistSq = FLT_MAX;
+	float ms_closestVideoPlayerDistSq = FLT_MAX;
+	float ms_closestRtScreenDistSq = FLT_MAX;
+
+	// Frame tracking for resetting distance calculations
+	unsigned long ms_lastMediaFrameTime = 0;
+
+	// Reset tracking each frame (called automatically when frame time changes)
+	void checkAndResetMediaDistanceTracking()
+	{
+		unsigned long const currentTime = GetTickCount();
+		// Reset if more than 10ms since last check (new frame)
+		if (currentTime - ms_lastMediaFrameTime > 10)
+		{
+			ms_closestPainting = nullptr;
+			ms_closestVideoPlayer = nullptr;
+			ms_closestRtScreen = nullptr;
+			ms_closestPaintingDistSq = FLT_MAX;
+			ms_closestVideoPlayerDistSq = FLT_MAX;
+			ms_closestRtScreenDistSq = FLT_MAX;
+			ms_lastMediaFrameTime = currentTime;
+		}
+	}
+
+	// Check if this object should be the active media renderer based on distance
+	bool shouldRenderMedia(TangibleObject const * obj, TangibleObject const *& closestTracker, float & closestDistSq)
+	{
+		if (!obj || !obj->isInWorld())
+			return false;
+
+		// Reset tracking if this is a new frame
+		checkAndResetMediaDistanceTracking();
+
+		Camera const * playerCamera = Game::getCamera();
+		if (!playerCamera)
+			return true;  // No camera, allow rendering
+
+		Vector const objPos = obj->getPosition_w();
+		Vector const camPos = playerCamera->getPosition_w();
+		float const distSq = objPos.magnitudeBetweenSquared(camPos);
+
+		// Too far away
+		if (distSq > cs_mediaMaxRenderDistanceSquared)
+			return false;
+
+		// Check if we're the closest
+		if (distSq < closestDistSq)
+		{
+			closestDistSq = distSq;
+			closestTracker = obj;
+		}
+
+		// Only render if we're the closest
+		return (closestTracker == obj);
+	}
 
 	Tag const TAG_MAIN = TAG(M,A,I,N);
 	float const cs_magicPaintingOverlayHeight = 2.0f;
@@ -1070,8 +1140,12 @@ namespace VideoStreamNamespace
 		return true;
 	}
 
-	unsigned int const VIDEO_WIDTH = 640;
-	unsigned int const VIDEO_HEIGHT = 360;
+	// Video player resolution - capped at 720p maximum to conserve GPU memory
+	// Using 16:9 aspect ratio at 360p for optimal performance
+	unsigned int const VIDEO_MAX_WIDTH = 1280;   // 720p max width
+	unsigned int const VIDEO_MAX_HEIGHT = 720;   // 720p max height
+	unsigned int const VIDEO_WIDTH = 640;        // Default 360p width
+	unsigned int const VIDEO_HEIGHT = 360;       // Default 360p height
 	unsigned int const VIDEO_PITCH = VIDEO_WIDTH * 4;
 
 	enum ResolveState
@@ -1662,6 +1736,10 @@ m_remoteStreamAspect     (),
 m_remoteStreamStartTime  (),
 m_remoteEmitterParentId  (),
 m_remoteEmitterVolume    (),
+m_rtScreenLinkedCamera   (),
+m_rtCameraFov            (),
+m_rtCameraResolution     (),
+m_rtCameraActive         (),
 m_damageTaken            (),
 m_maxHitPoints           (),
 m_components             (),
@@ -1702,6 +1780,10 @@ m_effectsMap()
 	m_remoteStreamStartTime.setSourceObject(this);
 	m_remoteEmitterParentId.setSourceObject(this);
 	m_remoteEmitterVolume.setSourceObject(this);
+	m_rtScreenLinkedCamera.setSourceObject(this);
+	m_rtCameraFov.setSourceObject(this);
+	m_rtCameraResolution.setSourceObject(this);
+	m_rtCameraActive.setSourceObject(this);
 	m_damageTaken.setSourceObject    (this);
 	m_condition.setSourceObject      (this);
 	m_maxHitPoints.setSourceObject   (this);
@@ -1733,6 +1815,10 @@ m_effectsMap()
 	addSharedVariable_np(m_remoteStreamStartTime);
 	addSharedVariable_np(m_remoteEmitterParentId);
 	addSharedVariable_np(m_remoteEmitterVolume);
+	addSharedVariable_np(m_rtScreenLinkedCamera);
+	addSharedVariable_np(m_rtCameraFov);
+	addSharedVariable_np(m_rtCameraResolution);
+	addSharedVariable_np(m_rtCameraActive);
 
 	m_effectsMap.setOnErase(this, &TangibleObject::OnObjectEffectErased);
 	m_effectsMap.setOnInsert(this, &TangibleObject::OnObjectEffectInsert);
@@ -1782,6 +1868,9 @@ TangibleObject::~TangibleObject()
 	}
 
 	clearRemoteImageTexture();
+	clearRemoteVideoStream();
+	clearVideoEmitterAudio();
+	clearRtCameraFeed();
 }
 
 // ----------------------------------------------------------------------
@@ -1830,19 +1919,40 @@ float TangibleObject::alter(const float elapsedTime)
 			if(isInWorld())
 			{
 				VerifyObjectEffects();
+
+				// Magic painting - only render if we're the closest one
 				if (hasCondition(C_magicPaintingUrl))
 				{
-					updateRemoteImageTexture();
-					updateGifAnimation(elapsedTime);
+					if (shouldRenderMedia(this, ms_closestPainting, ms_closestPaintingDistSq))
+					{
+						updateRemoteImageTexture();
+						updateGifAnimation(elapsedTime);
+					}
 				}
+
+				// Video player - only render if we're the closest one
 				if (hasCondition(C_magicVideoPlayer))
 				{
-					updateRemoteVideoStream();
+					if (shouldRenderMedia(this, ms_closestVideoPlayer, ms_closestVideoPlayerDistSq))
+					{
+						updateRemoteVideoStream();
+					}
 				}
+
 				if (!m_remoteEmitterParentId.get().empty())
 				{
 					updateVideoEmitterAudio();
 				}
+
+				// Update RT Screen texture from camera feed - only render if we're the closest one
+				if (!m_rtScreenLinkedCamera.get().empty())
+				{
+					if (shouldRenderMedia(this, ms_closestRtScreen, ms_closestRtScreenDistSq))
+					{
+						updateRtScreenTexture();
+					}
+				}
+
 				// Restart any object effects that are finished playing.
 				std::map<std::string, Object *>::const_iterator iter = m_objectEffects.begin();
 				for(; iter != m_objectEffects.end(); ++iter)
@@ -1939,6 +2049,8 @@ void TangibleObject::addToWorld()
 		updateRemoteVideoStream();
 	if (!m_remoteEmitterParentId.get().empty())
 		updateVideoEmitterAudio();
+	if (!m_rtScreenLinkedCamera.get().empty())
+		updateRtCameraFeed();
 }
 
 // ----------------------------------------------------------------------
@@ -1969,6 +2081,8 @@ void TangibleObject::removeFromWorld()
 		clearRemoteVideoStream();
 	if (!m_remoteEmitterParentId.get().empty())
 		clearVideoEmitterAudio();
+	if (!m_rtScreenLinkedCamera.get().empty())
+		clearRtCameraFeed();
 
 	ClientObject::removeFromWorld();
 }
@@ -2265,6 +2379,23 @@ void TangibleObject::updateRemoteImageTexture()
 		if (runtimeIt != ms_remoteImageRuntimeDataMap.end())
 			clearRemoteImageTexture();
 		return;
+	}
+
+	// Distance check - don't create image resources for distant objects
+	Camera const * playerCamera = Game::getCamera();
+	if (playerCamera)
+	{
+		Vector const objPos = getPosition_w();
+		Vector const camPos = playerCamera->getPosition_w();
+		float const distSq = objPos.magnitudeBetweenSquared(camPos);
+		if (distSq > cs_mediaMaxRenderDistanceSquared)
+		{
+			// Too far away - clean up any existing resources
+			RemoteImageRuntimeDataMap::iterator runtimeIt = ms_remoteImageRuntimeDataMap.find(this);
+			if (runtimeIt != ms_remoteImageRuntimeDataMap.end())
+				clearRemoteImageTexture();
+			return;
+		}
 	}
 
 	RemoteImageRuntimeData & runtimeData = getRemoteImageRuntimeData(this);
@@ -2633,6 +2764,23 @@ void TangibleObject::updateRemoteVideoStream()
 		if (runtimeIt != ms_videoStreamRuntimeDataMap.end())
 			clearRemoteVideoStream();
 		return;
+	}
+
+	// Distance check - don't create video resources for distant objects
+	Camera const * playerCamera = Game::getCamera();
+	if (playerCamera)
+	{
+		Vector const objPos = getPosition_w();
+		Vector const camPos = playerCamera->getPosition_w();
+		float const distSq = objPos.magnitudeBetweenSquared(camPos);
+		if (distSq > cs_mediaMaxRenderDistanceSquared)
+		{
+			// Too far away - clean up any existing resources
+			VideoStreamRuntimeDataMap::iterator runtimeIt = ms_videoStreamRuntimeDataMap.find(this);
+			if (runtimeIt != ms_videoStreamRuntimeDataMap.end())
+				clearRemoteVideoStream();
+			return;
+		}
 	}
 
 	if (!loadVlcApi())
@@ -3057,6 +3205,192 @@ void TangibleObject::clearVideoEmitterAudio()
 
 //----------------------------------------------------------------------
 
+void TangibleObject::rtScreenLinkedCameraModified(const std::string & value)
+{
+	UNREF(value);
+	updateRtCameraFeed();
+}
+
+//----------------------------------------------------------------------
+
+void TangibleObject::rtCameraFovModified(const std::string & value)
+{
+	// If this is a camera with a valid FOV, update the RtCameraManager directly
+	if (!value.empty())
+	{
+		float fov = static_cast<float>(atof(value.c_str()));
+		if (fov >= 30.0f && fov <= 120.0f)
+		{
+			NetworkId const cameraId = getNetworkId();
+			RtCameraManager::updateCameraFov(cameraId, fov);
+		}
+	}
+}
+
+//----------------------------------------------------------------------
+
+void TangibleObject::rtCameraResolutionModified(const std::string & value)
+{
+	UNREF(value);
+	updateRtCameraFeed();
+}
+
+//----------------------------------------------------------------------
+
+void TangibleObject::rtCameraActiveModified(const std::string & value)
+{
+	// Camera state changed
+	NetworkId const cameraId = getNetworkId();
+
+	if (value.empty() || value == "0")
+	{
+		// Camera is being deactivated - unregister the feed
+		RtCameraManager::unregisterFeed(cameraId);
+	}
+	else
+	{
+		// Camera is being activated - schedule for alter to set up the feed
+		scheduleForAlter();
+	}
+}
+
+//----------------------------------------------------------------------
+
+void TangibleObject::updateRtCameraFeed()
+{
+	// This object is an RT Screen - check if we have a linked camera
+	std::string const & linkedCameraStr = m_rtScreenLinkedCamera.get();
+	if (linkedCameraStr.empty())
+	{
+		clearRtCameraFeed();
+		return;
+	}
+
+	if (!isInWorld())
+	{
+		clearRtCameraFeed();
+		return;
+	}
+
+	// Distance check - don't create RT resources for distant screens
+	Camera const * playerCamera = Game::getCamera();
+	if (playerCamera)
+	{
+		Vector const objPos = getPosition_w();
+		Vector const camPos = playerCamera->getPosition_w();
+		float const distSq = objPos.magnitudeBetweenSquared(camPos);
+		if (distSq > cs_mediaMaxRenderDistanceSquared)
+		{
+			// Too far away - clean up any existing resources
+			clearRtCameraFeed();
+			return;
+		}
+	}
+
+	// Get the linked camera object
+	NetworkId const cameraNetId(linkedCameraStr);
+	if (!cameraNetId.isValid())
+	{
+		clearRtCameraFeed();
+		return;
+	}
+
+	Object * const cameraObj = NetworkIdManager::getObjectById(cameraNetId);
+	TangibleObject * const cameraTangible = TangibleObject::asTangibleObject(cameraObj);
+	if (!cameraTangible)
+	{
+		// Camera not loaded yet, try again later
+		scheduleForAlter();
+		return;
+	}
+
+	// Check if camera is active
+	std::string const & cameraActiveStr = cameraTangible->m_rtCameraActive.get();
+	if (cameraActiveStr.empty() || cameraActiveStr == "0")
+	{
+		clearRtCameraFeed();
+		return;
+	}
+
+	// Get resolution and FOV
+	int resolution = RtCameraManager::DEFAULT_RESOLUTION;
+	std::string const & resStr = m_rtCameraResolution.get();
+	if (!resStr.empty())
+	{
+		resolution = atoi(resStr.c_str());
+		if (resolution < 128) resolution = 128;
+		if (resolution > 512) resolution = 512;
+	}
+
+	float fov = 60.0f;
+	std::string const & fovStr = cameraTangible->m_rtCameraFov.get();
+	if (!fovStr.empty())
+	{
+		fov = static_cast<float>(atof(fovStr.c_str()));
+		if (fov < 30.0f) fov = 30.0f;
+		if (fov > 120.0f) fov = 120.0f;
+	}
+
+	// Register the feed with RtCameraManager
+	NetworkId const screenId = getNetworkId();
+
+	// Check if already registered
+	if (RtCameraManager::getFeedByScreen(screenId) != nullptr)
+	{
+		// Already registered, just update
+		RtCameraManager::updateCameraTransform(cameraNetId, cameraTangible->getTransform_o2w());
+		RtCameraManager::updateCameraFov(cameraNetId, fov);
+		return;
+	}
+
+	// Register new feed
+	RtCameraManager::registerFeed(cameraNetId, screenId, resolution, fov);
+}
+
+//----------------------------------------------------------------------
+
+void TangibleObject::clearRtCameraFeed()
+{
+	NetworkId const myId = getNetworkId();
+
+	// If this is a screen, unregister by screen ID
+	RtCameraManager::unregisterFeedByScreen(myId);
+
+	// If this is a camera, unregister by camera ID
+	RtCameraManager::unregisterFeed(myId);
+}
+
+//----------------------------------------------------------------------
+
+void TangibleObject::updateRtScreenTexture()
+{
+	// This object is an RT Screen - apply the camera's render texture to our appearance
+	std::string const & linkedCameraStr = m_rtScreenLinkedCamera.get();
+	if (linkedCameraStr.empty())
+		return;
+
+	NetworkId const screenId = getNetworkId();
+
+	// Get the render texture from RtCameraManager
+	Texture const * const cameraTexture = RtCameraManager::getScreenTexture(screenId);
+	if (!cameraTexture)
+	{
+		// No texture yet, make sure we're registered for the feed
+		updateRtCameraFeed();
+		return;
+	}
+
+	// Apply texture to this screen's appearance
+	Appearance * const appearance = getAppearance();
+	if (appearance)
+	{
+		// Use TAG_MAIN to replace the primary texture
+		appearance->setTexture(TAG_MAIN, *cameraTexture);
+	}
+}
+
+//----------------------------------------------------------------------
+
 CustomizationData *TangibleObject::fetchCustomizationData ()
 {
 	CustomizationDataProperty * const cdprop = safe_cast<CustomizationDataProperty *>(getProperty (CustomizationDataProperty::getClassPropertyId()));
@@ -3157,6 +3491,37 @@ void TangibleObject::Callbacks::DamageTaken::modified(TangibleObject & target, c
 		if (value > oldValue)
 			Transceivers::damageTaken.emitMessage (Messages::DamageTaken::Payload (&target, value - oldValue));
 	}
+}
+
+//----------------------------------------------------------------------
+
+// Explicit template specializations for RT Camera callbacks
+template<>
+void TangibleObject::Callbacks::DefaultCallback<TangibleObject::Messages::RtScreenLinkedCamera, std::string>::modified(TangibleObject & target, const std::string& oldValue, const std::string& value, bool) const
+{
+	UNREF(oldValue);
+	target.rtScreenLinkedCameraModified(value);
+}
+
+template<>
+void TangibleObject::Callbacks::DefaultCallback<TangibleObject::Messages::RtCameraFov, std::string>::modified(TangibleObject & target, const std::string& oldValue, const std::string& value, bool) const
+{
+	UNREF(oldValue);
+	target.rtCameraFovModified(value);
+}
+
+template<>
+void TangibleObject::Callbacks::DefaultCallback<TangibleObject::Messages::RtCameraResolution, std::string>::modified(TangibleObject & target, const std::string& oldValue, const std::string& value, bool) const
+{
+	UNREF(oldValue);
+	target.rtCameraResolutionModified(value);
+}
+
+template<>
+void TangibleObject::Callbacks::DefaultCallback<TangibleObject::Messages::RtCameraActive, std::string>::modified(TangibleObject & target, const std::string& oldValue, const std::string& value, bool) const
+{
+	UNREF(oldValue);
+	target.rtCameraActiveModified(value);
 }
 
 //----------------------------------------------------------------------
