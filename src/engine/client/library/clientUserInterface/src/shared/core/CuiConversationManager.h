@@ -14,6 +14,7 @@ class CachedNetworkId;
 class NetworkId;
 class StringId;
 class ProsePackage;
+class MessageQueueNpcConversationCameraCommand;
 
 //----------------------------------------------------------------------
 
@@ -97,6 +98,11 @@ public:
 	static const std::string & getSoundEffect();
 	static float getClientOnlyWindowCloseTime();
 
+	// Server-driven camera commands during cinematic conversation
+	typedef void (*CameraCommandHandler)(MessageQueueNpcConversationCameraCommand const *);
+	static void setCameraCommandHandler(CameraCommandHandler handler);
+	static void handleNpcConversationCameraCommand(MessageQueueNpcConversationCameraCommand const * cmd);
+
 private:
 
 	static void                              makeSinglePlayerResponses ();
@@ -107,6 +113,7 @@ private:
 	static Unicode::String                   ms_lastMessage;
 	static CachedNetworkId                   ms_targetId;
 	static uint32                            ms_appearanceOverrideSharedTemplateCrc;
+	static CameraCommandHandler              ms_cameraCommandHandler;
 };
 
 //----------------------------------------------------------------------

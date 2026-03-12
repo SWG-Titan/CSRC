@@ -1041,6 +1041,8 @@ enum GameControllerMessage
         CM_tangibleDynamicsData, // 1252 - sends TangibleDynamics force parameters to client
         CM_mountTangibleObject, // 1253 - mount/dismount player on tangible object for seamless movement
 
+        CM_npcConversationCameraCommand, // 1254 - server-driven camera during NPC conversation
+
         CM_COUNT
 };
 

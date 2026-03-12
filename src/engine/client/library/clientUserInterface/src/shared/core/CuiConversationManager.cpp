@@ -28,6 +28,7 @@
 #include "sharedMessageDispatch/Emitter.h"
 #include "sharedMessageDispatch/Message.h"
 #include "sharedMessageDispatch/Transceiver.h"
+#include "sharedNetworkMessages/MessageQueueNpcConversationCameraCommand.h"
 #include "sharedNetworkMessages/MessageQueueSpatialChat.h"
 #include "sharedObject/CachedNetworkId.h"
 #include "sharedObject/Controller.h"
@@ -102,6 +103,7 @@ Unicode::String                                         CuiConversationManager::
 CachedNetworkId                                         CuiConversationManager::ms_targetId;
 CuiConversationManager::CuiConversationManagerAction    CuiConversationManager::ms_action;
 uint32                                                  CuiConversationManager::ms_appearanceOverrideSharedTemplateCrc;
+CuiConversationManager::CameraCommandHandler           CuiConversationManager::ms_cameraCommandHandler = nullptr;
 
 const char * const CuiConversationManager::Messages::RESPONSES_CHANGED = "CuiConversationManager::RESPONSES_CHANGED";
 const char * const CuiConversationManager::Messages::TARGET_CHANGED    = "CuiConversationManager::TARGET_CHANGED";
@@ -144,7 +146,24 @@ void CuiConversationManager::remove ()
 
 	s_installed      = false;
 }
-	
+
+//----------------------------------------------------------------------
+
+void CuiConversationManager::setCameraCommandHandler(CameraCommandHandler handler)
+{
+	ms_cameraCommandHandler = handler;
+}
+
+//----------------------------------------------------------------------
+
+void CuiConversationManager::handleNpcConversationCameraCommand(MessageQueueNpcConversationCameraCommand const * cmd)
+{
+	if (ms_cameraCommandHandler && cmd)
+	{
+		ms_cameraCommandHandler(cmd);
+	}
+}
+
 //----------------------------------------------------------------------
 
 bool CuiConversationManager::respond (const NetworkId & id, int responseNum)

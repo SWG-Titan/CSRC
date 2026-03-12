@@ -75,6 +75,9 @@ public:
 	static void setEnabled(bool enabled);
 	static bool isActive();
 
+	// Handle server-driven camera commands (called from PlayerCreatureController)
+	static void handleCameraCommand(class MessageQueueNpcConversationCameraCommand const * cmd);
+
 public:
 	SwgCuiCinematicConversation(UIPage & page);
 	virtual ~SwgCuiCinematicConversation();
@@ -109,7 +112,9 @@ private:
 	void restoreCameraControl();
 	void updateCameraFocus(float deltaTime);
 	void setCameraShot(CameraShotType shotType);
+	void setCameraShot(CameraShotType shotType, float transitionDuration);
 	void transitionCamera(Vector const & targetPos, Vector const & targetLookAt, float duration);
+	void applyCameraCommand(class MessageQueueNpcConversationCameraCommand const * cmd);
 	Vector computeNpcHeadPosition() const;
 	Vector computePlayerPosition() const;
 

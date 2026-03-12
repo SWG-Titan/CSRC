@@ -6,8 +6,19 @@
 	PackSize='a,a'
 	ScrollExtent='1024,768'
 	Size='1024,768'
-	Visible='true'
+	Visible='false'
+	GetsInput='false'
+	AbsorbsInput='false'
 >
+	<Page
+		Location='0,0'
+		Name='convo'
+		PackLocation='cfc,cfc'
+		PackSize='a,a'
+		ScrollExtent='1024,768'
+		Size='1024,768'
+		Visible='true'
+	>
 	<Data
 		Name='CodeData'
 		letterboxTop='letterboxTop'
@@ -16,7 +27,6 @@
 		npcName='dialoguePanel.npcName'
 		npcMessage='dialoguePanel.npcMessage'
 		responsePanel='dialoguePanel.responsePanel'
-		npcViewerPage='npcViewerPage'
 		endConversation='dialoguePanel.endConversation'
 		response1='dialoguePanel.responsePanel.response1'
 		response2='dialoguePanel.responsePanel.response2'
@@ -50,45 +60,16 @@
 		Size='1024,0'
 	/>
 
-	<!-- NPC Viewer Page (optional 3D head view) -->
+	<!-- Dialogue Panel (KOTOR: bottom-anchored, no portrait) -->
 	<Page
 		BackgroundColor='#000000'
-		BackgroundOpacity='0.80'
-		Location='50,100'
-		Name='npcViewerPage'
-		ScrollExtent='200,200'
-		Size='200,200'
-		Visible='true'
-	>
-		<CuiWidget3dObjectListViewer
-			cameralookatcenter='true'
-			CameraPitch='0.3'
-			cameratransformtoobj='true'
-			camerayaw='180'
-			dragpitchok='false'
-			dragyawok='false'
-			fieldofview='40'
-			GetsInput='false'
-			Location='10,10'
-			Name='viewer'
-			PackLocation='cfc,cfc'
-			PackSize='a,a'
-			paused='false'
-			ScrollExtent='180,180'
-			Size='180,180'
-		/>
-	</Page>
-
-	<!-- Dialogue Panel -->
-	<Page
-		BackgroundColor='#000000'
-		BackgroundOpacity='0.85'
+		BackgroundOpacity='0.90'
 		Location='0,500'
 		Name='dialoguePanel'
 		PackLocation='cfc,fff'
 		PackSize='a,f'
-		ScrollExtent='1024,200'
-		Size='1024,200'
+		ScrollExtent='1024,268'
+		Size='1024,268'
 	>
 		<!-- NPC Name -->
 		<Text
@@ -114,8 +95,8 @@
 			Name='npcMessage'
 			PackLocation='nfn,nfn'
 			PackSize='a,f'
-			ScrollExtent='924,50'
-			Size='924,50'
+			ScrollExtent='924,56'
+			Size='924,56'
 			Style='/Styles.New.textStyleBody'
 			TextAlignment='Left'
 			TextAlignmentVertical='Top'
@@ -128,8 +109,8 @@
 			Name='responsePanel'
 			PackLocation='nfn,nfn'
 			PackSize='a,f'
-			ScrollExtent='924,90'
-			Size='924,90'
+			ScrollExtent='924,120'
+			Size='924,120'
 		>
 			<!-- Response 1 -->
 			<Page
@@ -178,7 +159,7 @@
 
 			<!-- Response 2 -->
 			<Page
-				Location='0,15'
+				Location='0,20'
 				Name='response2'
 				ScrollExtent='900,20'
 				Size='900,20'
@@ -223,7 +204,7 @@
 
 			<!-- Response 3 -->
 			<Page
-				Location='0,30'
+				Location='0,40'
 				Name='response3'
 				ScrollExtent='900,20'
 				Size='900,20'
@@ -268,7 +249,7 @@
 
 			<!-- Response 4 -->
 			<Page
-				Location='0,45'
+				Location='0,60'
 				Name='response4'
 				ScrollExtent='900,20'
 				Size='900,20'
@@ -313,7 +294,7 @@
 
 			<!-- Response 5 -->
 			<Page
-				Location='0,60'
+				Location='0,80'
 				Name='response5'
 				ScrollExtent='900,20'
 				Size='900,20'
@@ -358,7 +339,7 @@
 
 			<!-- Response 6 -->
 			<Page
-				Location='0,75'
+				Location='0,100'
 				Name='response6'
 				ScrollExtent='900,20'
 				Size='900,20'
@@ -405,7 +386,7 @@
 		<!-- End Conversation Button -->
 		<Button
 			Font='/fonts.Formal_Medium.medium'
-			Location='824,170'
+			Location='824,238'
 			Name='endConversation'
 			ScrollExtent='150,25'
 			Size='150,25'
@@ -415,6 +396,7 @@
 			TextColor='#FF6666'
 			TextColorHighlight='#FF0000'
 		/>
+	</Page>
 	</Page>
 </Page>
 

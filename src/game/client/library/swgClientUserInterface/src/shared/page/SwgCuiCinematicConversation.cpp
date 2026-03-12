@@ -17,15 +17,18 @@
 #include "clientObject/GameCamera.h"
 #include "clientUserInterface/CuiConversationManager.h"
 #include "clientUserInterface/CuiManager.h"
+#include "clientUserInterface/CuiMediatorFactory.h"
 #include "clientUserInterface/CuiObjectTextManager.h"
 #include "clientUserInterface/CuiPreferences.h"
 #include "clientUserInterface/CuiWidget3dObjectListViewer.h"
+#include "sharedNetworkMessages/MessageQueueNpcConversationCameraCommand.h"
 #include "sharedCollision/CollisionProperty.h"
 #include "sharedFoundation/Clock.h"
 #include "sharedMessageDispatch/Transceiver.h"
 #include "sharedObject/CachedNetworkId.h"
 #include "sharedObject/NetworkIdManager.h"
 
+#include "swgClientUserInterface/SwgCuiMediatorTypes.h"
 #include "UIButton.h"
 #include "UIData.h"
 #include "UIPage.h"
@@ -164,9 +167,9 @@ m_timeSinceLastShotChange(0.0f)
 	getCodeDataObject(TUIPage, m_responsePanel, "responsePanel");
 	getCodeDataObject(TUIButton, m_endConversationButton, "endConversation");
 
-	// Get optional NPC viewer
+	// Get optional NPC viewer (KOTOR style has no portrait)
 	UIBaseObject * viewerObj = nullptr;
-	if (getCodeDataObject(TUIPage, m_npcViewerPage, "npcViewerPage", false))
+	if (getCodeDataObject(TUIPage, m_npcViewerPage, "npcViewerPage", true))
 	{
 		viewerObj = m_npcViewerPage->GetChild("viewer");
 		m_npcViewer = dynamic_cast<CuiWidget3dObjectListViewer *>(viewerObj);
@@ -263,6 +266,8 @@ void SwgCuiCinematicConversation::performActivate()
 	m_callback->connect(*this, &SwgCuiCinematicConversation::onConversationEnded,
 		static_cast<CuiConversationManager::Messages::ConversationEnded *>(0));
 
+	CuiConversationManager::setCameraCommandHandler(&SwgCuiCinematicConversation::handleCameraCommand);
+
 	// Start letterbox animation
 	m_letterboxTargetHeight = LETTERBOX_HEIGHT;
 	m_letterboxAnimating = true;
@@ -307,6 +312,8 @@ void SwgCuiCinematicConversation::performDeactivate()
 	m_callback->disconnect(*this, &SwgCuiCinematicConversation::onConversationEnded,
 		static_cast<CuiConversationManager::Messages::ConversationEnded *>(0));
 
+	CuiConversationManager::setCameraCommandHandler(nullptr);
+
 	// Release pointer
 	CuiManager::requestPointer(false);
 
@@ -349,8 +356,11 @@ void SwgCuiCinematicConversation::initializeCameraControl()
 	m_cameraControlActive = true;
 	m_timeSinceLastShotChange = 0.0f;
 
-	// Start with a medium shot
-	setCameraShot(CST_MediumShot);
+	// Start with a medium shot only if we have a valid target in the world
+	if (NetworkIdManager::getObjectById(m_targetNpcId))
+	{
+		setCameraShot(CST_MediumShot);
+	}
 }
 
 //----------------------------------------------------------------------
@@ -409,7 +419,11 @@ void SwgCuiCinematicConversation::calculateCloseUpShot(Vector & outCameraPos, Ve
 {
 	Object * const targetObj = NetworkIdManager::getObjectById(m_targetNpcId);
 	if (!targetObj)
+	{
+		outCameraPos = m_currentCameraPos;
+		outLookAt = m_currentCameraLookAt;
 		return;
+	}
 
 	outLookAt = computeNpcHeadPosition();
 
@@ -428,7 +442,11 @@ void SwgCuiCinematicConversation::calculateMediumShot(Vector & outCameraPos, Vec
 {
 	Object * const targetObj = NetworkIdManager::getObjectById(m_targetNpcId);
 	if (!targetObj)
+	{
+		outCameraPos = m_currentCameraPos;
+		outLookAt = m_currentCameraLookAt;
 		return;
+	}
 
 	Vector npcHeadPos = computeNpcHeadPosition();
 
@@ -451,7 +469,11 @@ void SwgCuiCinematicConversation::calculateOverShoulderShot(Vector & outCameraPo
 	CreatureObject * const player = Game::getPlayerCreature();
 	Object * const targetObj = NetworkIdManager::getObjectById(m_targetNpcId);
 	if (!player || !targetObj)
+	{
+		outCameraPos = m_currentCameraPos;
+		outLookAt = m_currentCameraLookAt;
 		return;
+	}
 
 	// Look at NPC
 	outLookAt = computeNpcHeadPosition();
@@ -477,7 +499,11 @@ void SwgCuiCinematicConversation::calculateTwoShot(Vector & outCameraPos, Vector
 	CreatureObject * const player = Game::getPlayerCreature();
 	Object * const targetObj = NetworkIdManager::getObjectById(m_targetNpcId);
 	if (!player || !targetObj)
+	{
+		outCameraPos = m_currentCameraPos;
+		outLookAt = m_currentCameraLookAt;
 		return;
+	}
 
 	Vector playerPos = computePlayerPosition();
 	Vector npcPos = computeNpcHeadPosition();
@@ -500,6 +526,13 @@ void SwgCuiCinematicConversation::calculateTwoShot(Vector & outCameraPos, Vector
 //----------------------------------------------------------------------
 
 void SwgCuiCinematicConversation::setCameraShot(CameraShotType shotType)
+{
+	setCameraShot(shotType, DEFAULT_CAMERA_TRANSITION_DURATION);
+}
+
+//----------------------------------------------------------------------
+
+void SwgCuiCinematicConversation::setCameraShot(CameraShotType shotType, float transitionDuration)
 {
 	m_currentShotType = shotType;
 
@@ -530,11 +563,16 @@ void SwgCuiCinematicConversation::setCameraShot(CameraShotType shotType)
 				targetPos = targetLookAt - playerForward * CLOSE_UP_DISTANCE;
 				targetPos.y = targetLookAt.y + 0.1f;
 			}
+			else
+			{
+				targetPos = m_currentCameraPos;
+				targetLookAt = m_currentCameraLookAt;
+			}
 		}
 		break;
 	}
 
-	transitionCamera(targetPos, targetLookAt, DEFAULT_CAMERA_TRANSITION_DURATION);
+	transitionCamera(targetPos, targetLookAt, transitionDuration);
 
 	// Reset shot hold timer
 	m_timeSinceLastShotChange = 0.0f;
@@ -663,15 +701,98 @@ void SwgCuiCinematicConversation::updateCameraFocus(float deltaTime)
 		camera->setTransformIJK_o2p(right, up, forward);
 	}
 
-	// Update shot hold timer and potentially change shots
-	m_timeSinceLastShotChange += deltaTime;
-
-	// Auto-change shots for variety (optional - can be disabled)
-	if (m_timeSinceLastShotChange >= m_shotHoldTime && !m_cameraTransitioning)
+	// Update shot hold timer and potentially change shots (only if no server override)
+	if (m_shotHoldTime > 0.0f)
 	{
-		// Cycle through shot types
-		int nextShot = (static_cast<int>(m_currentShotType) + 1) % 4; // Cycle through first 4 shot types
-		setCameraShot(static_cast<CameraShotType>(nextShot));
+		m_timeSinceLastShotChange += deltaTime;
+
+		// Auto-change shots for variety (optional - can be disabled)
+		if (m_timeSinceLastShotChange >= m_shotHoldTime && !m_cameraTransitioning)
+		{
+			// Cycle through shot types
+			int nextShot = (static_cast<int>(m_currentShotType) + 1) % 4; // Cycle through first 4 shot types
+			setCameraShot(static_cast<CameraShotType>(nextShot));
+		}
+	}
+}
+
+//----------------------------------------------------------------------
+
+void SwgCuiCinematicConversation::handleCameraCommand(MessageQueueNpcConversationCameraCommand const * cmd)
+{
+	if (!cmd || !ms_enabled)
+		return;
+
+	CuiMediator * const mediator = CuiMediatorFactory::getInWorkspace(CuiMediatorTypes::WS_CinematicConversation, false, false);
+	SwgCuiCinematicConversation * const cinematic = dynamic_cast<SwgCuiCinematicConversation *>(mediator);
+	if (cinematic && cinematic->isActive())
+	{
+		cinematic->applyCameraCommand(cmd);
+	}
+}
+
+//----------------------------------------------------------------------
+
+void SwgCuiCinematicConversation::applyCameraCommand(MessageQueueNpcConversationCameraCommand const * cmd)
+{
+	if (!cmd || !m_cameraControlActive)
+		return;
+
+	float const duration = cmd->getTransitionDuration();
+	if (duration > 0.0f)
+	{
+		m_cameraTransitionDuration = duration;
+	}
+
+	float const holdTime = cmd->getHoldTime();
+	if (holdTime > 0.0f)
+	{
+		m_shotHoldTime = holdTime;
+		m_timeSinceLastShotChange = 0.0f;
+	}
+	else if (holdTime == 0.0f)
+	{
+		// Zero means disable auto-shot-change for this shot
+		m_shotHoldTime = 0.0f;
+	}
+
+	switch (cmd->getCommandType())
+	{
+	case MessageQueueNpcConversationCameraCommand::CT_LookAtTarget:
+		{
+			NetworkId const & targetId = cmd->getTargetId();
+			if (targetId.isValid())
+			{
+				Object * const targetObj = NetworkIdManager::getObjectById(targetId);
+				if (targetObj)
+				{
+					Vector lookAt = CuiObjectTextManager::getCurrentObjectHeadPoint_o(*targetObj);
+					lookAt.y += HEAD_HEIGHT_OFFSET;
+					lookAt = targetObj->rotateTranslate_o2w(lookAt);
+
+					// Keep camera roughly where it is, rotate to look at target
+					Vector targetPos = m_currentCameraPos;
+					transitionCamera(targetPos, lookAt, duration);
+				}
+			}
+		}
+		break;
+
+	case MessageQueueNpcConversationCameraCommand::CT_LookAtPosition:
+		{
+			Vector lookAt(cmd->getPositionX(), cmd->getPositionY(), cmd->getPositionZ());
+			Vector targetPos = m_currentCameraPos;
+			transitionCamera(targetPos, lookAt, duration);
+		}
+		break;
+
+	case MessageQueueNpcConversationCameraCommand::CT_ReturnToSpeaker:
+		setCameraShot(CST_MediumShot, duration > 0.0f ? duration : DEFAULT_CAMERA_TRANSITION_DURATION);
+		break;
+
+	case MessageQueueNpcConversationCameraCommand::CT_None:
+	default:
+		break;
 	}
 }
 

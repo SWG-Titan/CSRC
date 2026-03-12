@@ -157,11 +157,23 @@ void DataTableTool::run(void)
 
 	m_inputFile = CommandLine::getOptionString(SNAME_INPUT_FILE);
 
+	bool const isIff = DataTableWriter::isIffFile(m_inputFile.c_str());
 	isXml = DataTableWriter::isXmlFile(m_inputFile.c_str());
 
 	if (CommandLine::getOccurrenceCount(SNAME_OUTPUT_FILE))
 	{
 		m_outputFile = CommandLine::getOptionString(SNAME_OUTPUT_FILE);
+	}
+	else if (isIff)
+	{
+		// Decompile: default output is same path with .tab extension
+		m_outputFile = m_inputFile;
+		std::string::size_type dot = m_outputFile.find_last_of('.');
+		if (dot != std::string::npos)
+			m_outputFile.erase(dot);
+		m_outputFile.append(".tab");
+		m_outputPath = m_outputFile;
+		removeFileName(m_outputPath);
 	}
 	else
 	{
@@ -173,7 +185,10 @@ void DataTableTool::run(void)
 	testOutput = CommandLine::getOccurrenceCount(SNAME_TEST);
 
 	DataTableWriter dl;
-	dl.loadFromSpreadsheet(m_inputFile.c_str());
+	if (isIff)
+		dl.loadFromIff(m_inputFile.c_str());
+	else
+		dl.loadFromSpreadsheet(m_inputFile.c_str());
 
 	if (!m_outputFile.empty())
 	{
@@ -185,13 +200,13 @@ void DataTableTool::run(void)
 			// todo: perforce edit???
 		}
 
-		bool success = dl.save( m_outputFile.c_str() );
+		bool success = isIff ? dl.saveToTab(m_outputFile.c_str()) : dl.save(m_outputFile.c_str());
 
-		printf("%s creating data table: %s\n", success ? "SUCCESS" : "FAILURE", m_outputFile.c_str());
+		printf("%s %s data table: %s\n", success ? "SUCCESS" : "FAILURE", isIff ? "decompiling" : "creating", m_outputFile.c_str());
 
 		// todo: perforce add
 
-		if (testOutput)
+		if (testOutput && !isIff)
 			runTest(m_outputFile.c_str());
 	}
 	else

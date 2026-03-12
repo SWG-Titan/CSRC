@@ -92,6 +92,7 @@
 #include "sharedNetworkMessages/MessageQueueMissionGenericResponse.h"
 #include "sharedNetworkMessages/MessageQueueMissionListResponse.h"
 #include "sharedNetworkMessages/MessageQueueNetworkId.h"
+#include "sharedNetworkMessages/MessageQueueNpcConversationCameraCommand.h"
 #include "sharedNetworkMessages/MessageQueueNpcConversationMessage.h"
 #include "sharedNetworkMessages/MessageQueueObjectMenuRequest.h"
 #include "sharedNetworkMessages/MessageQueueQuestTaskCounterMessage.h"
@@ -1725,6 +1726,16 @@ void PlayerCreatureController::handleMessage (const int message, const float val
 				}
 
 				CuiConversationManager::setResponses (sv);
+			}
+		}
+		break;
+
+	case CM_npcConversationCameraCommand:
+		{
+			MessageQueueNpcConversationCameraCommand const * const cmd = dynamic_cast<MessageQueueNpcConversationCameraCommand const *>(data);
+			if (cmd)
+			{
+				CuiConversationManager::handleNpcConversationCameraCommand(cmd);
 			}
 		}
 		break;

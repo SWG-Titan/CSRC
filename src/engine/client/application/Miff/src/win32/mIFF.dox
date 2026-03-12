@@ -5,13 +5,14 @@ printf("\
 Usage:\n\
   mIFF {-%c <filename>|--%s=<filename>}\n\
        [{-%c <filename>|--%s=<filename>} | {-%c|--%s}]\n\
-       [{-%c|--%s}] [{-%c|--%s}] [{-%c|--%s}]\n\n", 
+       [{-%c|--%s}] [{-%c|--%s}] [{-%c|--%s}] [{-%c|--%s}]\n\n", 
        SNAME_INPUT_FILE, LNAME_INPUT_FILE,
        SNAME_OUTPUT_FILE, LNAME_OUTPUT_FILE,
        SNAME_PRAGMA_TARGET, LNAME_PRAGMA_TARGET,
        SNAME_CCCP, LNAME_CCCP, 
        SNAME_VERBOSE, LNAME_VERBOSE, 
-       SNAME_DEBUG, LNAME_DEBUG);
+       SNAME_DEBUG, LNAME_DEBUG,
+       SNAME_DECOMPILE, LNAME_DECOMPILE);
 printf("\
   mIFF {-%c|--%s}\n\n", SNAME_HELP, LNAME_HELP);
 
@@ -45,6 +46,10 @@ printf("\
                 [optional] enable debug mode (save intermediate files).\n", SNAME_DEBUG, LNAME_DEBUG);
 printf("\
     -%c,--%s\n\
+                [optional] decompile .iff binary to Miff source (.i).\n\
+                Input must be .iff; output defaults to .i.\n", SNAME_DECOMPILE, LNAME_DECOMPILE);
+printf("\
+    -%c,--%s\n\
                 [very optional] this help screen.\n", SNAME_HELP, LNAME_HELP);
 printf("\
 Examples:\n\
@@ -60,3 +65,6 @@ printf("\
     mIFF -%c foo.bar --%s\n\
         will generate output file specified by #pragma statements            \n\
         within file foo.bar.\n", SNAME_INPUT_FILE, LNAME_PRAGMA_TARGET);
+printf("\
+    mIFF -%c foo.iff --%s\n\
+        decompiles binary foo.iff to Miff source foo.i (and chunk_*.bin files).\n", SNAME_INPUT_FILE, LNAME_DECOMPILE);

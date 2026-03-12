@@ -46,10 +46,13 @@
 
 #include "InputFileHandler.h"
 #include "OutputFileHandler.h"
+#include "sharedFile/Iff.h"
+#include "sharedFoundation/Tag.h"
 
 #include <string.h>					// for memset()
 #include <stdio.h>					// FILE stuff
 #include <direct.h>					// for getcwd()
+#include <io.h>						// for _unlink
 #include <stdlib.h>					// for tolower()
 #include <process.h>				// for system()
 
@@ -59,7 +62,7 @@ const int	entryPointVersion = 1;				// constantly check DataEntryPoint.h to see 
 OutputFileHandler   *outfileHandler = NULL;
 const int   bufferSize = 16 * 1024 * 1024;
 const int   maxStringSize = 256;
-const char  version[] = "1.3 September 18, 2000";
+const char  version[] = "1.4 March 12t2026";
 
 // vars set by pragmas or via command line
 char        drive[4];                               // should be no more then 2 char "C:"
@@ -75,6 +78,7 @@ bool        usePragma = false;
 bool        useCCCP = false;
 bool        verboseMode = false;										// default to non-verbose mode
 bool        debugMode = false;                      // set this on and the preprocessed source file (mIFF.$$$) won't be deleted
+bool        decompileMode = false;                   // decompile .iff to Miff source instead of compile
 
 static bool runningUnderNT;
 
@@ -92,6 +96,7 @@ enum errorType {
 		ERR_OPTIONS         = -10,
 
 		ERR_WRITEERROR      = -11,
+		ERR_DECOMPILE       = -12,
 
 		ERR_NONE = 0
 	};
@@ -108,6 +113,7 @@ static const char * const LNAME_PRAGMA_TARGET = "pragmatarget";
 static const char * const LNAME_CCCP          = "cccp";
 static const char * const LNAME_VERBOSE       = "verbose";
 static const char * const LNAME_DEBUG         = "debug";
+static const char * const LNAME_DECOMPILE     = "decompile";
 
 static const char         SNAME_HELP          = 'h';
 static const char         SNAME_INPUT_FILE    = 'i';
@@ -116,6 +122,7 @@ static const char         SNAME_PRAGMA_TARGET = 'p';
 static const char         SNAME_CCCP          = 'c';
 static const char         SNAME_VERBOSE       = 'v';
 static const char         SNAME_DEBUG         = 'd';
+static const char         SNAME_DECOMPILE     = 'x';
 
 // following is the command line option spec tree needed for command line processing
 static CommandLine::OptionSpec optionSpecArray[] =
@@ -151,6 +158,9 @@ static CommandLine::OptionSpec optionSpecArray[] =
 
 				// if specified, enter debug info
 				OP_SINGLE_LIST_NODE(SNAME_DEBUG,   LNAME_DEBUG,   OP_ARG_NONE, OP_MULTIPLE_DENIED, OP_NODE_OPTIONAL),
+
+				// if specified, decompile .iff to source (instead of compile)
+				OP_SINGLE_LIST_NODE(SNAME_DECOMPILE, LNAME_DECOMPILE, OP_ARG_NONE, OP_MULTIPLE_DENIED, OP_NODE_OPTIONAL),
 			OP_END_LIST(),
 		OP_END_SWITCH_NODE(),
 
@@ -166,6 +176,7 @@ static void handleError(errorType error);
 static int preprocessSource(char *sourceName);
 static void callbackFunction(void);
 static errorType loadInputToBuffer(void *destAddr, int maxBufferSize);
+static errorType decompileIff(const char *inputPath, const char *outputPath);
 
 // functions called by parser.yac and parser.lex
 extern "C" void MIFFMessage(char *msg, int forceOut);
@@ -267,8 +278,15 @@ static void callbackFunction(void)
 	errorFlag = evaluateArgs();
 	if (ERR_NONE == errorFlag)
 	{
-		outfileHandler = new OutputFileHandler(outFileName);
-		MIFFCompile(sourceBuffer, inFileName);
+		if (decompileMode)
+		{
+			errorFlag = decompileIff(inFileName, outFileName);
+		}
+		else
+		{
+			outfileHandler = new OutputFileHandler(outFileName);
+			MIFFCompile(sourceBuffer, inFileName);
+		}
 	}
 	else
 		handleError(errorFlag);
@@ -360,10 +378,36 @@ static errorType evaluateArgs(void)
 
 
 	// handle options (get them out of the way, as we use them later)
-	useCCCP     = (CommandLine::getOccurrenceCount(SNAME_CCCP) != 0);
-	verboseMode = (CommandLine::getOccurrenceCount(SNAME_VERBOSE) != 0);
-	debugMode   = (CommandLine::getOccurrenceCount(SNAME_DEBUG) != 0);
+	useCCCP       = (CommandLine::getOccurrenceCount(SNAME_CCCP) != 0);
+	verboseMode   = (CommandLine::getOccurrenceCount(SNAME_VERBOSE) != 0);
+	debugMode     = (CommandLine::getOccurrenceCount(SNAME_DEBUG) != 0);
+	decompileMode = (CommandLine::getOccurrenceCount(SNAME_DECOMPILE) != 0);
 
+	if (decompileMode)
+	{
+		// Decompile mode: input must be .iff, output defaults to .i
+		const size_t inLen = strlen(inFileName);
+		if (inLen < 5 || _stricmp(inFileName + inLen - 4, ".iff") != 0)
+		{
+			fprintf(stderr, "MIFF: decompile requires .iff input file\n");
+			return ERR_DECOMPILE;
+		}
+		if (!CommandLine::getOccurrenceCount(SNAME_OUTPUT_FILE) && !CommandLine::getOccurrenceCount(SNAME_PRAGMA_TARGET))
+		{
+			// Override default output: .iff -> .i
+			strcpy(outFileName, inFileName);
+			char *terminator = strrchr(outFileName, '.');
+			if (terminator)
+				*terminator = 0;
+			strcat(outFileName, ".i");
+		}
+		if (verboseMode)
+		{
+			sprintf(err_msg, "Decompiling %s to %s...\n", inFileName, outFileName);
+			MIFFMessage(err_msg, 0);
+		}
+		return retVal;
+	}
 
 	// preprocess the input file
 	if (0 == preprocessSource(inFileName))
@@ -584,6 +628,138 @@ static errorType evaluateArgs(void)
 
 
 //---------------------------------------------------------------------------
+// Decompile binary .iff to Miff source (.i)
+//
+// Return Value:
+//   errorType
+//
+// Remarks:
+//   Walks the IFF structure and emits FORM/CHUNK with INCLUDEBIN for chunk data.
+//
+// See Also:
+//   decompileIffRecurse
+//
+// Revisions and History:
+//   2025 - created
+//
+static void decompileIffRecurse(Iff &iff, FILE *out, int indent, const char *outputDir, int &chunkCounter, errorType &retVal);
+
+static errorType decompileIff(const char *inputPath, const char *outputPath)
+{
+	Iff iff;
+	if (!iff.open(inputPath, true))
+	{
+		fprintf(stderr, "MIFF: could not open IFF file \"%s\"\n", inputPath);
+		return ERR_FILENOTFOUND;
+	}
+
+	FILE *out = fopen(outputPath, "wt");
+	if (!out)
+	{
+		fprintf(stderr, "MIFF: could not open output file \"%s\"\n", outputPath);
+		return ERR_WRITEERROR;
+	}
+
+	// Extract output directory for chunk temp files
+	char outputDir[maxStringSize * 2];
+	strcpy(outputDir, outputPath);
+	char *lastSlash = strrchr(outputDir, '\\');
+	if (!lastSlash)
+		lastSlash = strrchr(outputDir, '/');
+	if (lastSlash)
+		lastSlash[1] = '\0';
+	else
+		outputDir[0] = '\0';
+
+	int chunkCounter = 0;
+	errorType retVal = ERR_NONE;
+	decompileIffRecurse(iff, out, 0, outputDir, chunkCounter, retVal);
+
+	fclose(out);
+
+	if (retVal != ERR_NONE)
+	{
+		_unlink(outputPath);
+		return retVal;
+	}
+	return ERR_NONE;
+}
+
+static void decompileIffRecurse(Iff &iff, FILE *out, int indent, const char *outputDir, int &chunkCounter, errorType &retVal)
+{
+	if (retVal != ERR_NONE)
+		return;
+
+	while (!iff.atEndOfForm())
+	{
+		if (iff.isCurrentForm())
+		{
+			iff.enterForm();
+			Tag formName = iff.getCurrentName();
+			char tagStr[5];
+			ConvertTagToString(formName, tagStr);
+
+			for (int i = 0; i < indent; ++i)
+				fprintf(out, "    ");
+			fprintf(out, "FORM \"%s\" {\n", tagStr);
+
+			decompileIffRecurse(iff, out, indent + 1, outputDir, chunkCounter, retVal);
+
+			for (int i = 0; i < indent; ++i)
+				fprintf(out, "    ");
+			fprintf(out, "}\n");
+
+			iff.exitForm();
+		}
+		else
+		{
+			iff.enterChunk();
+			Tag chunkName = iff.getCurrentName();
+			char tagStr[5];
+			ConvertTagToString(chunkName, tagStr);
+
+			for (int i = 0; i < indent; ++i)
+				fprintf(out, "    ");
+			fprintf(out, "CHUNK \"%s\" {\n", tagStr);
+
+			const int chunkLen = iff.getChunkLengthLeft();
+			if (chunkLen > 0)
+			{
+				char chunkPath[maxStringSize];
+				sprintf(chunkPath, "%schunk_%d.bin", outputDir, chunkCounter++);
+
+				FILE *chunkFile = fopen(chunkPath, "wb");
+				if (chunkFile)
+				{
+					byte *data = iff.read_uint8(chunkLen);
+					if (data)
+					{
+						fwrite(data, 1, chunkLen, chunkFile);
+						delete[] data;
+					}
+					fclose(chunkFile);
+
+					for (int i = 0; i < indent + 1; ++i)
+						fprintf(out, "    ");
+					fprintf(out, "INCLUDEBIN \"chunk_%d.bin\"\n", chunkCounter - 1);
+				}
+				else
+				{
+					fprintf(stderr, "MIFF: could not create chunk file \"%s\"\n", chunkPath);
+					retVal = ERR_WRITEERROR;
+				}
+			}
+
+			for (int i = 0; i < indent; ++i)
+				fprintf(out, "    ");
+			fprintf(out, "}\n");
+
+			iff.exitChunk();
+		}
+	}
+}
+
+//---------------------------------------------------------------------------
 // reads the tmeporary files spit out by CCCP and stuffs the plain text into source buffer
 //
 // Return Value:
@@ -718,6 +894,14 @@ static void handleError(errorType error)
 
 		case ERR_OPTIONS:
 			MIFFMessage("ERROR: Failed to handle command line options\n", 1);
+			break;
+
+		case ERR_WRITEERROR:
+			MIFFMessage("ERROR: Failed to write output file\n", 1);
+			break;
+
+		case ERR_DECOMPILE:
+			MIFFMessage("ERROR: Decompile failed\n", 1);
 			break;
 
 		default:
